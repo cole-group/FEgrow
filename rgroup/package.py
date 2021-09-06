@@ -16,17 +16,17 @@ def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
 
 def rep2D(mol, idx=True):
     numbered = copy.deepcopy(mol)
+    numbered.RemoveAllConformers()
     for atom in numbered.GetAtoms():
         atom.SetAtomMapNum(atom.GetIdx())
     AllChem.Compute2DCoords(numbered)
     return numbered
 
 def draw3D(mol):
-    viewer = py3Dmol.view(width=300, height=300)
+    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
     viewer.addModel(Chem.MolToMolBlock(mol), 'mol')
     viewer.setStyle({"stick":{}})
     viewer.zoomTo()
-    viewer.show()
     return viewer
 
 
