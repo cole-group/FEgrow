@@ -1,5 +1,6 @@
 import copy
 
+import rdkit
 from rdkit import Chem
 from rdkit.Chem import Draw, AllChem
 from rdkit.Chem.rdMolAlign import AlignMol
@@ -75,18 +76,32 @@ def merge_R_group(mol, R_group, replaceIndex):
     # merge the two molecules
     combined = Chem.CombineMols(mol, R_group)
     emol = Chem.EditableMol(combined)
-    
-    # 
+
+    # connect
     bond_order = rgroup_R_atom.GetBonds()[0].GetBondType()
     emol.AddBond(replace_atom_neighbour.GetIdx(),
                  R_atom_neighbour.GetIdx() + mol.GetNumAtoms(),
                  order=bond_order)
+    # -1 accounts for the removed linking atom on the template
     emol.RemoveAtom(rgroup_R_atom.GetIdx() + mol.GetNumAtoms())
+    # remove the linking atom on the template
     emol.RemoveAtom(replace_atom.GetIdx())
-
+    
     merged = emol.GetMol()
     Chem.SanitizeMol(merged)
 
-    return merged
+    # prepare separately the template
+    etemp = Chem.EditableMol(mol)
+    etemp.RemoveAtom(replace_atom.GetIdx())
+    template = etemp.GetMol()
+
+    with_template = Mol(merged)
+    with_template.save_template(template)
+
+    return with_template
 
 
+class Mol(rdkit.Chem.rdchem.Mol):
+
+    def save_template(self, mol):
+        self.template = mol
