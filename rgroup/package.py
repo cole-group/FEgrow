@@ -32,6 +32,17 @@ def draw3D(mol):
     return viewer
 
 
+def draw3Dcons(mol):
+    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
+    for i in range(mol.GetNumConformers()):
+        mb = Chem.MolToMolBlock(mol, confId=i)
+        viewer.addModel(mb, 'mol')
+    viewer.setStyle({"stick":{}})
+    viewer.zoomTo()
+    return viewer
+
+
+
 def __getAttachmentVector(R_group):
     """ for a fragment to add, search for the position of 
     the attachment point (R) and extract the atom and the connected atom 
