@@ -17,8 +17,9 @@ def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
 def rep2D(mol, idx=True):
     numbered = copy.deepcopy(mol)
     numbered.RemoveAllConformers()
-    for atom in numbered.GetAtoms():
-        atom.SetAtomMapNum(atom.GetIdx())
+    if idx:
+        for atom in numbered.GetAtoms():
+            atom.SetAtomMapNum(atom.GetIdx())
     AllChem.Compute2DCoords(numbered)
     return numbered
 
@@ -30,7 +31,7 @@ def draw3D(mol):
     return viewer
 
 
-def getAttachmentVector(R_group):
+def __getAttachmentVector(R_group):
     """ for a fragment to add, search for the position of 
     the attachment point (R) and extract the atom and the connected atom 
     (currently only single bond supported)
@@ -56,7 +57,7 @@ def merge_R_group(mol, R_group, replaceIndex):
     https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py"""
     
     # the linking R atom on the R group
-    rgroup_R_atom, R_atom_neighbour = getAttachmentVector(R_group)
+    rgroup_R_atom, R_atom_neighbour = __getAttachmentVector(R_group)
     print(f'Rgroup atom index {rgroup_R_atom} neighbouring {R_atom_neighbour}')
     
     # atom to be replaced in the molecule
@@ -82,6 +83,10 @@ def merge_R_group(mol, R_group, replaceIndex):
                  order=bond_order)
     emol.RemoveAtom(rgroup_R_atom.GetIdx() + mol.GetNumAtoms())
     emol.RemoveAtom(replace_atom.GetIdx())
-    return emol.GetMol()
+
+    merged = emol.GetMol()
+    Chem.SanitizeMol(merged)
+
+    return merged
 
 
