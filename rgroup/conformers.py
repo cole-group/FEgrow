@@ -18,11 +18,11 @@ def duplicate_conformers(m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float
 
 
 def generate_conformers(mol: Chem.rdchem.Mol,
-                        ref_mol: Chem.rdchem.Mol,
                         num_conf: int,
                         minimum_conf_rms: Optional[float] = None,
                        ) -> List[Chem.rdchem.Mol]:
 	
+    ref_mol = mol.template
     # Add Hs so that conf gen is improved
     mol = deepcopy(mol)
     mol.RemoveAllConformers()
