@@ -13,7 +13,7 @@ def duplicate_conformers(m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float
             continue
         rms = AllChem.GetConformerRMS(m, new_conf_idx, i, prealigned=True)
         rmslist.append(rms)
-    return any(i < rms_limit for i in rmslist)
+    return any(rms < rms_limit for rms in rmslist)
 
 
 def generate_conformers(mol: Chem.rdchem.Mol,
@@ -31,10 +31,9 @@ def generate_conformers(mol: Chem.rdchem.Mol,
     dup_count = 0
     for i in range(num_conf):
     	# TODO - consider tethers as a feature
-        temp_mol = AllChem.ConstrainedEmbed(mol, ref_mol, randomseed=random.randint(1, 9e5))
-        print(list(temp_mol.GetConformers()))
+        temp_mol = AllChem.ConstrainedEmbed(deepcopy(mol), ref_mol, randomseed=random.randint(1, 9e5))
         conf_idx = mol.AddConformer(temp_mol.GetConformer(0), assignId=True)
-        if minimum_conf_rms is not None and False:
+        if minimum_conf_rms is not None:
             if duplicate_conformers(mol, conf_idx, rms_limit=minimum_conf_rms):
                 dup_count += 1
                 mol.RemoveConformer(conf_idx)
