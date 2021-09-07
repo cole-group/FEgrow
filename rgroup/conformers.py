@@ -8,11 +8,12 @@ from rdkit.Chem import AllChem, rdFMCS
 
 def duplicate_conformers(m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5) -> bool:
     rmslist = []
-    for i in range(m.GetNumConformers()):
-        if i == new_conf_idx:
+    for conf_idx in range(m.GetNumConformers()):
+        if conf_idx == new_conf_idx:
             continue
-        rms = AllChem.GetConformerRMS(m, new_conf_idx, i, prealigned=True)
+        rms = AllChem.GetConformerRMS(m, new_conf_idx, conf_idx, prealigned=True)
         rmslist.append(rms)
+    # True if it is too similar to any already generated conformers
     return any(rms < rms_limit for rms in rmslist)
 
 
