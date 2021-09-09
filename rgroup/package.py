@@ -6,6 +6,8 @@ from rdkit import Chem
 from rdkit.Chem import Draw, AllChem
 from rdkit.Chem.rdMolAlign import AlignMol
 import py3Dmol
+from MDAnalysis.analysis.distances import distance_array
+import numpy as np
 
 from .toxicity import tox_props
 from .conformers import generate_conformers
@@ -131,17 +133,33 @@ class Mol(rdkit.Chem.rdchem.Mol):
         viewer.zoomTo()
         return viewer
 
-    def generate_conformers(self, num_conf: int, minimum_conf_rms: Optional[float] = None):
+    def generate_conformers(self, num_conf: int, minimum_conf_rms: Optional[float]=None):
         cons = generate_conformers(self, num_conf, minimum_conf_rms)
         self.RemoveAllConformers()
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
 
-    def draw3Dconfs(self):
-        viewer = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
-        for i in range(self.GetNumConformers()):
-            mb = Chem.MolToMolBlock(self, confId=i)
-            viewer.addModel(mb, 'mol')
-        viewer.setStyle({"stick":{}})
-        viewer.zoomTo()
-        return viewer
+    def draw3Dconfs(self, view=None):
+        if view is None:
+            view = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
+
+        for conf in self.GetConformers():
+            mb = Chem.MolToMolBlock(self, confId=conf.GetId())
+            view.addModel(mb, 'mol')
+        # view.setStyle({"stick":{}})
+        view.zoomTo()
+        return view
+
+    def removeConfsClashingWithProdyProt(self, prot, min_dst_allowed=1):
+        prot_coords = prot.getCoords()
+
+        counter = 0
+        for conf in list(self.GetConformers())[::-1]:
+            confid = conf.GetId()
+
+            min_dst = np.min(distance_array(conf.GetPositions(), prot_coords))
+
+            if min_dst < min_dst_allowed:
+                self.RemoveConformer(confid)
+                print(f'Clash with the protein. Removing conformer id: {confid}')
+
 
