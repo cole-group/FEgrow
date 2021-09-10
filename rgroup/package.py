@@ -30,9 +30,9 @@ def rep2D(mol, idx=True):
     AllChem.Compute2DCoords(numbered)
     return numbered
 
-def draw3D(mol):
+def draw3D(mol, conf_id=-1):
     viewer = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
-    viewer.addModel(Chem.MolToMolBlock(mol), 'mol')
+    viewer.addModel(Chem.MolToMolBlock(mol, confId=conf_id), 'mol')
     viewer.setStyle({"stick":{}})
     viewer.zoomTo()
     return viewer
@@ -138,14 +138,19 @@ class Mol(rdkit.Chem.rdchem.Mol):
         self.RemoveAllConformers()
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
 
-    def draw3Dconfs(self, view=None):
+    def draw3Dconfs(self, view=None, confids=None):
         if view is None:
             view = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
+            view.setStyle({"stick":{}})
 
         for conf in self.GetConformers():
+            if confids is None:
+                selected = True
+            else:
+                selected = True if conf.GetId() in selected else False
             mb = Chem.MolToMolBlock(self, confId=conf.GetId())
             view.addModel(mb, 'mol')
-        # view.setStyle({"stick":{}})
+        
         view.zoomTo()
         return view
 
