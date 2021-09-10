@@ -1,16 +1,16 @@
 import copy
 from typing import Optional
 
-import rdkit
-from rdkit import Chem
-from rdkit.Chem import Draw, AllChem
-from rdkit.Chem.rdMolAlign import AlignMol
-import py3Dmol
-from MDAnalysis.analysis.distances import distance_array
 import numpy as np
+import py3Dmol
+import rdkit
+from MDAnalysis.analysis.distances import distance_array
+from rdkit import Chem
+from rdkit.Chem import AllChem, Draw
+from rdkit.Chem.rdMolAlign import AlignMol
 
-from .toxicity import tox_props
 from .conformers import generate_conformers
+from .toxicity import tox_props
 
 
 def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
@@ -30,80 +30,89 @@ def rep2D(mol, idx=True):
     AllChem.Compute2DCoords(numbered)
     return numbered
 
+
 def draw3D(mol):
-    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
-    viewer.addModel(Chem.MolToMolBlock(mol), 'mol')
-    viewer.setStyle({"stick":{}})
+    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
+    viewer.addModel(Chem.MolToMolBlock(mol), "mol")
+    viewer.setStyle({"stick": {}})
     viewer.zoomTo()
     return viewer
 
 
 def draw3Dcons(mol):
-    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
+    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
     for i in range(mol.GetNumConformers()):
         mb = Chem.MolToMolBlock(mol, confId=i)
-        viewer.addModel(mb, 'mol')
-    viewer.setStyle({"stick":{}})
+        viewer.addModel(mb, "mol")
+    viewer.setStyle({"stick": {}})
     viewer.zoomTo()
     return viewer
 
 
-
 def __getAttachmentVector(R_group):
-    """ for a fragment to add, search for the position of 
-    the attachment point (R) and extract the atom and the connected atom 
+    """for a fragment to add, search for the position of
+    the attachment point (R) and extract the atom and the connected atom
     (currently only single bond supported)
     rgroup: fragment passed as rdkit molecule
     return: tuple (ratom, ratom_neighbour)
     """
     for atom in R_group.GetAtoms():
         if not atom.GetAtomicNum() == 0:
-            continue 
-        
+            continue
+
         neighbours = atom.GetNeighbors()
         if len(neighbours) > 1:
-            raise Exception("The linking R atom in the R group has two or more attachment points. "
-                            "NOT IMPLEMENTED. ")
-        
+            raise Exception(
+                "The linking R atom in the R group has two or more attachment points. "
+                "NOT IMPLEMENTED. "
+            )
+
         return atom, neighbours[0]
-    
-    raise Exception('No R atom in the R group. ')
+
+    raise Exception("No R atom in the R group. ")
 
 
 def merge_R_group(mol, R_group, replaceIndex):
     """function originally copied from
     https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py"""
-    
+
     # the linking R atom on the R group
     rgroup_R_atom, R_atom_neighbour = __getAttachmentVector(R_group)
-    print(f'Rgroup atom index {rgroup_R_atom} neighbouring {R_atom_neighbour}')
-    
+    print(f"Rgroup atom index {rgroup_R_atom} neighbouring {R_atom_neighbour}")
+
     # atom to be replaced in the molecule
     replace_atom = mol.GetAtomWithIdx(replaceIndex)
-    assert len(replace_atom.GetNeighbors())==1, 'The atom being replaced on the molecule has more neighbour atoms than 1. Not supported.'
+    assert (
+        len(replace_atom.GetNeighbors()) == 1
+    ), "The atom being replaced on the molecule has more neighbour atoms than 1. Not supported."
     replace_atom_neighbour = replace_atom.GetNeighbors()[0]
-    
+
     # align the Rgroup
-    AlignMol(R_group, mol, atomMap=(
-        (R_atom_neighbour.GetIdx(),replace_atom.GetIdx()),
-        (rgroup_R_atom.GetIdx(), replace_atom_neighbour.GetIdx())
-                                    )
-            )
-    
+    AlignMol(
+        R_group,
+        mol,
+        atomMap=(
+            (R_atom_neighbour.GetIdx(), replace_atom.GetIdx()),
+            (rgroup_R_atom.GetIdx(), replace_atom_neighbour.GetIdx()),
+        ),
+    )
+
     # merge the two molecules
     combined = Chem.CombineMols(mol, R_group)
     emol = Chem.EditableMol(combined)
 
     # connect
     bond_order = rgroup_R_atom.GetBonds()[0].GetBondType()
-    emol.AddBond(replace_atom_neighbour.GetIdx(),
-                 R_atom_neighbour.GetIdx() + mol.GetNumAtoms(),
-                 order=bond_order)
+    emol.AddBond(
+        replace_atom_neighbour.GetIdx(),
+        R_atom_neighbour.GetIdx() + mol.GetNumAtoms(),
+        order=bond_order,
+    )
     # -1 accounts for the removed linking atom on the template
     emol.RemoveAtom(rgroup_R_atom.GetIdx() + mol.GetNumAtoms())
     # remove the linking atom on the template
     emol.RemoveAtom(replace_atom.GetIdx())
-    
+
     merged = emol.GetMol()
     Chem.SanitizeMol(merged)
 
@@ -119,7 +128,6 @@ def merge_R_group(mol, R_group, replaceIndex):
 
 
 class Mol(rdkit.Chem.rdchem.Mol):
-
     def save_template(self, mol):
         self.template = mol
 
@@ -127,24 +135,26 @@ class Mol(rdkit.Chem.rdchem.Mol):
         return tox_props(self)
 
     def draw3D(self):
-        viewer = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
-        viewer.addModel(Chem.MolToMolBlock(self), 'mol')
-        viewer.setStyle({"stick":{}})
+        viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
+        viewer.addModel(Chem.MolToMolBlock(self), "mol")
+        viewer.setStyle({"stick": {}})
         viewer.zoomTo()
         return viewer
 
-    def generate_conformers(self, num_conf: int, minimum_conf_rms: Optional[float]=None):
+    def generate_conformers(
+        self, num_conf: int, minimum_conf_rms: Optional[float] = None
+    ):
         cons = generate_conformers(self, num_conf, minimum_conf_rms)
         self.RemoveAllConformers()
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
 
     def draw3Dconfs(self, view=None):
         if view is None:
-            view = py3Dmol.view(width=300, height=300, viewergrid=(1,1))
+            view = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
 
         for conf in self.GetConformers():
             mb = Chem.MolToMolBlock(self, confId=conf.GetId())
-            view.addModel(mb, 'mol')
+            view.addModel(mb, "mol")
         # view.setStyle({"stick":{}})
         view.zoomTo()
         return view
@@ -160,6 +170,29 @@ class Mol(rdkit.Chem.rdchem.Mol):
 
             if min_dst < min_dst_allowed:
                 self.RemoveConformer(confid)
-                print(f'Clash with the protein. Removing conformer id: {confid}')
+                print(f"Clash with the protein. Removing conformer id: {confid}")
 
+    def to_file(self, file_name: str):
+        """
+        Write the molecule and all conformers to file.
 
+        Note:
+            The file type is worked out from the name extension by splitting on `.`.
+        """
+        file_type = file_name.split(".")[-1]
+        write_functions = {
+            "mol": Chem.MolToMolBlock,
+            "sdf": Chem.MolToMolBlock,
+            "pdb": Chem.MolToPDBBlock,
+            "xyz": Chem.MolToXYZBlock,
+        }
+
+        func = write_functions.get(file_type, None)
+        if func is None:
+            raise RuntimeError(
+                f"The file type {file_type} is not support please chose from {write_functions.keys()}"
+            )
+
+        with open(file_name, "w") as output:
+            for conformer in self.GetConformers():
+                output.write(func(self, confId=conformer.GetId()))
