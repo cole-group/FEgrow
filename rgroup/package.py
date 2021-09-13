@@ -2,9 +2,11 @@ import copy
 from typing import Optional
 
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import to_hex
+from MDAnalysis.analysis.distances import distance_array
 import py3Dmol
 import rdkit
-from MDAnalysis.analysis.distances import distance_array
 from rdkit import Chem
 from rdkit.Chem import AllChem, Draw
 from rdkit.Chem.rdMolAlign import AlignMol
@@ -148,20 +150,21 @@ class Mol(rdkit.Chem.rdchem.Mol):
         self.RemoveAllConformers()
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
 
-    def draw3Dconfs(self, view=None, mol=None, confids=None):
+    def draw3Dconfs(self, view=None, mol=None):
         if view is None:
             view = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
 
         for conf in self.GetConformers():
-            if confids is None:
-                selected = True
-            else:
-                selected = True if conf.GetId() in selected else False
             mb = Chem.MolToMolBlock(self, confId=conf.GetId())
             view.addModel(mb, "lig")
 
+        # use reverse indexing to reference the just added conformers
+        # http://3dmol.csb.pitt.edu/doc/types.html#AtomSelectionSpec
+        cmap = plt.get_cmap("tab20c")
+        for i in range(1, self.GetNumConformers() + 1):
+            hex = to_hex(cmap.colors[i]).split('#')[-1]
+            view.setStyle({'model': -i}, {'stick': {}})
 
-        # view.setStyle({'name':'lig'},{'stick':{}})
         view.zoomTo()
         return view
 
