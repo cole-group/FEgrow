@@ -12,6 +12,8 @@ from typing_extensions import Literal
 
 from .package import Mol
 
+import numpy
+
 # fix for new openmm versions
 try:
     from openmm import app, openmm, unit
@@ -57,6 +59,26 @@ def _can_use_ani2x(molecule: OFFMolecule) -> bool:
     return True
 
 
+def _scale_system(system: openmm.System, sigma_scale_factor: float, relative_permittivity: float):
+    """
+    Scale the sigma and charges of the openMM system in place.
+    """
+    if relative_permittivity != 1:
+        charge_scale_factor = 1 / numpy.sqrt(relative_permittivity)
+    else:
+        charge_scale_factor = 1
+    forces = {
+        system.getForce(i).__class__.__name__: system.getForce(i)
+        for i in range(system.getNumForces())
+    }
+    # assuming all nonbonded interactions are via the standard force
+    nonbonded_force = forces["NonbondedForce"]
+    # scale all particle parameters
+    for i in range(nonbonded_force.getNumParticles()):
+        charge, sigma, epsilon = nonbonded_force.getParticleParameters(i)
+        nonbonded_force.setParticleParameters(i, charge * charge_scale_factor, sigma * sigma_scale_factor, epsilon)
+
+
 ForceField = Literal["openff", "gaff"]
 
 
@@ -65,6 +87,8 @@ def optimise_in_receptor(
     receptor_file: str,
     ligand_force_field: ForceField,
     use_ani: bool = True,
+    sigma_scale_factor: float = 0.8,
+    relative_permittivity: float = 4
 ) -> Tuple[Mol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -78,6 +102,10 @@ def optimise_in_receptor(
             The base ligand force field that should be used.
         use_ani:
             If we should try and use ani2x for the internal energy of the ligand.
+        sigma_scale_factor:
+            The factor by which all sigma values should be scaled
+        relative_permittivity:
+            The relativity permittivity which should be used to scale all charges 1/sqrt(permittivity)
 
     Returns:
         A copy of the input molecule with the optimised positions.
@@ -132,6 +160,8 @@ def optimise_in_receptor(
         )
     else:
         complex_system = system
+    # scale the charges and sigma values
+    _scale_system(system=complex_system, sigma_scale_factor=sigma_scale_factor, relative_permittivity=relative_permittivity)
 
     # propagate the System with Langevin dynamics note integrator note used.
     time_step = 1 * unit.femtoseconds  # simulation timestep
@@ -184,3 +214,35 @@ def optimise_in_receptor(
         #     app.PDBFile.writeFile(complex_structure.topology, min_state.getPositions().value_in_unit(unit.angstrom), outfile)
 
     return final_mol, energies
+
+
+def sort_conformers(ligand: Mol, energies: List[float], energy_range: float = 5) -> Mol:
+    """
+    For the given molecule and the conformer energies order the energies and only keep any conformers with in the energy
+    range of the lowest energy conformer.
+
+    Note:
+        This sorting is done on a copy of the molecule.
+
+    Args:
+        ligand:
+            A molecule instance whose optimised conformers should be sorted.
+        energies:
+            The list of energies in the same order as the conformers.
+        energy_range:
+            The energy range (kcal/mol), above the minimum, for which conformers should be kept.
+    """
+    copy_mol = Mol(deepcopy(ligand))
+    copy_mol.RemoveAllConformers()
+    energies = numpy.array(energies)
+    # normalise
+    energies -= energies.min()
+    # order by lowest energy
+    energy_and_conformers = []
+    for i, conformer in enumerate(ligand.GetConformers()):
+        energy_and_conformers.append((energies[i], conformer))
+    energy_and_conformers.sort(key=lambda x: x[0])
+    for energy, conformer in energy_and_conformers:
+        if energy <= energy_range:
+            copy_mol.AddConformer(conformer, assignId=True)
+    return copy_mol
