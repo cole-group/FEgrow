@@ -1,5 +1,5 @@
 # R-group
-An interactive set of tools simplifying making cogeneric ligands. 
+An interactive set of tools for making co-generic ligands. 
 
 ### Acknowledgments
  - RDKit
