@@ -165,7 +165,8 @@ class Mol(rdkit.Chem.rdchem.Mol):
             hex = to_hex(cmap.colors[i]).split('#')[-1]
             view.setStyle({'model': -i}, {'stick': {}})
 
-        view.zoomTo()
+        # zoom to the last added model
+        view.zoomTo({'model': -1})
         return view
 
     def removeConfsClashingWithProdyProt(self, prot, min_dst_allowed=1):
