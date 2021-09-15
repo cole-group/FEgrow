@@ -1,5 +1,5 @@
 import copy
-from typing import Optional
+from typing import Optional, List, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -211,15 +211,6 @@ class Mol(rdkit.Chem.rdchem.Mol):
                 output.write(func(self, confId=conformer.GetId()))
 
 
-# def load_r_groups():
-#     """
-#     Load all r groups by category into a mols2grid object.
-#     """
-#     root_path = "data/rgroups/molecules/"
-#     for group in os.listdir(root_path):
-#         if os.path.isdir(group):
-#             # load the molecules from this file
-
 class RGroupGrid(mols2grid.MolGrid):
     """
     A wrapper around the mols to grid class to load and process the r group folders locally.
@@ -263,3 +254,32 @@ class RGroupGrid(mols2grid.MolGrid):
         subset = ["img", "Functional Group", "Name", "mols2grid-id"]
         return display(self.display(subset=subset))
 
+
+def build_molecules(core_ligand: Mol, attachment_points: List[int], r_groups: Union[RGroupGrid, List[Chem.Mol]], ) ->List[Mol]:
+    """
+    For the given core molecule and list of attachment points and r groups enumerate the possible molecules and return a list of them.
+
+    Args:
+        core_ligand:
+            The core scaffold molecule to attach the r groups to.
+        attachment_points:
+            The list of atom index in the core ligand that the r groups should be attached to.
+        r_groups:
+            The list of rdkit molecules which should be considered r groups or the RGroup Grid with highlighted molecules.
+    """
+    # get a list of rdkit molecules
+    if isinstance(r_groups, RGroupGrid):
+        selection = mols2grid.selection
+        # now get a list of the molecules
+        r_mols = [r_groups.dataframe.iloc[i]["Molecules"] for i in selection.keys()]
+    else:
+        r_mols = r_groups
+
+    combined_mols = []
+    # loop over the attachment points and r_groups
+    for atom_idx in attachment_points:
+        for r_mol in r_mols:
+            core_mol = Mol(copy.deepcopy(core_ligand))
+            combined_mols.append(merge_R_group(mol=core_mol, R_group=r_mol, replaceIndex=atom_idx))
+
+    return combined_mols
