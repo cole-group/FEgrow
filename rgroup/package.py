@@ -10,6 +10,9 @@ import rdkit
 from rdkit import Chem
 from rdkit.Chem import AllChem, Draw
 from rdkit.Chem.rdMolAlign import AlignMol
+import mols2grid
+import pandas as pd
+import os
 
 from .conformers import generate_conformers
 from .toxicity import tox_props
@@ -206,3 +209,57 @@ class Mol(rdkit.Chem.rdchem.Mol):
         with open(file_name, "w") as output:
             for conformer in self.GetConformers():
                 output.write(func(self, confId=conformer.GetId()))
+
+
+# def load_r_groups():
+#     """
+#     Load all r groups by category into a mols2grid object.
+#     """
+#     root_path = "data/rgroups/molecules/"
+#     for group in os.listdir(root_path):
+#         if os.path.isdir(group):
+#             # load the molecules from this file
+
+class RGroupGrid(mols2grid.MolGrid):
+    """
+    A wrapper around the mols to grid class to load and process the r group folders locally.
+    """
+
+    def __init__(self):
+        dataframe = self._load_molecules()
+
+        super(RGroupGrid, self).__init__(dataframe, mol_col="Molecules", use_coords=False)
+
+    def _load_molecules(self) -> pd.DataFrame:
+        """
+        Load the local r groups into rdkit molecules
+        """
+        molecules = []
+        groups = []
+        names = []
+        molfiles = []
+        root_path = "data/rgroups/molecules"
+        for group in os.listdir(root_path):
+            group_path = os.path.join(root_path, group)
+            if os.path.isdir(group_path):
+                # load all of the molecules in the folder
+                for f in os.listdir(group_path):
+                    molfile = os.path.join(group_path, f)
+                    r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
+                    groups.append(group)
+                    names.append(r_mol.GetProp("_Name"))
+                    molfiles.append(molfile)
+
+                    # highlight the attachment atom
+                    for atom in r_mol.GetAtoms():
+                        if atom.GetAtomicNum() == 0:
+                            setattr(r_mol, "__sssAtoms", [atom.GetIdx()])
+                    molecules.append(r_mol)
+
+        return pd.DataFrame({"Molecules": molecules, "Functional Group": groups, "Name": names, "Mol File": molfiles})
+
+    def _ipython_display_(self):
+        from IPython.display import display
+        subset = ["img", "Functional Group", "Name", "mols2grid-id"]
+        return display(self.display(subset=subset))
+
