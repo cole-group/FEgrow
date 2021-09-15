@@ -216,7 +216,7 @@ def optimise_in_receptor(
     return final_mol, energies
 
 
-def sort_conformers(ligand: Mol, energies: List[float], energy_range: float = 5) -> Mol:
+def sort_conformers(ligand: Mol, energies: List[float], energy_range: float = 5) -> Tuple[Mol, List[float]]:
     """
     For the given molecule and the conformer energies order the energies and only keep any conformers with in the energy
     range of the lowest energy conformer.
@@ -242,7 +242,9 @@ def sort_conformers(ligand: Mol, energies: List[float], energy_range: float = 5)
     for i, conformer in enumerate(ligand.GetConformers()):
         energy_and_conformers.append((energies[i], conformer))
     energy_and_conformers.sort(key=lambda x: x[0])
+    final_energies = []
     for energy, conformer in energy_and_conformers:
         if energy <= energy_range:
             copy_mol.AddConformer(conformer, assignId=True)
-    return copy_mol
+            final_energies.append(energy)
+    return copy_mol, final_energies
