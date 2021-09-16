@@ -160,9 +160,9 @@ class Mol(rdkit.Chem.rdchem.Mol):
 
         # use reverse indexing to reference the just added conformers
         # http://3dmol.csb.pitt.edu/doc/types.html#AtomSelectionSpec
-        cmap = plt.get_cmap("tab20c")
+        # cmap = plt.get_cmap("tab20c")
         for i in range(1, self.GetNumConformers() + 1):
-            hex = to_hex(cmap.colors[i]).split('#')[-1]
+            # hex = to_hex(cmap.colors[i]).split('#')[-1]
             view.setStyle({'model': -i}, {'stick': {}})
 
         # zoom to the last added model
