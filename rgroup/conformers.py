@@ -22,7 +22,7 @@ def duplicate_conformers(
 def generate_conformers(rmol: Chem.rdchem.Mol,
                         num_conf: int,
                         minimum_conf_rms: Optional[float] = None,
-                        flexible: Optional[List[int]] = None,
+                        flexible: Optional[List[int]] = [],
                         ) -> List[Chem.rdchem.Mol]:
     """
     flexible:
@@ -144,7 +144,7 @@ def ConstrainedEmbedR2(mol, core, coordMap, match, manmap, flexible, useTethers=
         # for i in range(core.GetNumAtoms()):
             p = conf.GetAtomPosition(coreI)
             pIdx = ff.AddExtraPoint(p.x, p.y, p.z, fixed=True) - 1
-            ff.AddDistanceConstraint(pIdx, matchedMolI, 0, 0, 100.)
+            ff.AddDistanceConstraint(pIdx, matchedMolI, 0, 0, 100. * 100)
         ff.Initialize()
         n = 4
         more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)

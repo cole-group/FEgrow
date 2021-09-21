@@ -28,7 +28,7 @@ def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
     return Chem.Mol(edit_mol)
 
 
-def rep2D(mol, idx=False, rdkit_mol=False, **kwargs):
+def rep2D(mol, idx=-1, rdkit_mol=False, **kwargs):
     numbered = copy.deepcopy(mol)
     numbered.RemoveAllConformers()
     if idx:
@@ -132,13 +132,13 @@ def merge_R_group(mol, R_group, replaceIndex):
 
 class Rmol(rdkit.Chem.rdchem.Mol):
     def save_template(self, mol):
-        self.template = mol
+        self.template = Rmol(copy.deepcopy(mol))
 
     def toxicity(self):
         return tox_props(self)
 
     def generate_conformers(
-        self, num_conf: int, minimum_conf_rms: Optional[float] = None, **kwargs
+        self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
     ):
         cons = generate_conformers(self, num_conf, minimum_conf_rms, **kwargs)
         self.RemoveAllConformers()
@@ -147,7 +147,7 @@ class Rmol(rdkit.Chem.rdchem.Mol):
     def rep2D(self, **kwargs):
         return rep2D(self, **kwargs)
 
-    def rep3D(self, view=None, prody=None, template=False):
+    def rep3D(self, view=None, prody=None, template=False, confIds: Optional[List[int]] = None):
         if prody is not None:
             view = view3D(prody)
 
@@ -155,22 +155,23 @@ class Rmol(rdkit.Chem.rdchem.Mol):
             view = py3Dmol.view(width=400, height=400, viewergrid=(1, 1))
 
         for conf in self.GetConformers():
+            # ignore the confIds that we're not asked for
+            if confIds is not None and conf.GetId() not in confIds:
+                continue
             mb = Chem.MolToMolBlock(self, confId=conf.GetId())
             view.addModel(mb, "lig")
 
-        # use reverse indexing to reference the just added conformers
-        # http://3dmol.csb.pitt.edu/doc/types.html#AtomSelectionSpec
-        # cmap = plt.get_cmap("tab20c")
-        for i in range(1, self.GetNumConformers() + 1):
+            # use reverse indexing to reference the just added conformer
+            # http://3dmol.csb.pitt.edu/doc/types.html#AtomSelectionSpec
+            # cmap = plt.get_cmap("tab20c")
             # hex = to_hex(cmap.colors[i]).split('#')[-1]
-            view.setStyle({'model': -i}, {'stick': {}})
+            view.setStyle({'model': -1}, {'stick': {}})
 
         if template:
             mb = Chem.MolToMolBlock(self.template)
             view.addModel(mb, "template")
             # show as sticks
-            view.setStyle({'model': -i}, {'stick': {'color': '0xAF10AB'}})
-            #
+            view.setStyle({'model': -1}, {'stick': {'color': '0xAF10AB'}})
 
         # zoom to the last added model
         view.zoomTo({'model': -1})
