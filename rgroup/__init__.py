@@ -5,4 +5,4 @@ from .toxicity import tox_props
 
 RGroups = RGroupGrid()
 
-__all__ = [generate_conformers, rep2D, draw3D, merge_R_group, fix_receptor, optimise_in_receptor, Mol, tox_props, sort_conformers, RGroups, build_molecules]
+__all__ = [Rmol, generate_conformers, rep2D, merge_R_group, fix_receptor, optimise_in_receptor, tox_props, sort_conformers, RGroups, build_molecules]

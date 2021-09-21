@@ -10,7 +10,7 @@ from rdkit.Geometry.rdGeometry import Point3D
 from tqdm import tqdm
 from typing_extensions import Literal
 
-from .package import Mol
+from .package import Rmol
 
 import numpy
 
@@ -83,13 +83,13 @@ ForceField = Literal["openff", "gaff"]
 
 
 def optimise_in_receptor(
-    ligand: Mol,
+    ligand: Rmol,
     receptor_file: str,
     ligand_force_field: ForceField,
     use_ani: bool = True,
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4
-) -> Tuple[Mol, List[float]]:
+) -> Tuple[Rmol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
 
@@ -178,7 +178,7 @@ def optimise_in_receptor(
     receptor_coords = parmed_receptor.positions
 
     # loop over the conformers and energy minimise and store the final positions
-    final_mol = Mol(deepcopy(ligand))
+    final_mol = Rmol(deepcopy(ligand))
     final_mol.save_template(ligand.template)
     final_mol.RemoveAllConformers()
     energies = []
@@ -216,7 +216,7 @@ def optimise_in_receptor(
     return final_mol, energies
 
 
-def sort_conformers(ligand: Mol, energies: List[float], energy_range: float = 5) -> Tuple[Mol, List[float]]:
+def sort_conformers(ligand: Rmol, energies: List[float], energy_range: float = 5) -> Tuple[Rmol, List[float]]:
     """
     For the given molecule and the conformer energies order the energies and only keep any conformers with in the energy
     range of the lowest energy conformer.
@@ -232,7 +232,7 @@ def sort_conformers(ligand: Mol, energies: List[float], energy_range: float = 5)
         energy_range:
             The energy range (kcal/mol), above the minimum, for which conformers should be kept.
     """
-    copy_mol = Mol(deepcopy(ligand))
+    copy_mol = Rmol(deepcopy(ligand))
     copy_mol.RemoveAllConformers()
     energies = numpy.array(energies)
     # normalise

@@ -1,10 +1,12 @@
 import copy
 from typing import Optional, List, Union
+import os
 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
 from MDAnalysis.analysis.distances import distance_array
+from prody.proteins.functions import showProtein, view3D
 import py3Dmol
 import rdkit
 from rdkit import Chem
@@ -12,7 +14,7 @@ from rdkit.Chem import AllChem, Draw
 from rdkit.Chem.rdMolAlign import AlignMol
 import mols2grid
 import pandas as pd
-import os
+
 
 from .conformers import generate_conformers
 from .toxicity import tox_props
@@ -26,25 +28,21 @@ def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
     return Chem.Mol(edit_mol)
 
 
-def rep2D(mol, idx=True):
+def rep2D(mol, idx=False, rdkit_mol=False, **kwargs):
     numbered = copy.deepcopy(mol)
     numbered.RemoveAllConformers()
     if idx:
         for atom in numbered.GetAtoms():
             atom.SetAtomMapNum(atom.GetIdx())
     AllChem.Compute2DCoords(numbered)
-    return numbered
+
+    if rdkit_mol:
+        return numbered
+    else:
+        return Draw.MolToImage(numbered, **kwargs)
 
 
-def draw3D(mol, conf_id=-1):
-    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
-    viewer.addModel(Chem.MolToMolBlock(mol, confId=conf_id), "mol")
-    viewer.setStyle({"stick": {}})
-    viewer.zoomTo()
-    return viewer
-
-
-def draw3Dcons(mol):
+def rep3D(mol):
     viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
     for i in range(mol.GetNumConformers()):
         mb = Chem.MolToMolBlock(mol, confId=i)
@@ -126,36 +124,35 @@ def merge_R_group(mol, R_group, replaceIndex):
     etemp.RemoveAtom(replace_atom.GetIdx())
     template = etemp.GetMol()
 
-    with_template = Mol(merged)
+    with_template = Rmol(merged)
     with_template.save_template(template)
 
     return with_template
 
 
-class Mol(rdkit.Chem.rdchem.Mol):
+class Rmol(rdkit.Chem.rdchem.Mol):
     def save_template(self, mol):
         self.template = mol
 
     def toxicity(self):
         return tox_props(self)
 
-    def draw3D(self):
-        viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
-        viewer.addModel(Chem.MolToMolBlock(self), "mol")
-        viewer.setStyle({"stick": {}})
-        viewer.zoomTo()
-        return viewer
-
     def generate_conformers(
-        self, num_conf: int, minimum_conf_rms: Optional[float] = None
+        self, num_conf: int, minimum_conf_rms: Optional[float] = None, **kwargs
     ):
-        cons = generate_conformers(self, num_conf, minimum_conf_rms)
+        cons = generate_conformers(self, num_conf, minimum_conf_rms, **kwargs)
         self.RemoveAllConformers()
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
 
-    def draw3Dconfs(self, view=None, mol=None):
+    def rep2D(self, **kwargs):
+        return rep2D(self, **kwargs)
+
+    def rep3D(self, view=None, prody=None, template=False):
+        if prody is not None:
+            view = view3D(prody)
+
         if view is None:
-            view = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
+            view = py3Dmol.view(width=400, height=400, viewergrid=(1, 1))
 
         for conf in self.GetConformers():
             mb = Chem.MolToMolBlock(self, confId=conf.GetId())
@@ -167,6 +164,13 @@ class Mol(rdkit.Chem.rdchem.Mol):
         for i in range(1, self.GetNumConformers() + 1):
             # hex = to_hex(cmap.colors[i]).split('#')[-1]
             view.setStyle({'model': -i}, {'stick': {}})
+
+        if template:
+            mb = Chem.MolToMolBlock(self.template)
+            view.addModel(mb, "template")
+            # show as sticks
+            view.setStyle({'model': -i}, {'stick': {'color': '0xAF10AB'}})
+            #
 
         # zoom to the last added model
         view.zoomTo({'model': -1})
@@ -255,7 +259,10 @@ class RGroupGrid(mols2grid.MolGrid):
         return display(self.display(subset=subset))
 
 
-def build_molecules(core_ligand: Mol, attachment_points: List[int], r_groups: Union[RGroupGrid, List[Chem.Mol]], ) ->List[Mol]:
+def build_molecules(core_ligand: Rmol,
+                    attachment_points: List[int],
+                    r_groups: Union[RGroupGrid, List[Chem.Mol]],
+                    ) ->List[Rmol]:
     """
     For the given core molecule and list of attachment points and r groups enumerate the possible molecules and return a list of them.
 
@@ -279,7 +286,7 @@ def build_molecules(core_ligand: Mol, attachment_points: List[int], r_groups: Un
     # loop over the attachment points and r_groups
     for atom_idx in attachment_points:
         for r_mol in r_mols:
-            core_mol = Mol(copy.deepcopy(core_ligand))
+            core_mol = Rmol(copy.deepcopy(core_ligand))
             combined_mols.append(merge_R_group(mol=core_mol, R_group=r_mol, replaceIndex=atom_idx))
 
     return combined_mols

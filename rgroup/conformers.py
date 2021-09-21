@@ -7,7 +7,7 @@ from rdkit.Chem import AllChem, rdFMCS
 
 
 def duplicate_conformers(
-    m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5
+        m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5
 ) -> bool:
     rmslist = []
     for conf_idx in range(m.GetNumConformers()):
@@ -19,45 +19,64 @@ def duplicate_conformers(
     return any(rms < rms_limit for rms in rmslist)
 
 
-def generate_conformers(mol: Chem.rdchem.Mol,
+def generate_conformers(rmol: Chem.rdchem.Mol,
                         num_conf: int,
                         minimum_conf_rms: Optional[float] = None,
-                       ) -> List[Chem.rdchem.Mol]:
-	
-    ref_mol =deepcopy(mol.template)
-    # Add Hs so that conf gen is improved
-    mol = deepcopy(mol)
-    # mol.RemoveAllConformers()
-    # mol = Chem.AddHs(mol)
+                        flexible: Optional[List[int]] = None,
+                        ) -> List[Chem.rdchem.Mol]:
+    """
+    flexible:
+            The list of atomic indices on the @core_ligand that should not be constrained during the conformer generation
+    """
+    # fixme - say something if the template has more than one conformer
+    template_mol = deepcopy(rmol.template)
 
-    core = ref_mol
-    match = mol.GetSubstructMatch(core)
+    # modify the template and remove the flexible atoms
+    # if flexible:
+    #     edit_mol = Chem.RWMol(template_mol)
+    #     # remove the flexible atoms
+    #     for idx in flexible:
+    #         edit_mol.RemoveAtom(idx)
+    #     template_mol = Chem.Mol(edit_mol)
+
+    # fixme - check if the conformer has H, it helps with conformer generation
+    rmol = deepcopy(rmol)
+
+    # compute for each template atom to which atom it corresponds to
+    match = rmol.GetSubstructMatch(template_mol)
     if not match:
         raise ValueError("molecule doesn't match the core")
+
+    # remember the coordinates
     coordMap = {}
+    coreConf = template_mol.GetConformer(0)
     manmap = []
-    coreConf = core.GetConformer(0)
-    for i, idxI in enumerate(match):
-      # print((i, idxI), end=', ')
-      corePtI = coreConf.GetAtomPosition(i)
-      coordMap[idxI] = corePtI
-      manmap.append((idxI, i))
+    for coreI, matchedMolI in enumerate(match):
+        if matchedMolI in flexible:
+            continue
+
+        corePtI = coreConf.GetAtomPosition(coreI)
+        coordMap[matchedMolI] = corePtI
+        manmap.append((matchedMolI, coreI))
+
+    # use a reproducible random seed
+    randomseed = 194715
 
     # Generate conformers with constrained embed
     dup_count = 0
-    for i in range(num_conf):
-    	# TODO - consider tethers as a feature
-        #temp_mol = AllChem.ConstrainedEmbed(deepcopy(mol), ref_mol, useTethers=False, randomseed=random.randint(1, 9e5))
-
-        temp_mol = ConstrainedEmbedR2(deepcopy(mol), ref_mol, coordMap, match, manmap, useTethers=True, randomseed=random.randint(1, 9e5))
-        conf_idx = mol.AddConformer(temp_mol.GetConformer(-1), assignId=True)
+    for coreI in range(num_conf):
+        # temp_mol = AllChem.ConstrainedEmbed(deepcopy(mol), template_mol, useTethers=False, randomseed=random.randint(1, 9e5))
+        temp_mol = ConstrainedEmbedR2(deepcopy(rmol), template_mol, coordMap, match, manmap, flexible,
+                                      randomseed=randomseed + coreI)
+        conf_idx = rmol.AddConformer(temp_mol.GetConformer(-1), assignId=True)
         if minimum_conf_rms is not None:
-            if duplicate_conformers(mol, conf_idx, rms_limit=minimum_conf_rms):
+            if duplicate_conformers(rmol, conf_idx, rms_limit=minimum_conf_rms):
                 dup_count += 1
-                mol.RemoveConformer(conf_idx)
+                rmol.RemoveConformer(conf_idx)
     if dup_count:
         print(f'removed {dup_count} duplicated conformations')
-    return mol
+    return rmol
+
 
 from rdkit import DataStructs
 from rdkit import ForceField
@@ -80,54 +99,67 @@ from rdkit.Chem.rdMolEnumerator import *
 from rdkit.Geometry import rdGeometry
 from rdkit.RDLogger import logger
 from rdkit.Chem.EnumerateStereoisomers import StereoEnumerationOptions, EnumerateStereoisomers
-def ConstrainedEmbedR2(mol, core, coordMap, match, manmap, useTethers=True, coreConfId=-1, randomseed=2342,
-                     getForceField=UFFGetMoleculeForceField, **kwargs):
-  ci = EmbedMolecule(mol, coordMap=coordMap, randomSeed=randomseed, **kwargs, useExpTorsionAnglePrefs=True, useBasicKnowledge=True, enforceChirality=True, useSmallRingTorsions=True)
-  if ci < 0:
-    raise ValueError('Could not embed molecule.')
 
-  # algMap = [(j, i) for i, j in enumerate(match)]
-  algMap = manmap
 
-  if not useTethers:
-    # clean up the conformation
-    ff = getForceField(mol, confId=0)
-    for i, idxI in enumerate(match):
-      for j in range(i + 1, len(match)):
-        idxJ = match[j]
-        d = coordMap[idxI].Distance(coordMap[idxJ])
-        ff.AddDistanceConstraint(idxI, idxJ, d, d, 100. * 999999)
-    ff.Initialize()
-    n = 4
-    more = ff.Minimize()
-    while more and n:
-      more = ff.Minimize()
-      n -= 1
-    # rotate the embedded conformation onto the core:
-    rms = AlignMol(mol, core, atomMap=algMap)
-  else:
-    # rotate the embedded conformation onto the core:
-    rms = AlignMol(mol, core, atomMap=algMap)
-    ff = getForceField(mol, confId=0)
-    conf = core.GetConformer()
-    for i in range(core.GetNumAtoms()):
-      p = conf.GetAtomPosition(i)
-      pIdx = ff.AddExtraPoint(p.x, p.y, p.z, fixed=True) - 1
-      ff.AddDistanceConstraint(pIdx, match[i], 0, 0, 100.)
-    ff.Initialize()
-    n = 4
-    more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
-    while more and n:
-      more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
-      n -= 1
-    # realign
-    rms = AlignMol(mol, core, atomMap=algMap)
-  mol.SetProp('EmbedRMS', str(rms))
-  return mol
+def ConstrainedEmbedR2(mol, core, coordMap, match, manmap, flexible, useTethers=True, coreConfId=-1, randomseed=2342,
+                       getForceField=UFFGetMoleculeForceField, **kwargs):
+    ci = EmbedMolecule(mol, coordMap=coordMap, randomSeed=randomseed, **kwargs, useExpTorsionAnglePrefs=True,
+                       useBasicKnowledge=True, enforceChirality=True, useSmallRingTorsions=True)
+    if ci < 0:
+        raise ValueError('Could not embed molecule.')
+
+    # rms = AlignMol(mol, core, atomMap=manmap)
+    # mol.SetProp('EmbedRMS', str(rms))
+    # return mol
+
+    if not useTethers:
+        print('not using tethers')
+        # clean up the conformation
+        ff = getForceField(mol, confId=0)
+        for i, idxI in enumerate(match):
+            if i in flexible:
+                continue
+
+            for j in range(i + 1, len(match)):
+                if j in flexible:
+                    continue
+
+                idxJ = match[j]
+                d = coordMap[idxI].Distance(coordMap[idxJ])
+                ff.AddDistanceConstraint(idxI, idxJ, d, d, 100. * 999999)
+        ff.Initialize()
+        n = 4
+        more = ff.Minimize()
+        while more and n:
+            more = ff.Minimize()
+            n -= 1
+        # rotate the embedded conformation onto the core:
+        rms = AlignMol(mol, core, atomMap=manmap)
+    else:
+        # rotate the embedded conformation onto the core:
+        rms = AlignMol(mol, core, atomMap=manmap)
+        ff = getForceField(mol, confId=0)
+        conf = core.GetConformer()
+        for matchedMolI, coreI in manmap:
+        # for i in range(core.GetNumAtoms()):
+            p = conf.GetAtomPosition(coreI)
+            pIdx = ff.AddExtraPoint(p.x, p.y, p.z, fixed=True) - 1
+            ff.AddDistanceConstraint(pIdx, matchedMolI, 0, 0, 100.)
+        ff.Initialize()
+        n = 4
+        more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
+        while more and n:
+            more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
+            n -= 1
+        # realign
+        rms = AlignMol(mol, core, atomMap=manmap)
+    mol.SetProp('EmbedRMS', str(rms))
+    return mol
+
 
 def ConstrainedEmbedR(mol, core, useTethers=True, coreConfId=-1, randomseed=2342,
-                     getForceField=UFFGetMoleculeForceField, **kwargs):
-  """ generates an embedding of a molecule where part of the molecule
+                      getForceField=UFFGetMoleculeForceField, **kwargs):
+    """ generates an embedding of a molecule where part of the molecule
     is constrained to have particular coordinates
 
     Arguments
@@ -171,44 +203,44 @@ def ConstrainedEmbedR(mol, core, useTethers=True, coreConfId=-1, randomseed=2342
 
     """
 
-  ci = EmbedMolecule(mol, coordMap=coordMap, randomSeed=randomseed, **kwargs)
-  if ci < 0:
-    raise ValueError('Could not embed molecule.')
+    ci = EmbedMolecule(mol, coordMap=coordMap, randomSeed=randomseed, **kwargs)
+    if ci < 0:
+        raise ValueError('Could not embed molecule.')
 
-  algMap = [(j, i) for i, j in enumerate(match)]
+    algMap = [(j, i) for i, j in enumerate(match)]
 
-  if not useTethers:
-    # clean up the conformation
-    ff = getForceField(mol, confId=0)
-    for i, idxI in enumerate(match):
-      for j in range(i + 1, len(match)):
-        idxJ = match[j]
-        d = coordMap[idxI].Distance(coordMap[idxJ])
-        ff.AddDistanceConstraint(idxI, idxJ, d, d, 100. * 999999)
-    ff.Initialize()
-    n = 4
-    more = ff.Minimize()
-    while more and n:
-      more = ff.Minimize()
-      n -= 1
-    # rotate the embedded conformation onto the core:
-    rms = AlignMol(mol, core, atomMap=algMap)
-  else:
-    # rotate the embedded conformation onto the core:
-    rms = AlignMol(mol, core, atomMap=algMap)
-    ff = getForceField(mol, confId=0)
-    conf = core.GetConformer()
-    for i in range(core.GetNumAtoms()):
-      p = conf.GetAtomPosition(i)
-      pIdx = ff.AddExtraPoint(p.x, p.y, p.z, fixed=True) - 1
-      ff.AddDistanceConstraint(pIdx, match[i], 0, 0, 100.)
-    ff.Initialize()
-    n = 4
-    more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
-    while more and n:
-      more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
-      n -= 1
-    # realign
-    rms = AlignMol(mol, core, atomMap=algMap)
-  mol.SetProp('EmbedRMS', str(rms))
-  return mol
+    if not useTethers:
+        # clean up the conformation
+        ff = getForceField(mol, confId=0)
+        for i, idxI in enumerate(match):
+            for j in range(i + 1, len(match)):
+                idxJ = match[j]
+                d = coordMap[idxI].Distance(coordMap[idxJ])
+                ff.AddDistanceConstraint(idxI, idxJ, d, d, 100. * 999999)
+        ff.Initialize()
+        n = 4
+        more = ff.Minimize()
+        while more and n:
+            more = ff.Minimize()
+            n -= 1
+        # rotate the embedded conformation onto the core:
+        rms = AlignMol(mol, core, atomMap=algMap)
+    else:
+        # rotate the embedded conformation onto the core:
+        rms = AlignMol(mol, core, atomMap=algMap)
+        ff = getForceField(mol, confId=0)
+        conf = core.GetConformer()
+        for i in range(core.GetNumAtoms()):
+            p = conf.GetAtomPosition(i)
+            pIdx = ff.AddExtraPoint(p.x, p.y, p.z, fixed=True) - 1
+            ff.AddDistanceConstraint(pIdx, match[i], 0, 0, 100.)
+        ff.Initialize()
+        n = 4
+        more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
+        while more and n:
+            more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
+            n -= 1
+        # realign
+        rms = AlignMol(mol, core, atomMap=algMap)
+    mol.SetProp('EmbedRMS', str(rms))
+    return mol
