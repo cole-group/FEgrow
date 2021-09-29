@@ -1,6 +1,7 @@
 import copy
 from typing import Optional, List, Union
 import os
+import glob
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -239,8 +240,7 @@ class RGroupGrid(mols2grid.MolGrid):
             group_path = os.path.join(root_path, group)
             if os.path.isdir(group_path):
                 # load all of the molecules in the folder
-                for f in os.listdir(group_path):
-                    molfile = os.path.join(group_path, f)
+                for molfile in glob.glob(group_path + '/*.mol'):
                     r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
                     groups.append(group)
                     names.append(r_mol.GetProp("_Name"))
