@@ -1,7 +1,13 @@
 import copy
+import stat
 from typing import Optional, List, Union
 import os
 import glob
+import tempfile
+import subprocess
+import re
+from pathlib import Path
+from urllib.request import urlretrieve
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -132,6 +138,13 @@ def merge_R_group(mol, R_group, replaceIndex):
 
 
 class Rmol(rdkit.Chem.rdchem.Mol):
+
+    def __init__(self, *args, template=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.template = template
+        self.gnina_dir = None
+
     def save_template(self, mol):
         self.template = Rmol(copy.deepcopy(mol))
 
@@ -190,6 +203,67 @@ class Rmol(rdkit.Chem.rdchem.Mol):
             if min_dst < min_dst_allowed:
                 self.RemoveConformer(confid)
                 print(f"Clash with the protein. Removing conformer id: {confid}")
+
+    def set_gnina(self, loc):
+        # set gnina location
+        path = Path(loc)
+        if path.is_file():
+            self.gnina_dir = path.parent
+        else:
+            raise Exception('The path is not the binary file gnina')
+        # extend this with running a binary check
+
+    def _check_download_gnina(self):
+        """
+        Check if gnina works. Otherwise download it.
+        """
+        if self.gnina_dir is None:
+            # assume it is in the current directory
+            self.gnina_dir = os.getcwd()
+
+        # check if gnina works
+        try:
+            subprocess.run(["./gnina", "--help"], capture_output=True, cwd=self.gnina_dir)
+            return
+        except FileNotFoundError as E:
+            pass
+
+        # gnina is not found, try downloading it
+        print(f'Gnina not found or set. Download gnina (~500MB) into {self.gnina_dir}')
+        gnina = os.path.join(self.gnina_dir, 'gnina')
+        # fixme - currently download to the working directory (Home could be more applicable).
+        urlretrieve('https://github.com/gnina/gnina/releases/download/v1.0.1/gnina', filename=gnina)
+        # make executable (chmod +x)
+        mode = os.stat(gnina).st_mode
+        os.chmod(gnina, mode | stat.S_IEXEC)
+
+        # check if it works
+        subprocess.run(["./gnina", "--help"], capture_output=True, cwd=self.gnina_dir)
+
+    def gnina(self, receptor_file):
+        self._check_download_gnina()
+
+        # make a temporary sdf file for gnina
+        tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.sdf')
+        with Chem.SDWriter(tmp.name) as w:
+            for conformer in self.GetConformers():
+                w.write(self, confId=conformer.GetId())
+
+        # run the code on the sdf
+        process = subprocess.run(
+            ["./gnina",
+             "--score_only",
+             "-l", tmp.name,
+             "-r", receptor_file,
+             "--seed", "0",
+             "--stripH", 'False'],
+            capture_output=True,
+            cwd=self.gnina_dir)
+        output = process.stdout.decode('utf-8')
+        CNNscores = re.findall(r'CNNscore: (\d+.\d+)', output)
+
+        # convert to float
+        return list(map(float, CNNscores))
 
     def to_file(self, file_name: str):
         """
