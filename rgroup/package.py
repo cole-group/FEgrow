@@ -260,10 +260,10 @@ class Rmol(rdkit.Chem.rdchem.Mol):
             capture_output=True,
             cwd=self.gnina_dir)
         output = process.stdout.decode('utf-8')
-        CNNscores = re.findall(r'CNNscore: (\d+.\d+)', output)
+        CNNaffinities = re.findall(r'CNNaffinity: (\d+.\d+)', output)
 
         # convert to float
-        return list(map(float, CNNscores))
+        return list(map(float, CNNaffinities))
 
     def to_file(self, file_name: str):
         """
