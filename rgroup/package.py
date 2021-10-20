@@ -137,6 +137,10 @@ def merge_R_group(mol, R_group, replaceIndex):
     return with_template
 
 
+def ic50(x):
+    return 10**(-x - -9)
+
+
 class Rmol(rdkit.Chem.rdchem.Mol):
 
     def __init__(self, *args, template=None, **kwargs):
