@@ -10,7 +10,7 @@ from rdkit.Geometry.rdGeometry import Point3D
 from tqdm import tqdm
 from typing_extensions import Literal
 
-from .package import Rmol
+from .package import RMol
 
 import numpy
 
@@ -83,13 +83,13 @@ ForceField = Literal["openff", "gaff"]
 
 
 def optimise_in_receptor(
-    ligand: Rmol,
+    ligand: RMol,
     receptor_file: str,
     ligand_force_field: ForceField,
     use_ani: bool = True,
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4
-) -> Tuple[Rmol, List[float]]:
+) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
 

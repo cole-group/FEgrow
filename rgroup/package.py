@@ -131,7 +131,7 @@ def merge_R_group(mol, R_group, replaceIndex):
     etemp.RemoveAtom(replace_atom.GetIdx())
     template = etemp.GetMol()
 
-    with_template = Rmol(merged)
+    with_template = RMol(merged)
     with_template.save_template(template)
 
     return with_template
