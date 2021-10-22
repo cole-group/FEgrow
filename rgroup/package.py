@@ -142,12 +142,12 @@ def ic50(x):
 
 
 class Rmol(rdkit.Chem.rdchem.Mol):
+    gnina_dir = None
 
     def __init__(self, *args, template=None, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.template = template
-        self.gnina_dir = None
 
     def save_template(self, mol):
         self.template = Rmol(copy.deepcopy(mol))
@@ -208,33 +208,35 @@ class Rmol(rdkit.Chem.rdchem.Mol):
                 self.RemoveConformer(confid)
                 print(f"Clash with the protein. Removing conformer id: {confid}")
 
-    def set_gnina(self, loc):
+    @staticmethod
+    def set_gnina(loc):
         # set gnina location
         path = Path(loc)
         if path.is_file():
-            self.gnina_dir = path.parent
+            Rmol.gnina_dir = path.parent
         else:
             raise Exception('The path is not the binary file gnina')
         # extend this with running a binary check
 
-    def _check_download_gnina(self):
+    @staticmethod
+    def _check_download_gnina():
         """
         Check if gnina works. Otherwise download it.
         """
-        if self.gnina_dir is None:
+        if Rmol.gnina_dir is None:
             # assume it is in the current directory
-            self.gnina_dir = os.getcwd()
+            Rmol.gnina_dir = os.getcwd()
 
         # check if gnina works
         try:
-            subprocess.run(["./gnina", "--help"], capture_output=True, cwd=self.gnina_dir)
+            subprocess.run(["./gnina", "--help"], capture_output=True, cwd=Rmol.gnina_dir)
             return
         except FileNotFoundError as E:
             pass
 
         # gnina is not found, try downloading it
-        print(f'Gnina not found or set. Download gnina (~500MB) into {self.gnina_dir}')
-        gnina = os.path.join(self.gnina_dir, 'gnina')
+        print(f'Gnina not found or set. Download gnina (~500MB) into {Rmol.gnina_dir}')
+        gnina = os.path.join(Rmol.gnina_dir, 'gnina')
         # fixme - currently download to the working directory (Home could be more applicable).
         urlretrieve('https://github.com/gnina/gnina/releases/download/v1.0.1/gnina', filename=gnina)
         # make executable (chmod +x)
@@ -242,7 +244,7 @@ class Rmol(rdkit.Chem.rdchem.Mol):
         os.chmod(gnina, mode | stat.S_IEXEC)
 
         # check if it works
-        subprocess.run(["./gnina", "--help"], capture_output=True, cwd=self.gnina_dir)
+        subprocess.run(["./gnina", "--help"], capture_output=True, cwd=Rmol.gnina_dir)
 
     def gnina(self, receptor_file):
         self._check_download_gnina()
@@ -262,7 +264,7 @@ class Rmol(rdkit.Chem.rdchem.Mol):
              "--seed", "0",
              "--stripH", 'False'],
             capture_output=True,
-            cwd=self.gnina_dir)
+            cwd=Rmol.gnina_dir)
         output = process.stdout.decode('utf-8')
         CNNaffinities = re.findall(r'CNNaffinity: (\d+.\d+)', output)
 
