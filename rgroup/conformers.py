@@ -19,7 +19,7 @@ def duplicate_conformers(
     return any(rms < rms_limit for rms in rmslist)
 
 
-def generate_conformers(rmol: Chem.rdchem.Mol,
+def generate_conformers(RMol: Chem.rdchem.Mol,
                         num_conf: int,
                         minimum_conf_rms: Optional[float] = None,
                         flexible: Optional[List[int]] = [],
@@ -29,7 +29,7 @@ def generate_conformers(rmol: Chem.rdchem.Mol,
             The list of atomic indices on the @core_ligand that should not be constrained during the conformer generation
     """
     # fixme - say something if the template has more than one conformer
-    template_mol = deepcopy(rmol.template)
+    template_mol = deepcopy(RMol.template)
 
     # modify the template and remove the flexible atoms
     # if flexible:
@@ -40,7 +40,7 @@ def generate_conformers(rmol: Chem.rdchem.Mol,
     #     template_mol = Chem.Mol(edit_mol)
 
     # fixme - check if the conformer has H, it helps with conformer generation
-    rmol = deepcopy(rmol)
+    rmol = deepcopy(RMol)
 
     # compute for each template atom to which atom it corresponds to
     match = rmol.GetSubstructMatch(template_mol)

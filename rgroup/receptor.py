@@ -178,7 +178,7 @@ def optimise_in_receptor(
     receptor_coords = parmed_receptor.positions
 
     # loop over the conformers and energy minimise and store the final positions
-    final_mol = Rmol(deepcopy(ligand))
+    final_mol = RMol(deepcopy(ligand))
     final_mol.save_template(ligand.template)
     final_mol.RemoveAllConformers()
     energies = []
@@ -216,7 +216,7 @@ def optimise_in_receptor(
     return final_mol, energies
 
 
-def sort_conformers(ligand: Rmol, energies: List[float], energy_range: float = 5) -> Tuple[Rmol, List[float]]:
+def sort_conformers(ligand: RMol, energies: List[float], energy_range: float = 5) -> Tuple[RMol, List[float]]:
     """
     For the given molecule and the conformer energies order the energies and only keep any conformers with in the energy
     range of the lowest energy conformer.
@@ -232,7 +232,7 @@ def sort_conformers(ligand: Rmol, energies: List[float], energy_range: float = 5
         energy_range:
             The energy range (kcal/mol), above the minimum, for which conformers should be kept.
     """
-    copy_mol = Rmol(deepcopy(ligand))
+    copy_mol = RMol(deepcopy(ligand))
     copy_mol.RemoveAllConformers()
     energies = numpy.array(energies)
     # normalise

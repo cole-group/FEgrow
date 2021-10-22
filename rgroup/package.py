@@ -141,7 +141,7 @@ def ic50(x):
     return 10**(-x - -9)
 
 
-class Rmol(rdkit.Chem.rdchem.Mol):
+class RMol(rdkit.Chem.rdchem.Mol):
     gnina_dir = None
 
     def __init__(self, *args, template=None, **kwargs):
@@ -150,7 +150,7 @@ class Rmol(rdkit.Chem.rdchem.Mol):
         self.template = template
 
     def save_template(self, mol):
-        self.template = Rmol(copy.deepcopy(mol))
+        self.template = RMol(copy.deepcopy(mol))
 
     def toxicity(self):
         return tox_props(self)
@@ -213,7 +213,7 @@ class Rmol(rdkit.Chem.rdchem.Mol):
         # set gnina location
         path = Path(loc)
         if path.is_file():
-            Rmol.gnina_dir = path.parent
+            RMol.gnina_dir = path.parent
         else:
             raise Exception('The path is not the binary file gnina')
         # extend this with running a binary check
@@ -223,20 +223,20 @@ class Rmol(rdkit.Chem.rdchem.Mol):
         """
         Check if gnina works. Otherwise download it.
         """
-        if Rmol.gnina_dir is None:
+        if RMol.gnina_dir is None:
             # assume it is in the current directory
-            Rmol.gnina_dir = os.getcwd()
+            RMol.gnina_dir = os.getcwd()
 
         # check if gnina works
         try:
-            subprocess.run(["./gnina", "--help"], capture_output=True, cwd=Rmol.gnina_dir)
+            subprocess.run(["./gnina", "--help"], capture_output=True, cwd=RMol.gnina_dir)
             return
         except FileNotFoundError as E:
             pass
 
         # gnina is not found, try downloading it
-        print(f'Gnina not found or set. Download gnina (~500MB) into {Rmol.gnina_dir}')
-        gnina = os.path.join(Rmol.gnina_dir, 'gnina')
+        print(f'Gnina not found or set. Download gnina (~500MB) into {RMol.gnina_dir}')
+        gnina = os.path.join(RMol.gnina_dir, 'gnina')
         # fixme - currently download to the working directory (Home could be more applicable).
         urlretrieve('https://github.com/gnina/gnina/releases/download/v1.0.1/gnina', filename=gnina)
         # make executable (chmod +x)
@@ -244,7 +244,7 @@ class Rmol(rdkit.Chem.rdchem.Mol):
         os.chmod(gnina, mode | stat.S_IEXEC)
 
         # check if it works
-        subprocess.run(["./gnina", "--help"], capture_output=True, cwd=Rmol.gnina_dir)
+        subprocess.run(["./gnina", "--help"], capture_output=True, cwd=RMol.gnina_dir)
 
     def gnina(self, receptor_file):
         self._check_download_gnina()
@@ -264,7 +264,7 @@ class Rmol(rdkit.Chem.rdchem.Mol):
              "--seed", "0",
              "--stripH", 'False'],
             capture_output=True,
-            cwd=Rmol.gnina_dir)
+            cwd=RMol.gnina_dir)
         output = process.stdout.decode('utf-8')
         CNNaffinities = re.findall(r'CNNaffinity: (\d+.\d+)', output)
 
@@ -340,10 +340,10 @@ class RGroupGrid(mols2grid.MolGrid):
         return display(self.display(subset=subset))
 
 
-def build_molecules(core_ligand: Rmol,
+def build_molecules(core_ligand: RMol,
                     attachment_points: List[int],
                     r_groups: Union[RGroupGrid, List[Chem.Mol]],
-                    ) ->List[Rmol]:
+                    ) ->List[RMol]:
     """
     For the given core molecule and list of attachment points and r groups enumerate the possible molecules and return a list of them.
 
@@ -367,7 +367,7 @@ def build_molecules(core_ligand: Rmol,
     # loop over the attachment points and r_groups
     for atom_idx in attachment_points:
         for r_mol in r_mols:
-            core_mol = Rmol(copy.deepcopy(core_ligand))
+            core_mol = RMol(copy.deepcopy(core_ligand))
             combined_mols.append(merge_R_group(mol=core_mol, R_group=r_mol, replaceIndex=atom_idx))
 
     return combined_mols
