@@ -1,6 +1,6 @@
 import copy
 import stat
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple
 import os
 import glob
 import tempfile
@@ -20,7 +20,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Draw
 from rdkit.Chem.rdMolAlign import AlignMol
 import mols2grid
-import pandas as pd
+import pandas
 
 
 from .conformers import generate_conformers
@@ -132,7 +132,9 @@ def merge_R_group(mol, R_group, replaceIndex):
     template = etemp.GetMol()
 
     with_template = RMol(merged)
-    with_template.save_template(template)
+    with_template._save_template(template)
+    # save the group
+    with_template._save_rgroup(R_group)
 
     return with_template
 
@@ -141,16 +143,51 @@ def ic50(x):
     return 10**(-x - -9)
 
 
-class RMol(rdkit.Chem.rdchem.Mol):
+class RInterface():
+    """
+    This is a shared interface for a molecule and a list of molecules.
+
+    The main purpose is to allow using the same functions on a single molecule and on a group of them.
+    """
+
+    def rep2D(self, **kwargs):
+        pass
+
+    def toxicity(self):
+        pass
+
+    def generate_conformers(
+        self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
+    ):
+        pass
+
+    def removeConfsClashingWithProdyProt(self, prot, min_dst_allowed=1):
+        pass
+
+
+class RMol(rdkit.Chem.rdchem.Mol, RInterface):
     gnina_dir = None
 
     def __init__(self, *args, template=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.template = template
+        if isinstance(args[0], RMol):
+            self.template = args[0].template
+            self.rgroup = args[0].rgroup
+            self.opt_energies = args[0].opt_energies
+        else:
+            self.template = template
+            self.rgroup = None
+            self.opt_energies = None
 
-    def save_template(self, mol):
+    def _save_template(self, mol):
         self.template = RMol(copy.deepcopy(mol))
+
+    def _save_rgroup(self, rgroup):
+        self.rgroup = rgroup
+
+    def _save_opt_energies(self, energies):
+        self.opt_energies = energies
 
     def toxicity(self):
         return tox_props(self)
@@ -161,6 +198,29 @@ class RMol(rdkit.Chem.rdchem.Mol):
         cons = generate_conformers(self, num_conf, minimum_conf_rms, **kwargs)
         self.RemoveAllConformers()
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
+
+    def optimise_in_receptor(self, *args, **kwargs):
+        from .receptor import ForceField, optimise_in_receptor
+        opt_mol, energies =  optimise_in_receptor(self, *args, **kwargs)
+        # replace the conformers with the optimised ones
+        self.RemoveAllConformers()
+        [self.AddConformer(conformer, assignId=True) for conformer  in opt_mol.GetConformers()]
+        # save the energies
+        self._save_opt_energies(energies)
+
+        return energies
+
+    def sort_conformers(self, energy_range=5):
+        if self.opt_energies is None:
+            raise AttributeError('Please run the optimise_in_receptor in order to generate the energies first. ')
+
+        from .receptor import sort_conformers
+        final_mol, final_energies = sort_conformers(self, self.opt_energies, energy_range=energy_range)
+        # overwrite the current confs
+        self.RemoveAllConformers()
+        [self.AddConformer(conformer, assignId=True) for conformer in final_mol.GetConformers()]
+        self._save_opt_energies(final_energies)
+        return final_energies
 
     def rep2D(self, **kwargs):
         return rep2D(self, **kwargs)
@@ -307,7 +367,7 @@ class RGroupGrid(mols2grid.MolGrid):
 
         super(RGroupGrid, self).__init__(dataframe, mol_col="Molecules", use_coords=False)
 
-    def _load_molecules(self) -> pd.DataFrame:
+    def _load_molecules(self) -> pandas.DataFrame:
         """
         Load the local r groups into rdkit molecules
         """
@@ -332,7 +392,7 @@ class RGroupGrid(mols2grid.MolGrid):
                             setattr(r_mol, "__sssAtoms", [atom.GetIdx()])
                     molecules.append(r_mol)
 
-        return pd.DataFrame({"Molecules": molecules, "Functional Group": groups, "Name": names, "Mol File": molfiles})
+        return pandas.DataFrame({"Molecules": molecules, "Functional Group": groups, "Name": names, "Mol File": molfiles})
 
     def _ipython_display_(self):
         from IPython.display import display
@@ -340,10 +400,65 @@ class RGroupGrid(mols2grid.MolGrid):
         return display(self.display(subset=subset))
 
 
+class RList(RInterface, list):
+    """
+    Streamline working with RMol by presenting the same interface on the list,
+    and allowing to dispatch the functions to any single member.
+    """
+
+    def rep2D(self, subImgSize=(400, 400), **kwargs):
+        return Draw.MolsToGridImage([mol.rep2D(rdkit_mol=True, **kwargs) for mol in self], subImgSize=subImgSize)
+
+    def toxicity(self):
+        return pandas.concat([m.toxicity() for m in self])
+
+    def generate_conformers(
+        self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
+    ):
+        for i, rmol in enumerate(self, start=1):
+            print(f'RMol {i}')
+            rmol.generate_conformers(num_conf, minimum_conf_rms, **kwargs)
+
+    def GetNumConformers(self):
+        return [rmol.GetNumConformers() for rmol in self]
+
+    def removeConfsClashingWithProdyProt(self, prot, min_dst_allowed=1):
+        for i, rmol in enumerate(self, start=1):
+            print(f'RMol {i}')
+            rmol.removeConfsClashingWithProdyProt(prot, min_dst_allowed=min_dst_allowed)
+
+    def optimise_in_receptor(self, *args, **kwargs):
+        """
+        Replace the current molecule with the optimised one. Return lists of energies.
+        """
+        energies = []
+        for i, rmol in enumerate(self, start=1):
+            print(f'RMol {i}')
+            energies.append(rmol.optimise_in_receptor(*args, **kwargs))
+
+        return energies
+
+    def sort_conformers(self, energy_range=5):
+        energies = []
+        for i, rmol in enumerate(self, start=1):
+            print(f'RMol {i}')
+            energies.append(rmol.sort_conformers(energy_range))
+
+        return energies
+
+    def gnina(self, receptor_file):
+        scores = []
+        for i, rmol in enumerate(self, start=1):
+            print(f'RMol {i}')
+            scores.append(rmol.gnina(receptor_file))
+
+        return scores
+
+
 def build_molecules(core_ligand: RMol,
                     attachment_points: List[int],
                     r_groups: Union[RGroupGrid, List[Chem.Mol]],
-                    ) ->List[RMol]:
+                    ) ->RList[RMol]:
     """
     For the given core molecule and list of attachment points and r groups enumerate the possible molecules and return a list of them.
 
@@ -363,7 +478,7 @@ def build_molecules(core_ligand: RMol,
     else:
         r_mols = r_groups
 
-    combined_mols = []
+    combined_mols = RList()
     # loop over the attachment points and r_groups
     for atom_idx in attachment_points:
         for r_mol in r_mols:
@@ -371,3 +486,6 @@ def build_molecules(core_ligand: RMol,
             combined_mols.append(merge_R_group(mol=core_mol, R_group=r_mol, replaceIndex=atom_idx))
 
     return combined_mols
+
+
+

@@ -179,7 +179,6 @@ def optimise_in_receptor(
 
     # loop over the conformers and energy minimise and store the final positions
     final_mol = RMol(deepcopy(ligand))
-    final_mol.save_template(ligand.template)
     final_mol.RemoveAllConformers()
     energies = []
     for i, conformer in enumerate(
