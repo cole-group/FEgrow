@@ -273,6 +273,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         # set gnina location
         path = Path(loc)
         if path.is_file():
+            assert path.name == 'gnina', 'Please ensure gnina binary is named "gnina"'
             RMol.gnina_dir = path.parent
         else:
             raise Exception('The path is not the binary file gnina')
@@ -309,6 +310,10 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
     def gnina(self, receptor_file):
         self._check_download_gnina()
 
+        # obtain the absolute file to the receptor
+        receptor = Path(receptor_file)
+        assert receptor.exists()
+
         # make a temporary sdf file for gnina
         tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.sdf')
         with Chem.SDWriter(tmp.name) as w:
@@ -320,7 +325,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
             ["./gnina",
              "--score_only",
              "-l", tmp.name,
-             "-r", receptor_file,
+             "-r", receptor.absolute(),
              "--seed", "0",
              "--stripH", 'False'],
             capture_output=True,
