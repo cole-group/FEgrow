@@ -452,14 +452,10 @@ class RList(RInterface, list):
         return energies
 
     def sort_conformers(self, energy_range=5):
-        energies = OrderedDict()
+        energies = []
         for i, rmol in enumerate(self):
             print(f'RMol index {i}')
-            sorted_conformer_energies = rmol.sort_conformers(energy_range)
-            if sorted_conformer_energies is None:
-                continue
-
-            energies[i] = sorted_conformer_energies
+            energies.append(rmol.sort_conformers(energy_range))
 
         return energies
 
