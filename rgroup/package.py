@@ -8,6 +8,7 @@ import subprocess
 import re
 from pathlib import Path
 from urllib.request import urlretrieve
+from collections import OrderedDict
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -200,6 +201,10 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
 
     def optimise_in_receptor(self, *args, **kwargs):
+        if self.GetNumConformers() == 0:
+            print("Warning: no conformers so cannot optimise_in_receptor. Ignoring.")
+            return
+
         from .receptor import ForceField, optimise_in_receptor
         opt_mol, energies =  optimise_in_receptor(self, *args, **kwargs)
         # replace the conformers with the optimised ones
@@ -211,7 +216,10 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         return energies
 
     def sort_conformers(self, energy_range=5):
-        if self.opt_energies is None:
+        if self.GetNumConformers() == 0:
+            print('An rmol doesn\'t have any conformers. Ignoring.')
+            return None
+        elif self.opt_energies is None:
             raise AttributeError('Please run the optimise_in_receptor in order to generate the energies first. ')
 
         from .receptor import sort_conformers
@@ -420,42 +428,50 @@ class RList(RInterface, list):
     def generate_conformers(
         self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
     ):
-        for i, rmol in enumerate(self, start=1):
-            print(f'RMol {i}')
+        for i, rmol in enumerate(self):
+            print(f'RMol index {i}')
             rmol.generate_conformers(num_conf, minimum_conf_rms, **kwargs)
 
     def GetNumConformers(self):
         return [rmol.GetNumConformers() for rmol in self]
 
     def removeConfsClashingWithProdyProt(self, prot, min_dst_allowed=1):
-        for i, rmol in enumerate(self, start=1):
-            print(f'RMol {i}')
+        for i, rmol in enumerate(self):
+            print(f'RMol index {i}')
             rmol.removeConfsClashingWithProdyProt(prot, min_dst_allowed=min_dst_allowed)
 
     def optimise_in_receptor(self, *args, **kwargs):
         """
         Replace the current molecule with the optimised one. Return lists of energies.
         """
-        energies = []
-        for i, rmol in enumerate(self, start=1):
-            print(f'RMol {i}')
-            energies.append(rmol.optimise_in_receptor(*args, **kwargs))
+        energies = OrderedDict()
+        for i, rmol in enumerate(self):
+            print(f'RMol index {i}')
+            conformer_energies = rmol.optimise_in_receptor(*args, **kwargs)
+            if conformer_energies is None:
+                continue
+
+            energies[i] = conformer_energies
 
         return energies
 
     def sort_conformers(self, energy_range=5):
-        energies = []
-        for i, rmol in enumerate(self, start=1):
-            print(f'RMol {i}')
-            energies.append(rmol.sort_conformers(energy_range))
+        energies = OrderedDict()
+        for i, rmol in enumerate(self):
+            print(f'RMol index {i}')
+            sorted_conformer_energies = rmol.sort_conformers(energy_range)
+            if sorted_conformer_energies is None:
+                continue
+
+            energies[i] = sorted_conformer_energies
 
         return energies
 
     def gnina(self, receptor_file):
-        scores = []
-        for i, rmol in enumerate(self, start=1):
-            print(f'RMol {i}')
-            scores.append(rmol.gnina(receptor_file))
+        scores = OrderedDict()
+        for i, rmol in enumerate(self):
+            print(f'RMol index {i}')
+            scores[i] = rmol.gnina(receptor_file)
 
         return scores
 
