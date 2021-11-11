@@ -444,14 +444,10 @@ class RList(RInterface, list):
         """
         Replace the current molecule with the optimised one. Return lists of energies.
         """
-        energies = OrderedDict()
+        energies = []
         for i, rmol in enumerate(self):
             print(f'RMol index {i}')
-            conformer_energies = rmol.optimise_in_receptor(*args, **kwargs)
-            if conformer_energies is None:
-                continue
-
-            energies[i] = conformer_energies
+            energies.append(rmol.optimise_in_receptor(*args, **kwargs))
 
         return energies
 
@@ -468,10 +464,10 @@ class RList(RInterface, list):
         return energies
 
     def gnina(self, receptor_file):
-        scores = OrderedDict()
+        scores = []
         for i, rmol in enumerate(self):
             print(f'RMol index {i}')
-            scores[i] = rmol.gnina(receptor_file)
+            scores.append(rmol.gnina(receptor_file))
 
         return scores
 
