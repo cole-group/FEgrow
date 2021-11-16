@@ -8,7 +8,7 @@ setup(
     url='https://blogs.ncl.ac.uk/danielcole/',
     author='Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Josh Horton, Daniel Cole',
     author_email='bieniekmat@gmail.com',
-    install_requires=['parmed', 'tqdm', 'mdanalysis', 'typing-extensions'],
+    install_requires=['parmed', 'tqdm', 'mdanalysis', 'typing-extensions'], #  FIXME: see env.yml for others
     packages=find_packages(),
     include_package_data=True,
 )
