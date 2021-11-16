@@ -388,7 +388,7 @@ class RGroupGrid(mols2grid.MolGrid):
         groups = []
         names = []
         molfiles = []
-        root_path = "data/rgroups/molecules"
+        root_path = Path(__file__).parent / "data" / "rgroups" / "molecules"
         for group in os.listdir(root_path):
             group_path = os.path.join(root_path, group)
             if os.path.isdir(group_path):
