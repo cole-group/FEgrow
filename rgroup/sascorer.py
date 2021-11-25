@@ -24,7 +24,7 @@ import pickle
 import math
 from collections import defaultdict
 
-import os.path as op
+from pathlib import Path
 
 _fscores = None
 
@@ -34,7 +34,7 @@ def readFragmentScores(name='fpscores'):
     global _fscores
     # generate the full path filename:
     if name == "fpscores":
-        name = op.join(op.dirname(__file__), name)
+        name = Path(__file__).parent / 'data' / name
     data = pickle.load(gzip.open('%s.pkl.gz' % name))
     outDict = {}
     for i in data:
