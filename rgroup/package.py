@@ -339,7 +339,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
             capture_output=True,
             cwd=RMol.gnina_dir)
         output = process.stdout.decode('utf-8')
-        CNNaffinities = re.findall(r'CNNaffinity: (\d+.\d+)', output)
+        CNNaffinities = re.findall(r'CNNaffinity: (-?\d+.\d+)', output)
 
         # convert to float
         return list(map(float, CNNaffinities))
