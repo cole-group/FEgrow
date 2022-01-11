@@ -473,7 +473,7 @@ class RList(RInterface, list):
         """
         for rmol in self[::-1]:
             if rmol.GetNumConformers() == 0:
-                print('Discarding a molecule due to the lack of conformers. ')
+                print(f'Discarding a molecule (id {self.index(rmol)}) due to the lack of conformers. ')
                 self.remove(rmol)
 
 
