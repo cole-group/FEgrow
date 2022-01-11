@@ -471,10 +471,13 @@ class RList(RInterface, list):
         """
         Remove from this list the molecules that have no conformers
         """
+        removed = []
         for rmol in self[::-1]:
             if rmol.GetNumConformers() == 0:
                 print(f'Discarding a molecule (id {self.index(rmol)}) due to the lack of conformers. ')
                 self.remove(rmol)
+                removed.append(self.index(rmol))
+        return removed
 
 
 def build_molecules(core_ligand: RMol,
