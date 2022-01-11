@@ -467,6 +467,15 @@ class RList(RInterface, list):
 
         return scores
 
+    def discard_missing(self):
+        """
+        Remove from this list the molecules that have no conformers
+        """
+        for rmol in self[::-1]:
+            if rmol.GetNumConformers() == 0:
+                print('Discarding a molecule due to the lack of conformers. ')
+                self.remove(rmol)
+
 
 def build_molecules(core_ligand: RMol,
                     attachment_points: List[int],
