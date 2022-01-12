@@ -474,9 +474,10 @@ class RList(RInterface, list):
         removed = []
         for rmol in self[::-1]:
             if rmol.GetNumConformers() == 0:
-                print(f'Discarding a molecule (id {self.index(rmol)}) due to the lack of conformers. ')
+                rmindex = self.index(rmol)
+                print(f'Discarding a molecule (id {rmindex}) due to the lack of conformers. ')
                 self.remove(rmol)
-                removed.append(self.index(rmol))
+                removed.append(rmindex)
         return removed
 
 
