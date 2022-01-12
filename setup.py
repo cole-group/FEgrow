@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='rgroup',
-    version='0.0.1.dev1',
+    version='0.0.1.dev2',
     description='RGroup: generate congeneric ligands by modifying groups. ',
     long_description='Copy from README file',
     url='https://blogs.ncl.ac.uk/danielcole/',
