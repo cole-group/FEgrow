@@ -88,7 +88,8 @@ def optimise_in_receptor(
     ligand_force_field: ForceField,
     use_ani: bool = True,
     sigma_scale_factor: float = 0.8,
-    relative_permittivity: float = 4
+    relative_permittivity: float = 4,
+    water_model = 'tip3p.xml'
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -106,6 +107,9 @@ def optimise_in_receptor(
             The factor by which all sigma values should be scaled
         relative_permittivity:
             The relativity permittivity which should be used to scale all charges 1/sqrt(permittivity)
+        water_model:
+            If set to None, the water model is ignored. Acceptable can be found in the
+            openmmforcefields package.
 
     Returns:
         A copy of the input molecule with the optimised positions.
@@ -124,9 +128,13 @@ def optimise_in_receptor(
     # load the molecule into openff
     openff_mol = OFFMolecule.from_rdkit(ligand, allow_undefined_stereo=True)
 
+    forcefields = [receptor_ff]
+    if water_model:
+        forcefields.append(water_model)
+
     # now we need to make our parameterised system, make a system generator
     system_generator = SystemGenerator(
-        forcefields=[receptor_ff],
+        forcefields=forcefields,
         small_molecule_forcefield=ligand_force_fields[ligand_force_field],
         cache="db.json",
         molecules=openff_mol,
