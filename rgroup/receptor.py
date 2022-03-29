@@ -52,7 +52,6 @@ def _can_use_ani2x(molecule: OFFMolecule) -> bool:
     ani2x_elements = {"H", "C", "N", "O", "S", "F", "Cl"}
     if (
         mol_elements - ani2x_elements
-        or molecule.total_charge.value_in_unit(unit.elementary_charge) != 0
     ):
         # if there is any difference in the sets or a net charge ani2x can not be used.
         return False
@@ -167,6 +166,7 @@ def optimise_in_receptor(
             complex_structure.topology, system, ligand_idx
         )
     else:
+        print("Using force field")
         complex_system = system
     # scale the charges and sigma values
     _scale_system(system=complex_system, sigma_scale_factor=sigma_scale_factor, relative_permittivity=relative_permittivity)
