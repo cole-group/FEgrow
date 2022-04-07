@@ -378,39 +378,51 @@ class RGroupGrid(mols2grid.MolGrid):
     def __init__(self):
         dataframe = self._load_molecules()
 
-        super(RGroupGrid, self).__init__(dataframe, mol_col="Molecules", use_coords=False)
+        super(RGroupGrid, self).__init__(dataframe, mol_col="Mol", use_coords=False)
 
     def _load_molecules(self) -> pandas.DataFrame:
         """
         Load the local r groups into rdkit molecules
         """
         molecules = []
-        groups = []
         names = []
         molfiles = []
-        root_path = Path(__file__).parent / "data" / "rgroups" / "molecules"
-        for group in os.listdir(root_path):
-            group_path = os.path.join(root_path, group)
-            if os.path.isdir(group_path):
-                # load all of the molecules in the folder
-                for molfile in glob.glob(group_path + '/*.mol'):
-                    r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
-                    groups.append(group)
-                    names.append(r_mol.GetProp("_Name"))
-                    molfiles.append(molfile)
+        inbuilt_rgroups = Path(__file__).parent / "data" / "rgroups" / "library"
+        # load all of the molecules in the folder
+        for molfile in glob.glob(str(inbuilt_rgroups / '*.mol')):
+            r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
+            names.append(Path(molfile).stem)
+            molfiles.append(molfile)
 
-                    # highlight the attachment atom
-                    for atom in r_mol.GetAtoms():
-                        if atom.GetAtomicNum() == 0:
-                            setattr(r_mol, "__sssAtoms", [atom.GetIdx()])
-                    molecules.append(r_mol)
+            # highlight the attachment atom
+            for atom in r_mol.GetAtoms():
+                if atom.GetAtomicNum() == 0:
+                    setattr(r_mol, "__sssAtoms", [atom.GetIdx()])
+            molecules.append(r_mol)
 
-        return pandas.DataFrame({"Molecules": molecules, "Functional Group": groups, "Name": names, "Mol File": molfiles})
+        return pandas.DataFrame({"Mol": molecules, "Name": names, "Path": molfiles})
 
     def _ipython_display_(self):
         from IPython.display import display
-        subset = ["img", "Functional Group", "Name", "mols2grid-id"]
+        subset = ["img", "Name", "mols2grid-id"]
         return display(self.display(subset=subset))
+
+    def get_selected_deprecated(self):
+        # .selection is deprecated and will be removed
+        selection = mols2grid.selection
+        # now get a list of the molecules
+        return [self.dataframe.iloc[i]["Mol"] for i in selection.keys()]
+
+    def get_selected(self):
+        # use the new API
+        df = self.get_selection()
+        # now get a list of the molecules
+        return list(df['Mol'])
+
+    # def get_selected(self):
+    #     selection = mols2grid.selection
+    #     # now get a list of the molecules
+    #     return [self.dataframe.iloc[i]["Mol File"] for i in selection.keys()]
 
 
 class RList(RInterface, list):
@@ -500,7 +512,7 @@ def build_molecules(core_ligand: RMol,
     if isinstance(r_groups, RGroupGrid):
         selection = mols2grid.selection
         # now get a list of the molecules
-        r_mols = [r_groups.dataframe.iloc[i]["Molecules"] for i in selection.keys()]
+        r_mols = [r_groups.dataframe.iloc[i]["Mol"] for i in selection.keys()]
     else:
         r_mols = r_groups
 

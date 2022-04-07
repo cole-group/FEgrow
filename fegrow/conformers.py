@@ -74,7 +74,7 @@ def generate_conformers(RMol: Chem.rdchem.Mol,
                 dup_count += 1
                 rmol.RemoveConformer(conf_idx)
     if dup_count:
-        print(f'removed {dup_count} duplicated conformations')
+        print(f'Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. ')
     return rmol
 
 

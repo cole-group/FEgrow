@@ -1,2 +1,3 @@
-include rgroup/data/rgroups/molecules/*/*-r.mol
-include rgroup/data/fpscores.pkl.gz
+include fegrow/data/rgroups/molecules/*/*-r.mol
+include fegrow/data/rgroups/library/*.mol
+include fegrow/data/fpscores.pkl.gz
