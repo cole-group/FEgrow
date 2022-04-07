@@ -1,0 +1,2 @@
+git+https://github.com/jthorton/openmm-ml.git@main
+.
