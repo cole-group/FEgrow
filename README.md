@@ -1,4 +1,4 @@
-# R-group
+# FEgrow
 An interactive set of tools for making co-generic ligands. 
 
 # Installation - Conda
