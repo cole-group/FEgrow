@@ -162,7 +162,7 @@ class RInterface():
     ):
         pass
 
-    def removeConfsClashingWithProdyProt(self, prot, min_dst_allowed=1):
+    def remove_clashing_confs(self, prot, min_dst_allowed=1):
         pass
 
 
@@ -263,7 +263,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         view.zoomTo({'model': -1})
         return view
 
-    def removeConfsClashingWithProdyProt(self, prot, min_dst_allowed=1):
+    def remove_clashing_confs(self, prot, min_dst_allowed=1):
         prot_coords = prot.getCoords()
 
         counter = 0
@@ -339,10 +339,16 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
             capture_output=True,
             cwd=RMol.gnina_dir)
         output = process.stdout.decode('utf-8')
-        CNNaffinities = re.findall(r'CNNaffinity: (-?\d+.\d+)', output)
+        CNNaffinities_str = re.findall(r'CNNaffinity: (-?\d+.\d+)', output)
+
+        # convert to floats
+        CNNaffinities = list(map(float, CNNaffinities_str))
+
+        # generate IC50 from the CNNaffinities
+        ic50s = list(map(ic50, CNNaffinities))
 
         # convert to float
-        return list(map(float, CNNaffinities))
+        return CNNaffinities, ic50s
 
     def to_file(self, file_name: str):
         """
@@ -447,10 +453,10 @@ class RList(RInterface, list):
     def GetNumConformers(self):
         return [rmol.GetNumConformers() for rmol in self]
 
-    def removeConfsClashingWithProdyProt(self, prot, min_dst_allowed=1):
+    def remove_clashing_confs(self, prot, min_dst_allowed=1):
         for i, rmol in enumerate(self):
             print(f'RMol index {i}')
-            rmol.removeConfsClashingWithProdyProt(prot, min_dst_allowed=min_dst_allowed)
+            rmol.remove_clashing_confs(prot, min_dst_allowed=min_dst_allowed)
 
     def optimise_in_receptor(self, *args, **kwargs):
         """
@@ -473,11 +479,14 @@ class RList(RInterface, list):
 
     def gnina(self, receptor_file):
         scores = []
+        all_ic50s = []
         for i, rmol in enumerate(self):
             print(f'RMol index {i}')
-            scores.append(rmol.gnina(receptor_file))
+            cnnaffinities, ic50s = rmol.gnina(receptor_file)
+            scores.append(cnnaffinities)
+            all_ic50s.append(ic50s)
 
-        return scores
+        return scores, all_ic50s
 
     def discard_missing(self):
         """
