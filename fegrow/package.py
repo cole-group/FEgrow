@@ -167,6 +167,15 @@ class RInterface():
 
 
 class RMol(rdkit.Chem.rdchem.Mol, RInterface):
+    """
+    RMol is essentially a wrapper around RDKit Mol with
+    tailored functionalities for attaching R groups, etc.
+
+    :param rmol: when provided, energies and additional metadata is preserved.
+    :type rmol: RMol
+    :param template: Provide the original molecule template
+        used for this RMol.
+    """
     gnina_dir = None
 
     def __init__(self, *args, template=None, **kwargs):
@@ -191,11 +200,35 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         self.opt_energies = energies
 
     def toxicity(self):
+        """
+        Assessed various ADMET properties, including
+         - Lipinksi rule of 5 properties,
+         - the presence of unwanted substructures
+         - problematic functional groups
+         - synthetic accessibility
+
+         :return: a row of a dataframe with the descriptors
+         :rtype: dataframe
+        """
         return tox_props(self)
 
     def generate_conformers(
         self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
     ):
+        """
+        Generate conformers using the RDKIT's ETKDG. The generated conformers
+        are embedded into the template structure. In other words,
+        any atoms that are common with the template structure,
+        should have the same coordinates.
+
+        :param num_conf: fixme
+        :param minimum_conf_rms: The minimum acceptable difference in the RMS in any new generated conformer.
+            Conformers that are too similar are discarded.
+        :type minimum_conf_rms: float
+        :param flexible: A list of indices that are common with the template molecule
+            that should have new coordinates.
+        :type flexible: List[int]
+        """
         cons = generate_conformers(self, num_conf, minimum_conf_rms, **kwargs)
         self.RemoveAllConformers()
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
@@ -215,7 +248,12 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
         return energies
 
-    def sort_conformers(self, energy_range=5):
+    def sort_conformers(self, energy_range=5, filter=True):
+        """
+
+
+        :param filter: Remove
+        """
         if self.GetNumConformers() == 0:
             print('An rmol doesn\'t have any conformers. Ignoring.')
             return None
@@ -424,11 +462,6 @@ class RGroupGrid(mols2grid.MolGrid):
         df = self.get_selection()
         # now get a list of the molecules
         return list(df['Mol'])
-
-    # def get_selected(self):
-    #     selection = mols2grid.selection
-    #     # now get a list of the molecules
-    #     return [self.dataframe.iloc[i]["Mol File"] for i in selection.keys()]
 
 
 class RList(RInterface, list):

@@ -3,14 +3,12 @@ API
 
 Here is the Application Programming Interface
 
-.. currentmodule:: fegrow
+A list of classes
 
-.. autosummary::
-   :recursive:
-   :toctree: fegrow
+.. toctree::
+   :maxdepth: 3
 
-   RMol
-   RList
-   RGroups
-   build_molecules
-   fix_receptor
+   ./classes/RMol
+   ./classes/RList
+   ./classes/RGroups
+   ./classes/functions
