@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>functions &#8212; FEgrow 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="RGroups" href="RGroups.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="functions">
+<h1>functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="fegrow.fix_receptor">
+<span class="sig-prename descclassname"><span class="pre">fegrow.</span></span><span class="sig-name descname"><span class="pre">fix_receptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/receptor.html#fix_receptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.fix_receptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use PDBFixer to correct the input and add hydrogen.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>input_file:</dt><dd><p>The name of the pdb file which contains the receptor.</p>
+</dd>
+<dt>output_file:</dt><dd><p>The name of the pdb file the fixed receptor should be wrote to.</p>
+</dd>
+<dt>ph:</dt><dd><p>The ph the pronation state should be fixed for.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fegrow.build_molecules">
+<span class="sig-prename descclassname"><span class="pre">fegrow.</span></span><span class="sig-name descname"><span class="pre">build_molecules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core_ligand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RMol.html#fegrow.RMol" title="fegrow.package.RMol"><span class="pre">fegrow.package.RMol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">attachment_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">fegrow.package.RGroupGrid</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">rdkit.Chem.rdchem.Mol</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RList.html#fegrow.RList" title="fegrow.package.RList"><span class="pre">fegrow.package.RList</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RMol.html#fegrow.RMol" title="fegrow.package.RMol"><span class="pre">fegrow.package.RMol</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/fegrow/package.html#build_molecules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.build_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>For the given core molecule and list of attachment points and r groups enumerate the possible molecules and return a list of them.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>core_ligand:</dt><dd><p>The core scaffold molecule to attach the r groups to.</p>
+</dd>
+<dt>attachment_points:</dt><dd><p>The list of atom index in the core ligand that the r groups should be attached to.</p>
+</dd>
+<dt>r_groups:</dt><dd><p>The list of rdkit molecules which should be considered r groups or the RGroup Grid with highlighted molecules.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FEgrow</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../main.html">FEgrow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="RMol.html">RMol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RList.html">RList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RGroups.html">RGroups</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">functions</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="RGroups.html" title="previous chapter">RGroups</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Daniel J Cole.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/classes/functions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

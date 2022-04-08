@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RList &#8212; FEgrow 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RGroups" href="RGroups.html" />
+    <link rel="prev" title="RMol" href="RMol.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="rlist">
+<h1>RList<a class="headerlink" href="#rlist" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fegrow.RList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fegrow.</span></span><span class="sig-name descname"><span class="pre">RList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streamline working with RMol by presenting the same interface on the list,
+and allowing to dispatch the functions to any single member.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RList.discard_missing">
+<span class="sig-name descname"><span class="pre">discard_missing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RList.discard_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RList.discard_missing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove from this list the molecules that have no conformers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RList.optimise_in_receptor">
+<span class="sig-name descname"><span class="pre">optimise_in_receptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RList.optimise_in_receptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RList.optimise_in_receptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the current molecule with the optimised one. Return lists of energies.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FEgrow</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../main.html">FEgrow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="RMol.html">RMol</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RGroups.html">RGroups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html">functions</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="RMol.html" title="previous chapter">RMol</a></li>
+      <li>Next: <a href="RGroups.html" title="next chapter">RGroups</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Daniel J Cole.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/classes/RList.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
