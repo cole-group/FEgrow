@@ -215,8 +215,8 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         """
         df = tox_props(self)
         # add an index column to the front
-        df.insert(0, 'id', self.id)
-        df.set_index('id', inplace=True)
+        df.insert(0, 'ID', self.id)
+        df.set_index('ID', inplace=True)
 
         # add a column with smiles
         df = df.assign(Smiles=[Chem.MolToSmiles(self)])
@@ -259,7 +259,14 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         # save the energies
         self._save_opt_energies(energies)
 
-        return energies
+        # build a dataframe with the molecules
+        conformer_ids = [c.GetId() for c in self.GetConformers()]
+        df = pandas.DataFrame({"ID":        [self.id]*len(energies),
+                               "Conformer": conformer_ids,
+                               "Energy":    energies,
+                               })
+
+        return df
 
     def sort_conformers(self, energy_range=5, filter=True):
         """
@@ -279,7 +286,15 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         self.RemoveAllConformers()
         [self.AddConformer(conformer, assignId=True) for conformer in final_mol.GetConformers()]
         self._save_opt_energies(final_energies)
-        return final_energies
+
+        # build a dataframe with the molecules
+        conformer_ids = [c.GetId() for c in self.GetConformers()]
+        df = pandas.DataFrame({"ID":        [self.id]*len(final_energies),
+                               "Conformer": conformer_ids,
+                               "Energy":    final_energies,
+                               })
+
+        return df
 
     def rep2D(self, **kwargs):
         return rep2D(self, **kwargs)
@@ -398,8 +413,15 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         # generate IC50 from the CNNaffinities
         ic50s = list(map(ic50, CNNaffinities))
 
-        # convert to float
-        return CNNaffinities, ic50s
+        # create a dataframe
+        conformer_ids = [c.GetId() for c in self.GetConformers()]
+        df = pandas.DataFrame({'ID':                    [self.id]*len(CNNaffinities),
+                               'Conformer':             conformer_ids,
+                               'CNNaffinity':           CNNaffinities,
+                               'CNNaffinity->IC50s':    ic50s
+                               })
+
+        return df
 
     def to_file(self, file_name: str):
         """
@@ -425,6 +447,28 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         with open(file_name, "w") as output:
             for conformer in self.GetConformers():
                 output.write(func(self, confId=conformer.GetId()))
+
+    def df(self):
+        df = pandas.DataFrame({'ID': [self.id],
+                              'Smiles': [Chem.MolToSmiles(self)],
+                              })
+        # attach energies if they're present
+        if self.opt_energies:
+            df = df.assign(Energies=', '.join([str(e) for e in sorted(self.opt_energies)]))
+
+        # add a column with the visualisation
+        PandasTools.AddMoleculeColumnToFrame(df, 'Smiles', 'Molecule', includeFingerprints=True)
+        df.set_index(['ID'], inplace=True)
+        return df
+
+    def _repr_html_(self):
+        df = pandas.DataFrame({'ID': [self.id],
+                               'Smiles': [Chem.MolToSmiles(self)],
+                               })
+
+        # add a column with the visualisation
+        PandasTools.AddMoleculeColumnToFrame(df, 'Smiles', 'Molecule', includeFingerprints=True)
+        return df._repr_html_()
 
 
 class RGroupGrid(mols2grid.MolGrid):
@@ -508,31 +552,36 @@ class RList(RInterface, list):
         """
         Replace the current molecule with the optimised one. Return lists of energies.
         """
-        energies = []
+        # return pandas.concat([m.toxicity() for m in self])
+
+        dfs = []
         for i, rmol in enumerate(self):
             print(f'RMol index {i}')
-            energies.append(rmol.optimise_in_receptor(*args, **kwargs))
+            dfs.append(rmol.optimise_in_receptor(*args, **kwargs))
 
-        return energies
+        df = pandas.concat(dfs)
+        df.set_index(['ID', 'Conformer'], inplace=True)
+        return df
 
     def sort_conformers(self, energy_range=5):
-        energies = []
+        dfs = []
         for i, rmol in enumerate(self):
             print(f'RMol index {i}')
-            energies.append(rmol.sort_conformers(energy_range))
+            dfs.append(rmol.sort_conformers(energy_range))
 
-        return energies
+        df = pandas.concat(dfs)
+        df.set_index(['ID', 'Conformer'], inplace=True)
+        return df
 
     def gnina(self, receptor_file):
-        scores = []
-        all_ic50s = []
+        dfs = []
         for i, rmol in enumerate(self):
             print(f'RMol index {i}')
-            cnnaffinities, ic50s = rmol.gnina(receptor_file)
-            scores.append(cnnaffinities)
-            all_ic50s.append(ic50s)
+            dfs.append(rmol.gnina(receptor_file))
 
-        return scores, all_ic50s
+        df = pandas.concat(dfs)
+        df.set_index(['ID', 'Conformer'], inplace=True)
+        return df
 
     def discard_missing(self):
         """
@@ -546,6 +595,9 @@ class RList(RInterface, list):
                 self.remove(rmol)
                 removed.append(rmindex)
         return removed
+
+    def _repr_html_(self):
+        return pandas.concat([rmol.df() for rmol in self])._repr_html_()
 
 
 def build_molecules(core_ligand: RMol,
