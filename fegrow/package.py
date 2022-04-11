@@ -20,6 +20,7 @@ import rdkit
 from rdkit import Chem
 from rdkit.Chem import AllChem, Draw
 from rdkit.Chem.rdMolAlign import AlignMol
+from rdkit.Chem import PandasTools
 import mols2grid
 import pandas
 
@@ -216,6 +217,12 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         # add an index column to the front
         df.insert(0, 'id', self.id)
         df.set_index('id', inplace=True)
+
+        # add a column with smiles
+        df = df.assign(Smiles=[Chem.MolToSmiles(self)])
+        # add a column with the visualisation
+        PandasTools.AddMoleculeColumnToFrame(df, 'Smiles', 'Molecule', includeFingerprints=True)
+
         return df
 
     def generate_conformers(
