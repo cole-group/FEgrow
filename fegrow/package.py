@@ -178,17 +178,19 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
     """
     gnina_dir = None
 
-    def __init__(self, *args, template=None, **kwargs):
+    def __init__(self, *args, id=None, template=None, **kwargs):
         super().__init__(*args, **kwargs)
 
         if isinstance(args[0], RMol):
             self.template = args[0].template
             self.rgroup = args[0].rgroup
             self.opt_energies = args[0].opt_energies
+            self.id = args[0].id
         else:
             self.template = template
             self.rgroup = None
             self.opt_energies = None
+            self.id = id
 
     def _save_template(self, mol):
         self.template = RMol(copy.deepcopy(mol))
@@ -210,7 +212,11 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
          :return: a row of a dataframe with the descriptors
          :rtype: dataframe
         """
-        return tox_props(self)
+        df = tox_props(self)
+        # add an index column to the front
+        df.insert(0, 'id', self.id)
+        df.set_index('id', inplace=True)
+        return df
 
     def generate_conformers(
         self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
@@ -559,11 +565,16 @@ def build_molecules(core_ligand: RMol,
         r_mols = r_groups
 
     combined_mols = RList()
+    id_counter = 0
     # loop over the attachment points and r_groups
     for atom_idx in attachment_points:
         for r_mol in r_mols:
             core_mol = RMol(copy.deepcopy(core_ligand))
-            combined_mols.append(merge_R_group(mol=core_mol, R_group=r_mol, replaceIndex=atom_idx))
+            merged_mol = merge_R_group(mol=core_mol, R_group=r_mol, replaceIndex=atom_idx)
+            # assign the identifying index to the molecule
+            merged_mol.id = id_counter
+            combined_mols.append(merged_mol)
+            id_counter += 1
 
     return combined_mols
 
