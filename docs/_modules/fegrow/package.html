@@ -53,6 +53,7 @@
 <span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
 <span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span><span class="p">,</span> <span class="n">Draw</span>
 <span class="kn">from</span> <span class="nn">rdkit.Chem.rdMolAlign</span> <span class="kn">import</span> <span class="n">AlignMol</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">PandasTools</span>
 <span class="kn">import</span> <span class="nn">mols2grid</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 
@@ -211,17 +212,19 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gnina_dir</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">RMol</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">template</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rgroup</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rgroup</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">opt_energies</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">opt_energies</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">template</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rgroup</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">opt_energies</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
 
     <span class="k">def</span> <span class="nf">_save_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">RMol</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mol</span><span class="p">))</span>
@@ -243,7 +246,17 @@
 <span class="sd">         :return: a row of a dataframe with the descriptors</span>
 <span class="sd">         :rtype: dataframe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">tox_props</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">tox_props</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># add an index column to the front</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># add a column with smiles</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Smiles</span><span class="o">=</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)])</span>
+        <span class="c1"># add a column with the visualisation</span>
+        <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;Smiles&#39;</span><span class="p">,</span> <span class="s1">&#39;Molecule&#39;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="RMol.generate_conformers"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.generate_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">generate_conformers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">num_conf</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">minimum_conf_rms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="o">**</span><span class="n">kwargs</span>
@@ -279,7 +292,14 @@
         <span class="c1"># save the energies</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_opt_energies</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">energies</span>
+        <span class="c1"># build a dataframe with the molecules</span>
+        <span class="n">conformer_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">()]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;ID&quot;</span><span class="p">:</span>        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">),</span>
+                               <span class="s2">&quot;Conformer&quot;</span><span class="p">:</span> <span class="n">conformer_ids</span><span class="p">,</span>
+                               <span class="s2">&quot;Energy&quot;</span><span class="p">:</span>    <span class="n">energies</span><span class="p">,</span>
+                               <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">df</span>
 
 <div class="viewcode-block" id="RMol.sort_conformers"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.sort_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">sort_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_range</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -299,7 +319,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">,</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">conformer</span> <span class="ow">in</span> <span class="n">final_mol</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">()]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_opt_energies</span><span class="p">(</span><span class="n">final_energies</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">final_energies</span></div>
+
+        <span class="c1"># build a dataframe with the molecules</span>
+        <span class="n">conformer_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">()]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;ID&quot;</span><span class="p">:</span>        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">final_energies</span><span class="p">),</span>
+                               <span class="s2">&quot;Conformer&quot;</span><span class="p">:</span> <span class="n">conformer_ids</span><span class="p">,</span>
+                               <span class="s2">&quot;Energy&quot;</span><span class="p">:</span>    <span class="n">final_energies</span><span class="p">,</span>
+                               <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">df</span></div>
 
     <span class="k">def</span> <span class="nf">rep2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">rep2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -418,8 +446,15 @@
         <span class="c1"># generate IC50 from the CNNaffinities</span>
         <span class="n">ic50s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">ic50</span><span class="p">,</span> <span class="n">CNNaffinities</span><span class="p">))</span>
 
-        <span class="c1"># convert to float</span>
-        <span class="k">return</span> <span class="n">CNNaffinities</span><span class="p">,</span> <span class="n">ic50s</span>
+        <span class="c1"># create a dataframe</span>
+        <span class="n">conformer_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">()]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span>                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">CNNaffinities</span><span class="p">),</span>
+                               <span class="s1">&#39;Conformer&#39;</span><span class="p">:</span>             <span class="n">conformer_ids</span><span class="p">,</span>
+                               <span class="s1">&#39;CNNaffinity&#39;</span><span class="p">:</span>           <span class="n">CNNaffinities</span><span class="p">,</span>
+                               <span class="s1">&#39;CNNaffinity-&gt;IC50s&#39;</span><span class="p">:</span>    <span class="n">ic50s</span>
+                               <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">df</span>
 
 <div class="viewcode-block" id="RMol.to_file"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.to_file">[docs]</a>    <span class="k">def</span> <span class="nf">to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -444,7 +479,29 @@
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">conformer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">():</span>
-                <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">conformer</span><span class="o">.</span><span class="n">GetId</span><span class="p">()))</span></div></div>
+                <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">conformer</span><span class="o">.</span><span class="n">GetId</span><span class="p">()))</span></div>
+
+    <span class="k">def</span> <span class="nf">df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                              <span class="s1">&#39;Smiles&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)],</span>
+                              <span class="p">})</span>
+        <span class="c1"># attach energies if they&#39;re present</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opt_energies</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Energies</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_energies</span><span class="p">)]))</span>
+
+        <span class="c1"># add a column with the visualisation</span>
+        <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;Smiles&#39;</span><span class="p">,</span> <span class="s1">&#39;Molecule&#39;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                               <span class="s1">&#39;Smiles&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)],</span>
+                               <span class="p">})</span>
+
+        <span class="c1"># add a column with the visualisation</span>
+        <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;Smiles&#39;</span><span class="p">,</span> <span class="s1">&#39;Molecule&#39;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span></div>
 
 
 <span class="k">class</span> <span class="nc">RGroupGrid</span><span class="p">(</span><span class="n">mols2grid</span><span class="o">.</span><span class="n">MolGrid</span><span class="p">):</span>
@@ -528,31 +585,36 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replace the current molecule with the optimised one. Return lists of energies.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">energies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># return pandas.concat([m.toxicity() for m in self])</span>
+
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rmol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;RMol index </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmol</span><span class="o">.</span><span class="n">optimise_in_receptor</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmol</span><span class="o">.</span><span class="n">optimise_in_receptor</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">energies</span></div>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Conformer&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
 
     <span class="k">def</span> <span class="nf">sort_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_range</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
-        <span class="n">energies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rmol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;RMol index </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmol</span><span class="o">.</span><span class="n">sort_conformers</span><span class="p">(</span><span class="n">energy_range</span><span class="p">))</span>
+            <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmol</span><span class="o">.</span><span class="n">sort_conformers</span><span class="p">(</span><span class="n">energy_range</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">energies</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Conformer&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span> <span class="nf">gnina</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receptor_file</span><span class="p">):</span>
-        <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">all_ic50s</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rmol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;RMol index </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">cnnaffinities</span><span class="p">,</span> <span class="n">ic50s</span> <span class="o">=</span> <span class="n">rmol</span><span class="o">.</span><span class="n">gnina</span><span class="p">(</span><span class="n">receptor_file</span><span class="p">)</span>
-            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cnnaffinities</span><span class="p">)</span>
-            <span class="n">all_ic50s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ic50s</span><span class="p">)</span>
+            <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmol</span><span class="o">.</span><span class="n">gnina</span><span class="p">(</span><span class="n">receptor_file</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">scores</span><span class="p">,</span> <span class="n">all_ic50s</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Conformer&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
 
 <div class="viewcode-block" id="RList.discard_missing"><a class="viewcode-back" href="../../classes/RList.html#fegrow.RList.discard_missing">[docs]</a>    <span class="k">def</span> <span class="nf">discard_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -565,7 +627,10 @@
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Discarding a molecule (id </span><span class="si">{</span><span class="n">rmindex</span><span class="si">}</span><span class="s1">) due to the lack of conformers. &#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rmol</span><span class="p">)</span>
                 <span class="n">removed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmindex</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">removed</span></div></div>
+        <span class="k">return</span> <span class="n">removed</span></div>
+
+    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">rmol</span><span class="o">.</span><span class="n">df</span><span class="p">()</span> <span class="k">for</span> <span class="n">rmol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="build_molecules"><a class="viewcode-back" href="../../classes/functions.html#fegrow.build_molecules">[docs]</a><span class="k">def</span> <span class="nf">build_molecules</span><span class="p">(</span><span class="n">core_ligand</span><span class="p">:</span> <span class="n">RMol</span><span class="p">,</span>
@@ -592,11 +657,16 @@
         <span class="n">r_mols</span> <span class="o">=</span> <span class="n">r_groups</span>
 
     <span class="n">combined_mols</span> <span class="o">=</span> <span class="n">RList</span><span class="p">()</span>
+    <span class="n">id_counter</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># loop over the attachment points and r_groups</span>
     <span class="k">for</span> <span class="n">atom_idx</span> <span class="ow">in</span> <span class="n">attachment_points</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">r_mol</span> <span class="ow">in</span> <span class="n">r_mols</span><span class="p">:</span>
             <span class="n">core_mol</span> <span class="o">=</span> <span class="n">RMol</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">core_ligand</span><span class="p">))</span>
-            <span class="n">combined_mols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merge_R_group</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">core_mol</span><span class="p">,</span> <span class="n">R_group</span><span class="o">=</span><span class="n">r_mol</span><span class="p">,</span> <span class="n">replaceIndex</span><span class="o">=</span><span class="n">atom_idx</span><span class="p">))</span>
+            <span class="n">merged_mol</span> <span class="o">=</span> <span class="n">merge_R_group</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">core_mol</span><span class="p">,</span> <span class="n">R_group</span><span class="o">=</span><span class="n">r_mol</span><span class="p">,</span> <span class="n">replaceIndex</span><span class="o">=</span><span class="n">atom_idx</span><span class="p">)</span>
+            <span class="c1"># assign the identifying index to the molecule</span>
+            <span class="n">merged_mol</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">id_counter</span>
+            <span class="n">combined_mols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merged_mol</span><span class="p">)</span>
+            <span class="n">id_counter</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">return</span> <span class="n">combined_mols</span></div>
 

@@ -9,4 +9,5 @@ This is the main content in the index.
    installation
    tutorial
    api
+   acknowledgments
 
