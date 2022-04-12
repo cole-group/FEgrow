@@ -6,11 +6,11 @@ FEgrow is licensed with MIT license (see below). For a summary, please see https
 FEgrow was heavily inspired by other codes, specifically the following:
  - Constrained Embedding:
 
-  - https://github.com/JoshuaMeyers/Snippets/blob/master/200405_constrained_conformers.ipynb
-  - https://github.com/InformaticsMatters/pipelines/blob/master/src/python/pipelines/rdkit/constrained_conf_gen.py
+  - `Joshua Meyers’ Notebook <https://github.com/JoshuaMeyers/Snippets/blob/master/200405_constrained_conformers.ipynb>`_
+  - `Tim Dudgeon example <https://github.com/InformaticsMatters/pipelines/blob/master/src/python/pipelines/rdkit/constrained_conf_gen.py>`_
  - Grafting:
 
-  - https://pschmidtke.github.io/blog/rdkit/3d-editor/2021/01/23/grafting-fragments.html
+  - `Peter Schmidtke <https://pschmidtke.github.io/blog/rdkit/3d-editor/2021/01/23/grafting-fragments.html>`_
 
 Which are licensed under Apache License (Version 2.0, January 2004),
 which can be found below the MIT license.

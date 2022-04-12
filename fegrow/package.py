@@ -251,7 +251,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         Enumerate the conformers inside of the receptor by employing
         ANI2x, a hybrid machine learning / molecular mechanics (ML/MM) approach.
         ANI2x is neural nework potential for the ligand energetics
-         but works only for the following atoms: H, C, N, O, F, S, Cl.
+        but works only for the following atoms: H, C, N, O, F, S, Cl.
 
         Open Force Field Parsley force field is used for intermolecular interactions with the receptor.
 
