@@ -9,4 +9,5 @@ FEgrow - An Open-Source Molecular Builder and Free Energy Preparation Workflow
    tutorial
    api
    acknowledgments
+   license
 

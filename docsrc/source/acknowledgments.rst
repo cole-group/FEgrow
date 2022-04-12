@@ -4,7 +4,8 @@ Acknowledgments
 We are grateful to many open source softwares available, including but not limited to:
  - RDKit (https://rdkit.org/):
 
-   - Constrained Embedding (https://github.com/JoshuaMeyers/Snippets/blob/master/200405_constrained_conformers.ipynb)
+   - Constrained Embedding (https://github.com/JoshuaMeyers/Snippets/blob/master/200405_constrained_conformers.ipynb,
+https://github.com/InformaticsMatters/pipelines/blob/master/src/python/pipelines/rdkit/constrained_conf_gen.py)
    - Grafting (https://pschmidtke.github.io/blog/rdkit/3d-editor/2021/01/23/grafting-fragments.html)
  - OpenMM (https://openmm.org/)
  - Open Force Field foundation packages (https://openforcefield.org/)
