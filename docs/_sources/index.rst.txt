@@ -1,8 +1,7 @@
 Contents
 --------
 
-
-This is the main content in the index.
+FEgrow - An Open-Source Molecular Builder and Free Energy Preparation Workflow
 
 .. toctree::
    main
