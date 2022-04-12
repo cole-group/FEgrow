@@ -94,23 +94,19 @@
 <span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span> <span class="k">as</span> <span class="n">OFFMolecule</span>
 
 
-<div class="viewcode-block" id="fix_receptor"><a class="viewcode-back" href="../../classes/functions.html#fegrow.fix_receptor">[docs]</a><span class="k">def</span> <span class="nf">fix_receptor</span><span class="p">(</span><span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ph</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">):</span>
+<div class="viewcode-block" id="fix_receptor"><a class="viewcode-back" href="../../classes/functions.html#fegrow.fix_receptor">[docs]</a><span class="k">def</span> <span class="nf">fix_receptor</span><span class="p">(</span><span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pH</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Use PDBFixer to correct the input and add hydrogen.</span>
+<span class="sd">    Use PDBFixer to correct the input and add hydrogens with the given pH.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        input_file:</span>
-<span class="sd">            The name of the pdb file which contains the receptor.</span>
-<span class="sd">        output_file:</span>
-<span class="sd">            The name of the pdb file the fixed receptor should be wrote to.</span>
-<span class="sd">        ph:</span>
-<span class="sd">            The ph the pronation state should be fixed for.</span>
+<span class="sd">    :param input_file: The name of the pdb file which contains the receptor.</span>
+<span class="sd">    :param output_file: The name of the pdb file the fixed receptor should be wrote to.</span>
+<span class="sd">    :param pH:The ph the pronation state should be fixed for.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fixer</span> <span class="o">=</span> <span class="n">PDBFixer</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">input_file</span><span class="p">)</span>
     <span class="n">fixer</span><span class="o">.</span><span class="n">findMissingResidues</span><span class="p">()</span>
     <span class="n">fixer</span><span class="o">.</span><span class="n">findMissingAtoms</span><span class="p">()</span>
     <span class="n">fixer</span><span class="o">.</span><span class="n">addMissingAtoms</span><span class="p">()</span>
-    <span class="n">fixer</span><span class="o">.</span><span class="n">addMissingHydrogens</span><span class="p">(</span><span class="n">ph</span><span class="p">)</span>
+    <span class="n">fixer</span><span class="o">.</span><span class="n">addMissingHydrogens</span><span class="p">(</span><span class="n">pH</span><span class="p">)</span>
     <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">writeFile</span><span class="p">(</span><span class="n">fixer</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">fixer</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">))</span></div>
 
 

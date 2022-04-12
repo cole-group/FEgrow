@@ -318,7 +318,16 @@
 
 <div class="viewcode-block" id="RMol.optimise_in_receptor"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.optimise_in_receptor">[docs]</a>    <span class="k">def</span> <span class="nf">optimise_in_receptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enumerate the conformers inside of the receptor by employing</span>
+<span class="sd">        ANI2x, a hybrid machine learning / molecular mechanics (ML/MM) approach.</span>
+<span class="sd">        ANI2x is neural nework potential for the ligand energetics</span>
+<span class="sd">         but works only for the following atoms: H, C, N, O, F, S, Cl.</span>
 
+<span class="sd">        Open Force Field Parsley force field is used for intermolecular interactions with the receptor.</span>
+
+<span class="sd">        :param sigma_scale_factor: is used to scale the Lennard-Jones radii of the atoms.</span>
+<span class="sd">        :param relative_permittivity: is used to scale the electrostatic interactions with the protein.</span>
+<span class="sd">        :param water_model: can be used to set the force field for any water molecules present in the binding site.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetNumConformers</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: no conformers so cannot optimise_in_receptor. Ignoring.&quot;</span><span class="p">)</span>
@@ -341,11 +350,14 @@
 
         <span class="k">return</span> <span class="n">df</span></div>
 
-<div class="viewcode-block" id="RMol.sort_conformers"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.sort_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">sort_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_range</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="RMol.sort_conformers"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.sort_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">sort_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_range</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For the given molecule and the conformer energies order the energies</span>
+<span class="sd">         and only keep any conformers with in the energy range of the</span>
+<span class="sd">         lowest energy conformer.</span>
 
-
-<span class="sd">        :param filter: Remove</span>
+<span class="sd">        :param energy_range: The energy range (kcal/mol),</span>
+<span class="sd">            above the minimum, for which conformers should be kept.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetNumConformers</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;An rmol doesn</span><span class="se">\&#39;</span><span class="s1">t have any conformers. Ignoring.&#39;</span><span class="p">)</span>
@@ -369,10 +381,33 @@
 
         <span class="k">return</span> <span class="n">df</span></div>
 
-    <span class="k">def</span> <span class="nf">rep2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">rep2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="viewcode-block" id="RMol.rep2D"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.rep2D">[docs]</a>    <span class="k">def</span> <span class="nf">rep2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use RDKit and get a 2D diagram.</span>
+<span class="sd">        Uses Compute2DCoords and Draw.MolToImage function</span>
 
-    <span class="k">def</span> <span class="nf">rep3D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prody</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">confIds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="sd">        Works with IPython Notebook.</span>
+
+<span class="sd">        :param **kwargs: are passed further to Draw.MolToImage function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">rep2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RMol.rep3D"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.rep3D">[docs]</a>    <span class="k">def</span> <span class="nf">rep3D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prody</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">confIds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use py3Dmol to obtain the 3D view of the molecule.</span>
+
+<span class="sd">        Works with IPython Notebook.</span>
+
+<span class="sd">        :param view: a view to which add the visualisation. Useful if one wants to 3D view</span>
+<span class="sd">            multiple conformers in one view.</span>
+<span class="sd">        :type view: py3Dmol view instance (None)</span>
+<span class="sd">        :param prody: A prody protein around which a view 3D can be created</span>
+<span class="sd">        :type prody: Prody instance (Default: None)</span>
+<span class="sd">        :param template: Whether to visualise the original 3D template as well from which the molecule was made.</span>
+<span class="sd">        :type template: bool (False)</span>
+<span class="sd">        :param confIds: Select the conformations for display.</span>
+<span class="sd">        :type confIds: List[int]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">prody</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">view</span> <span class="o">=</span> <span class="n">view3D</span><span class="p">(</span><span class="n">prody</span><span class="p">)</span>
 
@@ -400,9 +435,22 @@
 
         <span class="c1"># zoom to the last added model</span>
         <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">({</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
-        <span class="k">return</span> <span class="n">view</span>
+        <span class="k">return</span> <span class="n">view</span></div>
 
-    <span class="k">def</span> <span class="nf">remove_clashing_confs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prot</span><span class="p">,</span> <span class="n">min_dst_allowed</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="RMol.remove_clashing_confs"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.remove_clashing_confs">[docs]</a>    <span class="k">def</span> <span class="nf">remove_clashing_confs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prot</span><span class="p">,</span> <span class="n">min_dst_allowed</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removing conformations that class with the protein.</span>
+<span class="sd">        Note that the original conformer should be well docked into the protein,</span>
+<span class="sd">        ideally with some space between the area of growth and the protein,</span>
+<span class="sd">        so that any growth on the template doesn&#39;t automatically cause</span>
+<span class="sd">        clashes.</span>
+
+<span class="sd">        :param prot: The protein against which the conformers should be tested.</span>
+<span class="sd">        :type prot: Prody instance</span>
+<span class="sd">        :param min_dst_allowed: If any atom is within this distance in a conformer, the</span>
+<span class="sd">         conformer will be deleted.</span>
+<span class="sd">        :type min_dst_allowed: float in Angstroms</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">prot_coords</span> <span class="o">=</span> <span class="n">prot</span><span class="o">.</span><span class="n">getCoords</span><span class="p">()</span>
 
         <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
@@ -413,17 +461,27 @@
 
             <span class="k">if</span> <span class="n">min_dst</span> <span class="o">&lt;</span> <span class="n">min_dst_allowed</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">confid</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Clash with the protein. Removing conformer id: </span><span class="si">{</span><span class="n">confid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Clash with the protein. Removing conformer id: </span><span class="si">{</span><span class="n">confid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="RMol.set_gnina"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.set_gnina">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">set_gnina</span><span class="p">(</span><span class="n">loc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the location of the binary file gnina. This could be your own compiled directory,</span>
+<span class="sd">        or a directory where you&#39;d like it to be downloaded.</span>
+
+<span class="sd">        By default, gnina path is to the working directory (~500MB).</span>
+
+<span class="sd">        :param loc: path to gnina binary file. E.g. /dir/path/gnina. Note that right now gnina should</span>
+<span class="sd">         be a binary file with that specific filename &quot;gnina&quot;.</span>
+<span class="sd">        :type loc: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># set gnina location</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
             <span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;gnina&#39;</span><span class="p">,</span> <span class="s1">&#39;Please ensure gnina binary is named &quot;gnina&quot;&#39;</span>
             <span class="n">RMol</span><span class="o">.</span><span class="n">gnina_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;The path is not the binary file gnina&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;The path is not the binary file gnina&#39;</span><span class="p">)</span></div>
         <span class="c1"># extend this with running a binary check</span>
 
     <span class="nd">@staticmethod</span>
@@ -454,7 +512,15 @@
         <span class="c1"># check if it works</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;./gnina&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">],</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">RMol</span><span class="o">.</span><span class="n">gnina_dir</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">gnina</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receptor_file</span><span class="p">):</span>
+<div class="viewcode-block" id="RMol.gnina"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.gnina">[docs]</a>    <span class="k">def</span> <span class="nf">gnina</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receptor_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use gnina to extract CNNaffinity, and convert it into IC50.</span>
+
+<span class="sd">        LIMITATION: currenly the gnina binaries do not support Mac.</span>
+
+<span class="sd">        :param receptor_file: Path to the receptor file.</span>
+<span class="sd">        :type receptor_file: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_download_gnina</span><span class="p">()</span>
 
         <span class="c1"># obtain the absolute file to the receptor</span>
@@ -494,7 +560,7 @@
                                <span class="s1">&#39;CNNaffinity-&gt;IC50s&#39;</span><span class="p">:</span>    <span class="n">ic50s</span>
                                <span class="p">})</span>
 
-        <span class="k">return</span> <span class="n">df</span>
+        <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="RMol.to_file"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.to_file">[docs]</a>    <span class="k">def</span> <span class="nf">to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -521,7 +587,12 @@
             <span class="k">for</span> <span class="n">conformer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">():</span>
                 <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">conformer</span><span class="o">.</span><span class="n">GetId</span><span class="p">()))</span></div>
 
-    <span class="k">def</span> <span class="nf">df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RMol.df"><a class="viewcode-back" href="../../classes/RMol.html#fegrow.RMol.df">[docs]</a>    <span class="k">def</span> <span class="nf">df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a pandas dataframe row for this molecule, with SMILES and a picture.</span>
+
+<span class="sd">        :returns: pandas dataframe row.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
                               <span class="s1">&#39;Smiles&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)],</span>
                               <span class="p">})</span>
@@ -532,7 +603,7 @@
         <span class="c1"># add a column with the visualisation</span>
         <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;Smiles&#39;</span><span class="p">,</span> <span class="s1">&#39;Molecule&#39;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">df</span>
+        <span class="k">return</span> <span class="n">df</span></div>
 
     <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
@@ -678,15 +749,15 @@
                     <span class="n">r_groups</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">RGroupGrid</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">]],</span>
                     <span class="p">)</span> <span class="o">-&gt;</span><span class="n">RList</span><span class="p">[</span><span class="n">RMol</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For the given core molecule and list of attachment points and r groups enumerate the possible molecules and return a list of them.</span>
+<span class="sd">    For the given core molecule and list of attachment points</span>
+<span class="sd">     and r groups enumerate the possible molecules and</span>
+<span class="sd">     return a list of them.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        core_ligand:</span>
-<span class="sd">            The core scaffold molecule to attach the r groups to.</span>
-<span class="sd">        attachment_points:</span>
-<span class="sd">            The list of atom index in the core ligand that the r groups should be attached to.</span>
-<span class="sd">        r_groups:</span>
-<span class="sd">            The list of rdkit molecules which should be considered r groups or the RGroup Grid with highlighted molecules.</span>
+<span class="sd">    :param core_ligand: The core scaffold molecule to attach the r groups to.</span>
+<span class="sd">    :param attachment_points: The list of atom index in the core ligand</span>
+<span class="sd">      that the r groups should be attached to.</span>
+<span class="sd">    :param r_groups: The list of rdkit molecules which should be considered</span>
+<span class="sd">      r groups or the RGroup Grid with highlighted molecules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># get a list of rdkit molecules</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r_groups</span><span class="p">,</span> <span class="n">RGroupGrid</span><span class="p">):</span>

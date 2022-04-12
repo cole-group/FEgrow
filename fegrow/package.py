@@ -247,6 +247,18 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         [self.AddConformer(con, assignId=True) for con in cons.GetConformers()]
 
     def optimise_in_receptor(self, *args, **kwargs):
+        """
+        Enumerate the conformers inside of the receptor by employing
+        ANI2x, a hybrid machine learning / molecular mechanics (ML/MM) approach.
+        ANI2x is neural nework potential for the ligand energetics
+         but works only for the following atoms: H, C, N, O, F, S, Cl.
+
+        Open Force Field Parsley force field is used for intermolecular interactions with the receptor.
+
+        :param sigma_scale_factor: is used to scale the Lennard-Jones radii of the atoms.
+        :param relative_permittivity: is used to scale the electrostatic interactions with the protein.
+        :param water_model: can be used to set the force field for any water molecules present in the binding site.
+        """
         if self.GetNumConformers() == 0:
             print("Warning: no conformers so cannot optimise_in_receptor. Ignoring.")
             return
@@ -268,11 +280,14 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
         return df
 
-    def sort_conformers(self, energy_range=5, filter=True):
+    def sort_conformers(self, energy_range=5):
         """
+        For the given molecule and the conformer energies order the energies
+         and only keep any conformers with in the energy range of the
+         lowest energy conformer.
 
-
-        :param filter: Remove
+        :param energy_range: The energy range (kcal/mol),
+            above the minimum, for which conformers should be kept.
         """
         if self.GetNumConformers() == 0:
             print('An rmol doesn\'t have any conformers. Ignoring.')
@@ -297,9 +312,32 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         return df
 
     def rep2D(self, **kwargs):
+        """
+        Use RDKit and get a 2D diagram.
+        Uses Compute2DCoords and Draw.MolToImage function
+
+        Works with IPython Notebook.
+
+        :param **kwargs: are passed further to Draw.MolToImage function.
+        """
         return rep2D(self, **kwargs)
 
     def rep3D(self, view=None, prody=None, template=False, confIds: Optional[List[int]] = None):
+        """
+        Use py3Dmol to obtain the 3D view of the molecule.
+
+        Works with IPython Notebook.
+
+        :param view: a view to which add the visualisation. Useful if one wants to 3D view
+            multiple conformers in one view.
+        :type view: py3Dmol view instance (None)
+        :param prody: A prody protein around which a view 3D can be created
+        :type prody: Prody instance (Default: None)
+        :param template: Whether to visualise the original 3D template as well from which the molecule was made.
+        :type template: bool (False)
+        :param confIds: Select the conformations for display.
+        :type confIds: List[int]
+        """
         if prody is not None:
             view = view3D(prody)
 
@@ -329,7 +367,20 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         view.zoomTo({'model': -1})
         return view
 
-    def remove_clashing_confs(self, prot, min_dst_allowed=1):
+    def remove_clashing_confs(self, prot, min_dst_allowed=1.0):
+        """
+        Removing conformations that class with the protein.
+        Note that the original conformer should be well docked into the protein,
+        ideally with some space between the area of growth and the protein,
+        so that any growth on the template doesn't automatically cause
+        clashes.
+
+        :param prot: The protein against which the conformers should be tested.
+        :type prot: Prody instance
+        :param min_dst_allowed: If any atom is within this distance in a conformer, the
+         conformer will be deleted.
+        :type min_dst_allowed: float in Angstroms
+        """
         prot_coords = prot.getCoords()
 
         counter = 0
@@ -344,6 +395,16 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
     @staticmethod
     def set_gnina(loc):
+        """
+        Set the location of the binary file gnina. This could be your own compiled directory,
+        or a directory where you'd like it to be downloaded.
+
+        By default, gnina path is to the working directory (~500MB).
+
+        :param loc: path to gnina binary file. E.g. /dir/path/gnina. Note that right now gnina should
+         be a binary file with that specific filename "gnina".
+        :type loc: str
+        """
         # set gnina location
         path = Path(loc)
         if path.is_file():
@@ -382,6 +443,14 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         subprocess.run(["./gnina", "--help"], capture_output=True, cwd=RMol.gnina_dir)
 
     def gnina(self, receptor_file):
+        """
+        Use gnina to extract CNNaffinity, and convert it into IC50.
+
+        LIMITATION: currenly the gnina binaries do not support Mac.
+
+        :param receptor_file: Path to the receptor file.
+        :type receptor_file: str
+        """
         self._check_download_gnina()
 
         # obtain the absolute file to the receptor
@@ -449,6 +518,11 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
                 output.write(func(self, confId=conformer.GetId()))
 
     def df(self):
+        """
+        Generate a pandas dataframe row for this molecule, with SMILES and a picture.
+
+        :returns: pandas dataframe row.
+        """
         df = pandas.DataFrame({'ID': [self.id],
                               'Smiles': [Chem.MolToSmiles(self)],
                               })
@@ -605,15 +679,15 @@ def build_molecules(core_ligand: RMol,
                     r_groups: Union[RGroupGrid, List[Chem.Mol]],
                     ) ->RList[RMol]:
     """
-    For the given core molecule and list of attachment points and r groups enumerate the possible molecules and return a list of them.
+    For the given core molecule and list of attachment points
+     and r groups enumerate the possible molecules and
+     return a list of them.
 
-    Args:
-        core_ligand:
-            The core scaffold molecule to attach the r groups to.
-        attachment_points:
-            The list of atom index in the core ligand that the r groups should be attached to.
-        r_groups:
-            The list of rdkit molecules which should be considered r groups or the RGroup Grid with highlighted molecules.
+    :param core_ligand: The core scaffold molecule to attach the r groups to.
+    :param attachment_points: The list of atom index in the core ligand
+      that the r groups should be attached to.
+    :param r_groups: The list of rdkit molecules which should be considered
+      r groups or the RGroup Grid with highlighted molecules.
     """
     # get a list of rdkit molecules
     if isinstance(r_groups, RGroupGrid):

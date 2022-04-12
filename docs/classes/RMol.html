@@ -93,6 +93,17 @@ used for this RMol.</p></li>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.df">
+<span class="sig-name descname"><span class="pre">df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.df" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a pandas dataframe row for this molecule, with SMILES and a picture.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>pandas dataframe row.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fegrow.RMol.generate_conformers">
 <span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_conf_rms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.generate_conformers" title="Permalink to this definition"></a></dt>
 <dd><p>Generate conformers using the RDKIT’s ETKDG. The generated conformers
@@ -113,16 +124,115 @@ that should have new coordinates.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.gnina">
+<span class="sig-name descname"><span class="pre">gnina</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receptor_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.gnina"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.gnina" title="Permalink to this definition"></a></dt>
+<dd><p>Use gnina to extract CNNaffinity, and convert it into IC50.</p>
+<p>LIMITATION: currenly the gnina binaries do not support Mac.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>receptor_file</strong> (<em>str</em>) – Path to the receptor file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fegrow.RMol.optimise_in_receptor">
 <span class="sig-name descname"><span class="pre">optimise_in_receptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.optimise_in_receptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.optimise_in_receptor" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Enumerate the conformers inside of the receptor by employing
+ANI2x, a hybrid machine learning / molecular mechanics (ML/MM) approach.
+ANI2x is neural nework potential for the ligand energetics</p>
+<blockquote>
+<div><p>but works only for the following atoms: H, C, N, O, F, S, Cl.</p>
+</div></blockquote>
+<p>Open Force Field Parsley force field is used for intermolecular interactions with the receptor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma_scale_factor</strong> – is used to scale the Lennard-Jones radii of the atoms.</p></li>
+<li><p><strong>relative_permittivity</strong> – is used to scale the electrostatic interactions with the protein.</p></li>
+<li><p><strong>water_model</strong> – can be used to set the force field for any water molecules present in the binding site.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.remove_clashing_confs">
+<span class="sig-name descname"><span class="pre">remove_clashing_confs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dst_allowed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.remove_clashing_confs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.remove_clashing_confs" title="Permalink to this definition"></a></dt>
+<dd><p>Removing conformations that class with the protein.
+Note that the original conformer should be well docked into the protein,
+ideally with some space between the area of growth and the protein,
+so that any growth on the template doesn’t automatically cause
+clashes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prot</strong> (<em>Prody instance</em>) – The protein against which the conformers should be tested.</p></li>
+<li><p><strong>min_dst_allowed</strong> (<em>float in Angstroms</em>) – If any atom is within this distance in a conformer, the
+conformer will be deleted.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.rep2D">
+<span class="sig-name descname"><span class="pre">rep2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.rep2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.rep2D" title="Permalink to this definition"></a></dt>
+<dd><p>Use RDKit and get a 2D diagram.
+Uses Compute2DCoords and Draw.MolToImage function</p>
+<p>Works with IPython Notebook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – <p>are passed further to Draw.MolToImage function.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.rep3D">
+<span class="sig-name descname"><span class="pre">rep3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prody</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confIds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.rep3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.rep3D" title="Permalink to this definition"></a></dt>
+<dd><p>Use py3Dmol to obtain the 3D view of the molecule.</p>
+<p>Works with IPython Notebook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>view</strong> (<em>py3Dmol view instance</em><em> (</em><em>None</em><em>)</em>) – a view to which add the visualisation. Useful if one wants to 3D view
+multiple conformers in one view.</p></li>
+<li><p><strong>prody</strong> (<em>Prody instance</em><em> (</em><em>Default: None</em><em>)</em>) – A prody protein around which a view 3D can be created</p></li>
+<li><p><strong>template</strong> (<em>bool</em><em> (</em><em>False</em><em>)</em>) – Whether to visualise the original 3D template as well from which the molecule was made.</p></li>
+<li><p><strong>confIds</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – Select the conformations for display.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.set_gnina">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_gnina</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.set_gnina"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.set_gnina" title="Permalink to this definition"></a></dt>
+<dd><p>Set the location of the binary file gnina. This could be your own compiled directory,
+or a directory where you’d like it to be downloaded.</p>
+<p>By default, gnina path is to the working directory (~500MB).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loc</strong> (<em>str</em>) – path to gnina binary file. E.g. /dir/path/gnina. Note that right now gnina should
+be a binary file with that specific filename “gnina”.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fegrow.RMol.sort_conformers">
-<span class="sig-name descname"><span class="pre">sort_conformers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.sort_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.sort_conformers" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<span class="sig-name descname"><span class="pre">sort_conformers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fegrow/package.html#RMol.sort_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.sort_conformers" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>For the given molecule and the conformer energies order the energies</dt><dd><p>and only keep any conformers with in the energy range of the
+lowest energy conformer.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filter</strong> – Remove</p>
+<dd class="field-odd"><p><strong>energy_range</strong> – The energy range (kcal/mol),
+above the minimum, for which conformers should be kept.</p>
 </dd>
 </dl>
 </dd></dl>

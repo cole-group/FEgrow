@@ -24,23 +24,19 @@ except (ImportError, ModuleNotFoundError):
 from openff.toolkit.topology import Molecule as OFFMolecule
 
 
-def fix_receptor(input_file: str, output_file: str, ph: float = 7.0):
+def fix_receptor(input_file: str, output_file: str, pH: float = 7.0):
     """
-    Use PDBFixer to correct the input and add hydrogen.
+    Use PDBFixer to correct the input and add hydrogens with the given pH.
 
-    Args:
-        input_file:
-            The name of the pdb file which contains the receptor.
-        output_file:
-            The name of the pdb file the fixed receptor should be wrote to.
-        ph:
-            The ph the pronation state should be fixed for.
+    :param input_file: The name of the pdb file which contains the receptor.
+    :param output_file: The name of the pdb file the fixed receptor should be wrote to.
+    :param pH:The ph the pronation state should be fixed for.
     """
     fixer = PDBFixer(filename=input_file)
     fixer.findMissingResidues()
     fixer.findMissingAtoms()
     fixer.addMissingAtoms()
-    fixer.addMissingHydrogens(ph)
+    fixer.addMissingHydrogens(pH)
     app.PDBFile.writeFile(fixer.topology, fixer.positions, open(output_file, "w"))
 
 
