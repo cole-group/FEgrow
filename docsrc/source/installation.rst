@@ -26,4 +26,4 @@ Windows
 -------
 
 We have not verified whether this toolkit works on Windows
-and we expect issues with the dependancy **openmm-tensorflow**.
+and we expect issues with the dependancy **openmm-torch**.
