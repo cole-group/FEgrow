@@ -1,8 +1,8 @@
 Installation
 ============
 
-Linux
------
+Linux / MacOS
+-------------
 
 For conda installation, please use the provided environment file *env.yml*:
 
