@@ -13,7 +13,6 @@ from collections import OrderedDict
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
-from MDAnalysis.analysis.distances import distance_array
 from prody.proteins.functions import showProtein, view3D
 import py3Dmol
 import rdkit
@@ -387,7 +386,13 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         for conf in list(self.GetConformers())[::-1]:
             confid = conf.GetId()
 
-            min_dst = np.min(distance_array(conf.GetPositions(), prot_coords))
+            # for each atom check how far it is from the protein atoms
+            eacheach_shortest = []
+            for coord in conf.GetPositions():
+                shortest = np.min(np.sqrt(np.sum((coord - prot_coords) ** 2, axis=1)))
+                eacheach_shortest.append(shortest)
+
+            min_dst = np.min(eacheach_shortest)
 
             if min_dst < min_dst_allowed:
                 self.RemoveConformer(confid)
