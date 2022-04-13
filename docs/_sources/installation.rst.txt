@@ -22,6 +22,10 @@ In order to ensure that the environment is available in your jupyter, you can us
 
     python -m ipykernel install --user --name=fegrow
 
+..
+
+    WARNING: Gnina stage is not supported on MacOS because of CUDA's incompatibility with MacOS's GPUs (`the relevant issue <https://github.com/gnina/gnina/issues/129>`_)
+
 Windows
 -------
 
