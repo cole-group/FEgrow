@@ -18,7 +18,6 @@ We are grateful to many open source softwares available, including but not limit
  - openmmforcefields (https://github.com/openmm/openmmforcefields)
  - openmm-torch (https://github.com/openmm/openmm-torch)
  - parmed (https://www.parmed.com/)
- - MDAnalysis (https://www.mdanalysis.org/)
  - OpenBabel (https://openbabel.org/)
  - torchani (https://aiqm.github.io/torchani/)
 

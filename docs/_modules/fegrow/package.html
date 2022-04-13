@@ -83,7 +83,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">to_hex</span>
-<span class="kn">from</span> <span class="nn">MDAnalysis.analysis.distances</span> <span class="kn">import</span> <span class="n">distance_array</span>
 <span class="kn">from</span> <span class="nn">prody.proteins.functions</span> <span class="kn">import</span> <span class="n">showProtein</span><span class="p">,</span> <span class="n">view3D</span>
 <span class="kn">import</span> <span class="nn">py3Dmol</span>
 <span class="kn">import</span> <span class="nn">rdkit</span>
@@ -457,7 +456,13 @@
         <span class="k">for</span> <span class="n">conf</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">())[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
             <span class="n">confid</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
 
-            <span class="n">min_dst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">distance_array</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">GetPositions</span><span class="p">(),</span> <span class="n">prot_coords</span><span class="p">))</span>
+            <span class="c1"># for each atom check how far it is from the protein atoms</span>
+            <span class="n">eacheach_shortest</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">conf</span><span class="o">.</span><span class="n">GetPositions</span><span class="p">():</span>
+                <span class="n">shortest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">coord</span> <span class="o">-</span> <span class="n">prot_coords</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span>
+                <span class="n">eacheach_shortest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shortest</span><span class="p">)</span>
+
+            <span class="n">min_dst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">eacheach_shortest</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">min_dst</span> <span class="o">&lt;</span> <span class="n">min_dst_allowed</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">confid</span><span class="p">)</span>
