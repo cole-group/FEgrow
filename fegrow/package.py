@@ -585,7 +585,7 @@ class RGroupGrid(mols2grid.MolGrid):
     def _ipython_display_(self):
         from IPython.display import display
         subset = ["img", "Name", "mols2grid-id"]
-        return display(self.display(subset=subset))
+        return display(self.display(subset=subset, substruct_highlight=False))
 
     def get_selected_deprecated(self):
         # .selection is deprecated and will be removed
