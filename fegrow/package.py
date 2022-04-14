@@ -570,7 +570,7 @@ class RGroupGrid(mols2grid.MolGrid):
         inbuilt_rgroups = Path(__file__).parent / "data" / "rgroups" / "library"
         # load all of the molecules in the folder
         for molfile in glob.glob(str(inbuilt_rgroups / '*.mol')):
-            r_mol = Chem.MolFromMolFile(molfile)
+            r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
             names.append(Path(molfile).stem)
             molfiles.append(molfile)
 
@@ -585,7 +585,7 @@ class RGroupGrid(mols2grid.MolGrid):
     def _ipython_display_(self):
         from IPython.display import display
         subset = ["img", "Name", "mols2grid-id"]
-        return display(self.display(subset=subset, substruct_highlight=False))
+        return display(self.display(subset=subset, substruct_highlight=True))
 
     def get_selected_deprecated(self):
         # .selection is deprecated and will be removed
