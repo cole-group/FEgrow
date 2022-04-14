@@ -628,7 +628,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_molecules</span><span class="p">()</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">RGroupGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">mol_col</span><span class="o">=</span><span class="s2">&quot;Mol&quot;</span><span class="p">,</span> <span class="n">use_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RGroupGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">removeHs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mol_col</span><span class="o">=</span><span class="s2">&quot;Mol&quot;</span><span class="p">,</span> <span class="n">use_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_load_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -655,7 +655,7 @@
     <span class="k">def</span> <span class="nf">_ipython_display_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
         <span class="n">subset</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;mols2grid-id&quot;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span> <span class="n">substruct_highlight</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">get_selected_deprecated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># .selection is deprecated and will be removed</span>
