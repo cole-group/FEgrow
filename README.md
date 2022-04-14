@@ -4,7 +4,7 @@ An interactive workflow for building user-defined congeneric series of ligands i
 
 ### Preprint
 
-[An Open-Source Molecular Builder and Free Energy Preparation Workflow](An Open-Source Molecular Builder and Free Energy Preparation Workflow) by Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, and Daniel J. Cole.
+[An Open-Source Molecular Builder and Free Energy Preparation Workflow](https://doi.org/10.26434/chemrxiv-2022-hr5q4) by Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, and Daniel J. Cole.
 
 
 ### Further Information
