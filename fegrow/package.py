@@ -558,7 +558,7 @@ class RGroupGrid(mols2grid.MolGrid):
     def __init__(self):
         dataframe = self._load_molecules()
 
-        super(RGroupGrid, self).__init__(dataframe, mol_col="Mol", use_coords=False)
+        super(RGroupGrid, self).__init__(dataframe, removeHs=True, mol_col="Mol", use_coords=False)
 
     def _load_molecules(self) -> pandas.DataFrame:
         """
@@ -570,7 +570,7 @@ class RGroupGrid(mols2grid.MolGrid):
         inbuilt_rgroups = Path(__file__).parent / "data" / "rgroups" / "library"
         # load all of the molecules in the folder
         for molfile in glob.glob(str(inbuilt_rgroups / '*.mol')):
-            r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
+            r_mol = Chem.MolFromMolFile(molfile)
             names.append(Path(molfile).stem)
             molfiles.append(molfile)
 
