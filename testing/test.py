@@ -64,3 +64,27 @@ def test_growing_plural_groups():
 
 	assert len(rmols) == 2
 
+
+def test_added_ethanol_conformer_generation():
+	"""
+	Check if conformers are generated correctly. 
+	"""
+	# load the SDF
+	template_mol = Chem.SDMolSupplier('data/sarscov2_coreh.sdf', removeHs=False)[0]
+	attachment_index = [40]
+
+	# get a group
+	groups = RGroups.dataframe
+	R_group_ethanol = groups.loc[groups['Name']=='ethanol']['Mol'].values[0]
+
+	# merge
+	rmols = fegrow.build_molecules(template_mol, 
+                               attachment_index, 
+                               [R_group_ethanol])
+
+	# generate conformers
+	rmols.generate_conformers(num_conf=20, minimum_conf_rms=0.1)
+
+	# there should be multiple conformers
+	assert rmols[0].GetNumConformers() > 2
+
