@@ -582,6 +582,61 @@ class RGroupGrid(mols2grid.MolGrid):
 
         return pandas.DataFrame({"Mol": molecules, "Name": names, "Path": molfiles})
 
+class RLinkerGrid(mols2grid.MolGrid):
+    """
+    A wrapper around the mols to grid class to load and process the linker folders locally.
+    """
+
+    def __init__(self):
+        dataframe = self._load_molecules()
+
+        super(RGroupGrid, self).__init__(dataframe, removeHs=True, mol_col="Mol", use_coords=False)
+
+    def _load_molecules(self) -> pandas.DataFrame:
+        """
+        Load the local linkers into rdkit molecules
+        """
+        molecules = []
+        names = []
+        molfiles = []
+        inbuilt_rgroups = Path(__file__).parent / "data" / "rgroups" / "linkers"
+        # load all of the molecules in the folder
+        for molfile in glob.glob(str(inbuilt_rgroups / '*.mol')):
+            r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
+            names.append(Path(molfile).stem)
+            molfiles.append(molfile)
+
+            # highlight the attachment atom
+            for atom in r_mol.GetAtoms():
+                if atom.GetAtomicNum() == 0:
+                    setattr(r_mol, "__sssAtoms", [atom.GetIdx()])
+            molecules.append(r_mol)
+
+        return pandas.DataFrame({"Mol": molecules, "Name": names, "Path": molfiles})
+
+    def joinLinker(Rgroups, Rlinkers):
+        rgroup_smiles = []
+        linker_smiles = []
+        combined = []
+        conf = []
+        # convert rgroup/linker to smiles
+        for (i, j) in zip(Rgroups, Rlinkers):
+            rgroup_smiles.append(Chem.MolToSmiles(i))
+            linker_smiles.append(Chem.MolToSmiles(j))
+        # loop over and combine smiles
+        for linker in linker_smiles:
+            for rgroup in rgroup_smiles:
+                combined.append(rgroup.replace('*', '*' + linker))
+        # generate 3D conformers from smiles
+        for smile in combined:
+            mol = Chem.MolFromSmiles(smile)
+            params = AllChem.ETKDGv3()
+            a = Chem.rdmolops.AddHs(mol)
+            AllChem.EmbedMultipleConfs(a, numConfs=1, params=params)
+            conf.append(a)
+            Chem.MolToMolFile(a, filename=str(Chem.MolToSmiles(mol)) + '.mol')
+        return conf
+
     def _ipython_display_(self):
         from IPython.display import display
         subset = ["img", "Name", "mols2grid-id"]
