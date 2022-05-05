@@ -1,4 +1,5 @@
 import copy
+import itertools
 import stat
 from typing import Optional, List, Union, Tuple
 import os
@@ -582,6 +583,18 @@ class RGroupGrid(mols2grid.MolGrid):
 
         return pandas.DataFrame({"Mol": molecules, "Name": names, "Path": molfiles})
 
+    def _ipython_display_(self):
+        from IPython.display import display
+        subset = ["img", "Name", "mols2grid-id"]
+        return display(self.display(subset=subset, substruct_highlight=True))
+
+    def get_selected(self):
+        # use the new API
+        df = self.get_selection()
+        # now get a list of the molecules
+        return list(df['Mol'])
+
+
 class RLinkerGrid(mols2grid.MolGrid):
     """
     A wrapper around the mols to grid class to load and process the linker folders locally.
@@ -590,7 +603,7 @@ class RLinkerGrid(mols2grid.MolGrid):
     def __init__(self):
         dataframe = self._load_molecules()
 
-        super(RGroupGrid, self).__init__(dataframe, removeHs=True, mol_col="Mol", use_coords=False)
+        super(RLinkerGrid, self).__init__(dataframe, removeHs=True, mol_col="Mol", use_coords=False)
 
     def _load_molecules(self) -> pandas.DataFrame:
         """
@@ -599,7 +612,7 @@ class RLinkerGrid(mols2grid.MolGrid):
         molecules = []
         names = []
         molfiles = []
-        inbuilt_rgroups = Path(__file__).parent / "data" / "rgroups" / "linkers"
+        inbuilt_rgroups = Path(__file__).parent / "data" / "linkers"
         # load all of the molecules in the folder
         for molfile in glob.glob(str(inbuilt_rgroups / '*.mol')):
             r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
@@ -614,45 +627,36 @@ class RLinkerGrid(mols2grid.MolGrid):
 
         return pandas.DataFrame({"Mol": molecules, "Name": names, "Path": molfiles})
 
-    def joinLinker(Rgroups, Rlinkers):
-        rgroup_smiles = []
-        linker_smiles = []
-        combined = []
-        conf = []
-        # convert rgroup/linker to smiles
-        for (i, j) in zip(Rgroups, Rlinkers):
-            rgroup_smiles.append(Chem.MolToSmiles(i))
-            linker_smiles.append(Chem.MolToSmiles(j))
-        # loop over and combine smiles
-        for linker in linker_smiles:
-            for rgroup in rgroup_smiles:
-                combined.append(rgroup.replace('*', '*' + linker))
-        # generate 3D conformers from smiles
-        for smile in combined:
-            mol = Chem.MolFromSmiles(smile)
-            params = AllChem.ETKDGv3()
-            a = Chem.rdmolops.AddHs(mol)
-            AllChem.EmbedMultipleConfs(a, numConfs=1, params=params)
-            conf.append(a)
-            Chem.MolToMolFile(a, filename=str(Chem.MolToSmiles(mol)) + '.mol')
-        return conf
-
     def _ipython_display_(self):
         from IPython.display import display
         subset = ["img", "Name", "mols2grid-id"]
         return display(self.display(subset=subset, substruct_highlight=True))
-
-    def get_selected_deprecated(self):
-        # .selection is deprecated and will be removed
-        selection = mols2grid.selection
-        # now get a list of the molecules
-        return [self.dataframe.iloc[i]["Mol"] for i in selection.keys()]
 
     def get_selected(self):
         # use the new API
         df = self.get_selection()
         # now get a list of the molecules
         return list(df['Mol'])
+
+
+def link(Rgroups, Rlinkers):
+    # convert rgroups/linkers to smiles
+    rgroup_smiles = [Chem.MolToSmiles(mol) for mol in Rgroups]
+    linker_smiles = [Chem.MolToSmiles(mol) for mol in Rlinkers]
+
+    # loop over and combine smiles
+    combined = []
+    for linker in linker_smiles:
+        for rgroup in rgroup_smiles:
+            combined.append(rgroup.replace('*', '*' + linker))
+
+    # generate 3D conformers for each molecule
+    mols = []
+    for smile in combined:
+        mol = Chem.MolFromSmiles(smile)
+        AllChem.EmbedMultipleConfs(mol, numConfs=1, params=AllChem.ETKDGv3())
+        mols.append(mol)
+    return mols
 
 
 class RList(RInterface, list):
