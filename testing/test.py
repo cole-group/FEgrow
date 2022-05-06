@@ -14,7 +14,7 @@ def test_adding_ethanol_1mol():
 
 	# get a group
 	groups = RGroups.dataframe
-	R_group_ethanol = groups.loc[groups['Name']=='ethanol']['Mol'].values[0]
+	R_group_ethanol = groups.loc[groups['Name']=='*CCO']['Mol'].values[0]
 
 	# merge
 	rmols = fegrow.build_molecules(template_mol, 
@@ -34,7 +34,7 @@ def test_adding_ethanol_number_of_atoms():
 
 	# get a group
 	groups = RGroups.dataframe
-	R_group_ethanol = groups.loc[groups['Name']=='ethanol']['Mol'].values[0]
+	R_group_ethanol = groups.loc[groups['Name']=='*CCO']['Mol'].values[0]
 	ethanol_atoms_num = R_group_ethanol.GetNumAtoms()
 
 	# merge
@@ -54,8 +54,8 @@ def test_growing_plural_groups():
 
 	# get a group
 	groups = RGroups.dataframe
-	R_group_ethanol = groups.loc[groups['Name']=='ethanol']['Mol'].values[0]
-	R_group_cyclopropane = groups.loc[groups['Name'] == 'cyclopropane' ]['Mol'].values[0]
+	R_group_ethanol = groups.loc[groups['Name']=='*CCO']['Mol'].values[0]
+	R_group_cyclopropane = groups.loc[groups['Name'] == '*C1CC1' ]['Mol'].values[0]
 
 	# merge
 	rmols = fegrow.build_molecules(template_mol, 
@@ -75,7 +75,7 @@ def test_added_ethanol_conformer_generation():
 
 	# get a group
 	groups = RGroups.dataframe
-	R_group_ethanol = groups.loc[groups['Name']=='ethanol']['Mol'].values[0]
+	R_group_ethanol = groups.loc[groups['Name']=='*CCO']['Mol'].values[0]
 
 	# merge
 	rmols = fegrow.build_molecules(template_mol, 
