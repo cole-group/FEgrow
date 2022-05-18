@@ -1,11 +1,12 @@
 from setuptools import setup, find_packages
+import fegrow.version
 
 setup(
     name='fegrow',
-    version='1.0.0',
-    description='RGroup: generate congeneric ligands for FEP by growing a template molecule. ',
-    long_description='Copy from README file',
-    url='https://blogs.ncl.ac.uk/danielcole/',
+    version=fegrow.version.__version__,
+    description='FEgrow: generate congeneric ligands for FEP by growing a template molecule. ',
+    long_description='See https://cole-group.github.io/FEgrow/',
+    url='https://github.com/cole-group/FEgrow',
     author='Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Josh Horton, Daniel Cole',
     author_email='bieniekmat@gmail.com',
     install_requires=['parmed', 'tqdm', 'typing-extensions'], #  FIXME: see env.yml for others
