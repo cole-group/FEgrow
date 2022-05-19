@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
-from fegrow.version import __version__
+
+version = open('fegrow/version.txt').read().strip()
 
 setup(
     name='fegrow',
-    version=__version__,
+    version=version,
     description='FEgrow: generate congeneric ligands for FEP by growing a template molecule. ',
     long_description='See https://cole-group.github.io/FEgrow/',
     url='https://github.com/cole-group/FEgrow',
