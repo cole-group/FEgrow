@@ -1,7 +1,7 @@
 # FEgrow
 An interactive workflow for building user-defined congeneric series of ligands in protein binding pockets for input to free energy calculations.
 
-[![CI](https://github.com/cole-group/FEgrow/actions/workflows/CI.yml/badge.svg)]
+[CI](https://github.com/cole-group/FEgrow/actions/workflows/CI.yml/badge.svg)
 
 ### Preprint
 
