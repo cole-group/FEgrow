@@ -42,7 +42,7 @@ from fegrow import RGroups
 # In[ ]:
 
 
-get_ipython().system('obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7')
+# get_ipython().system('obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7')
 
 
 # Load the protonated ligand into FEgrow
@@ -265,7 +265,7 @@ print(final_energies)
 # In[ ]:
 
 
-CNNscores, ic50s = rmols.gnina(receptor_file="rec_h.pdb") 
+CNNscores, ic50s = rmols.gnina(receptor_file="rec_final.pdb") 
 CNNscores
 
 
