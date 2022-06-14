@@ -1,27 +1,25 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # FEgrow - congeneric ligands from a template
+# # FEgrow: An Open-Source Molecular Builder and Free Energy Preparation Workflow
 # 
-# ### Developers: Mat Bieniek, Ben Cree, Rachael Pirie, Josh Horton
+# **Authors: Mateusz K Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, Daniel J. Cole**
 # 
-# * Add R-groups in user-defined positions
+# * Add chemical functional groups (R-groups) in user-defined positions
 # * Output ADMET properties
 # * Perform constrained optimisation
 # * Score poses
-# * Send output to free energy calculations
-# 
-# Open source, customisable, fast/easy to use.
+# * Output structures for free energy calculations
 
 # ## Overview
 # 
-# This notebook demonstrates the entire rgroups workflow for generating a series of ligands with a common core for a specific binding site, by the addition of a user-defined set of R-groups. 
+# This notebook demonstrates the entire `FEgrow` workflow for generating a series of ligands with a common core for a specific binding site, via the addition of a user-defined set of R-groups. 
 # 
-# These de novo ligands are then subjected to ADMET analysis. Valid conformers are enumerated, and optimised in the receptor using hybrid machine learning / molecular mechanics potentials (ML/MM). 
+# These *de novo* ligands are then subjected to ADMET analysis. Valid conformers of the added R-groups are enumerated, and optimised in the context of the receptor binding pocket, optionally using hybrid machine learning / molecular mechanics potentials (ML/MM).
 # 
-# An ensemble of low energy conformers is generated for each ligand, and scored using a convolutional neural network (CNN), then finally compared to experimental data (where available).
+# An ensemble of low energy conformers is generated for each ligand, and scored using the `gnina` convolutional neural network (CNN). Output structures are saved as `pdb` files ready for use in free energy calculations.
 # 
-# The target for this tutorial is PTP1B. [1][2]
+# The target for this tutorial is the main protease (Mpro) of SARS-CoV-2, and the core and receptor structures are taken from a [recent study by Jorgensen & co-workers](https://doi.org/10.1021/acscentsci.1c00039).
 
 # In[ ]:
 
@@ -37,15 +35,15 @@ from fegrow import RGroups
 
 # # Prepare the ligand template
 
-# Protonate the template structure with open babel
+# The provided core structure `lig.pdb` has been extracted from a crystal structure of Mpro in complex with compound **4** from the Jorgensen study (PDB: 7L10), and a Cl atom has been removed to allow growth into the S3/S4 pocket. The template structure of the ligand is protonated with [Open Babel](http://openbabel.org/wiki/Main_Page):
 
 # In[ ]:
 
 
-# get_ipython().system('obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7')
+#get_ipython().system('obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7')
 
 
-# Load the protonated ligand into FEgrow
+# Load the protonated ligand into FEgrow:
 
 # In[ ]:
 
@@ -64,7 +62,7 @@ template_mol = fegrow.RMol(init_mol)
 template_mol.rep2D(idx=True, size=(500, 500))
 
 
-# Using the 2D drawing, select a hydrogen index for the R-group
+# Using the 2D drawing, select an index for the growth vector. Note that it is currently only possible to grow from hydrogen atom positions. In this case, we are selecting the hydrogen atom labelled H:40 to enable growth into the S3/S4 pocket of Mpro.
 
 # In[ ]:
 
@@ -72,7 +70,13 @@ template_mol.rep2D(idx=True, size=(500, 500))
 attachment_index = [40]
 
 
-# R-groups can be selected interactively or programmaticaly. Tailor .mol files can be used as well as long as their hydrogen is replaced with the *element* R. 
+# R-groups can be selected interactively or programmaticaly.
+# 
+# We have provided a set of common R-groups (see `fegrow/data/rgroups/library`), which can be browsed and selected interactively below.
+# 
+# Molecules from the library can alternatively be selected by name, as demonstrated below.
+# 
+# Finally, user-defined R-groups may be provided as `.mol` files. *In this case, the hydrogen atom selected for attachment should be replaced by the element symbol R.* See the directory `manual_rgroups` for examples.
 
 # In[ ]:
 
@@ -89,20 +93,20 @@ interactive_rgroups = RGroups.get_selected()
 
 # you can also directly access the built-in dataframe programmatically
 groups = RGroups.dataframe
-R_group_ethanol = groups.loc[groups['Name']=='ethanol']['Mol'].values[0]
-R_group_cyclopropane = groups.loc[groups['Name'] == 'cyclopropane' ]['Mol'].values[0]
+R_group_ethanol = groups.loc[groups['Name']=='*CCO']['Mol'].values[0]
+R_group_cyclopropane = groups.loc[groups['Name'] == '*C1CC1' ]['Mol'].values[0]
 
 # add your own R-groups files
-R_group_methanol = Chem.MolFromMolFile('manual_rgroups/methanol-r.mol', removeHs=False)
+R_group_propanol = Chem.MolFromMolFile('manual_rgroups/propan-1-ol-r.mol', removeHs=False)
 
 # make a list of R-group molecule
-selected_rgroups = [R_group_methanol, R_group_ethanol, R_group_cyclopropane] + interactive_rgroups
+selected_rgroups = [R_group_propanol, R_group_ethanol, R_group_cyclopropane] + interactive_rgroups
 selected_rgroups
 
 
 # # Build a congeneric series
 
-# Merge the template with the R-groups
+# Now that the R-groups have been selected, we merge them with the ligand core:
 
 # In[ ]:
 
@@ -111,6 +115,14 @@ rmols = fegrow.build_molecules(template_mol,
                                attachment_index, 
                                selected_rgroups)
 
+
+# In[ ]:
+
+
+rmols
+
+
+# The R-group library can also be viewed as a 2D grid, or individual molecules can be selected for 3D view (note that the conformation of the R-group has not yet been optimised):
 
 # In[ ]:
 
@@ -124,7 +136,7 @@ rmols.rep2D()
 rmols[0].rep3D()
 
 
-# Once the ligands have been generated, they can be assessed for various ADMET properties, including Lipinksi rule of 5 properties, the presence of unwanted substructures or problematic functional groups, and synthetic accessibility. [3][4]
+# Once the ligands have been generated, they can be assessed for various ADMET properties, including Lipinksi rule of 5 properties, the presence of unwanted substructures or problematic functional groups, and synthetic accessibility.
 
 # In[ ]:
 
@@ -132,34 +144,31 @@ rmols[0].rep3D()
 rmols.toxicity()
 
 
-# For each ligand, a specified number of conformers (`num_conf`) is generated by using the RDKit ETKDG algorithm.[5] Conformers that are too similar to the initial structure are discarded. Empirically, we have found that `num_conf=200` gives an exhaustive search, and `num_conf=50` gives a reasonable, fast search, in most cases.
+# For each ligand, a specified number of conformers (`num_conf`) is generated by using the RDKit [ETKDG algorithm](https://doi.org/10.1021/acs.jcim.5b00654). Conformers that are too similar to an existing structure are discarded. Empirically, we have found that `num_conf=200` gives an exhaustive search, and `num_conf=50` gives a reasonable, fast search, in most cases.
 # 
-# If required, a third argument can be added `flexible=[0,1,...]`, which provides a list of additional atoms in the core that can be allowed to be flexible. This is useful, for example, if growing from a methyl group and you would like the added R-group to freely rotate.
+# If required, a third argument can be added `flexible=[0,1,...]`, which provides a list of additional atoms in the core that are allowed to be flexible. This is useful, for example, if growing from a methyl group and you would like the added R-group to freely rotate.
 
 # In[ ]:
 
 
-rmols.generate_conformers(num_conf=10, 
-                         minimum_conf_rms=0.5, 
+rmols.generate_conformers(num_conf=50, 
+                          minimum_conf_rms=0.5, 
+                          # flexible=[3, 18, 20])
                         )
-                        # flexible=[39, 18, 40, 16, 17, 19, 5, 6, 36, 2, 1, 33, 3, 4, 35, 34, 15, 38])
-
-
-# In[ ]:
-
-
-#rmol.rep3D(template=True)
 
 
 # ### Prepare the protein
 
-# The protein structure initially is not protonated, this along with other repairs is done using PDBFixer [6]. 
+# The protein-ligand complex structure is downloaded, and [PDBFixer](https://github.com/openmm/pdbfixer) is used to protonate the protein, and perform other simple repair:
 
 # In[ ]:
 
 
+# get the protein-ligand complex structure
+#get_ipython().system('wget -nc https://files.rcsb.org/download/7L10.pdb')
+
 # load the complex with the ligand
-sys = prody.parsePDB('sarscov2/7l10.pdb')
+sys = prody.parsePDB('7L10.pdb')
 
 # remove any unwanted molecules
 rec = sys.select('not (nucleic or hetatm or water)')
@@ -174,13 +183,15 @@ fegrow.fix_receptor("rec.pdb", "rec_final.pdb")
 rec_final = prody.parsePDB("rec_final.pdb")
 
 
+# View enumerated conformers in complex with protein:
+
 # In[ ]:
 
 
 rmols[0].rep3D(prody=rec_final)
 
 
-# Any conformers that clash with the protein (within 1 A of the backbone), are removed.
+# Any conformers that clash with the protein (any atom-atom distance less than 1 Angstrom), are removed.
 
 # In[ ]:
 
@@ -196,7 +207,13 @@ rmols[0].rep3D(prody=rec_final)
 
 # ### Optimise conformers in context of protein
 
-# The remaining conformers are optimised using hybrid machine learning / molecular mechanics (ML/MM), using the ANI [cite]neural nework potential for the ligand energetics (as long as it contains only the atoms H, C, N, O, F, S, Cl). (Note that the Open Force Field Parsley force field is used otherwise).
+# The remaining conformers are optimised using hybrid machine learning / molecular mechanics (ML/MM), using the [ANI2x](https://doi.org/10.1021/acs.jctc.0c00121) neural nework potential for the ligand energetics (as long as it contains only the atoms H, C, N, O, F, S, Cl). Note that the Open Force Field [Parsley](https://doi.org/10.1021/acs.jctc.1c00571) force field is used for intermolecular interactions with the receptor.
+# 
+# `sigma_scale_factor`: is used to scale the Lennard-Jones radii of the atoms.
+# 
+# `relative_permittivity`: is used to scale the electrostatic interactions with the protein.
+# 
+# `water_model`: can be used to set the force field for any water molecules present in the binding site.
 
 # In[ ]:
 
@@ -212,13 +229,7 @@ energies = rmols.optimise_in_receptor(
 )
 
 
-# In[ ]:
-
-
-print(energies)
-
-
-# Any of the rmols that have no conformers (due to clashing with the protein) can be discarded using the .discard_missing() function. This function also returns a list of the indexes that were removed, which will be used in order to carry out data analysis.
+# Any of the rmols that have no available conformers (due to unresolvable steric clashes with the protein) can be discarded using the `.discard_missing()` function. This function also returns a list of the indices that were removed, which can be helpful when carrying out data analysis.
 
 # In[ ]:
 
@@ -226,19 +237,15 @@ print(energies)
 missing_ids = rmols.discard_missing()
 
 
+# Optionally, display the final optimised conformers. Note that, unlike classical force fields, ANI allows bond breaking. You may occasionally see ligands with distorted structures and very long bonds, but in our experience these are rarely amongst the low energy structures and can be ignored.
+
 # In[ ]:
 
 
 rmols[0].rep3D()
 
 
-# In[ ]:
-
-
-rmols[0].to_file("optimised_coords.pdb")
-
-
-# Conformers are now sorted by energy, only retaining those within 5 kcal/mol of the lowest energy structure.
+# Conformers are now sorted by energy, only retaining those within 5 kcal/mol of the lowest energy structure:
 
 # In[ ]:
 
@@ -246,7 +253,7 @@ rmols[0].to_file("optimised_coords.pdb")
 final_energies = rmols.sort_conformers(energy_range=5)
 
 
-# Save all of the best conformers to files
+# Save all of the lowest energy conformers to files and print the sorted energies in kcal/mol (shifted so that the lowest energy conformer is zero).
 
 # In[ ]:
 
@@ -260,37 +267,13 @@ final_energies = rmols.sort_conformers(energy_range=5)
 print(final_energies)
 
 
-# The conformers are scored by using Gnina [7] on each conformer of each ligand, which utilises a convolutional neural network. Gnina is downloaded during the first time it is used. MAC is currently not supported. 
+# The conformers are scored using the [Gnina](https://github.com/gnina/gnina) molecular docking program and convolutional neural network scoring function. *[Note that this step is not supported on macOS].* If unavailable, the Gnina executable is downloaded during the first time it is used. The CNNscores may also be converted to predicted IC50 (nM) (see column "CNNaffinity->IC50s").
 
 # In[ ]:
 
 
-CNNscores, ic50s = rmols.gnina(receptor_file="rec_final.pdb") 
-CNNscores
+affinities = rmols.gnina(receptor_file="rec_final.pdb") 
+affinities
 
 
-# IC50 values are also predicted from the CNNscores
-
-# In[ ]:
-
-
-ic50s
-
-
-# The gnina score can be converted to predicted IC50.
-
-# References:
-# 
-#     1 - https://pubs.acs.org/doi/10.1021/ja512751q
-#     
-#     2 - https://pubs.acs.org/doi/10.1021/jm0702478
-#     
-#     3 - https://www.sciencedirect.com/science/article/pii/S0169409X96004231
-#     
-#     4 - http://www.jcheminf.com/content/1/1/8
-#     
-#     5 - https://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
-#     
-#     6 - https://academic.oup.com/bioinformatics/article/37/20/3657/6211036
-#     
-#     7 - https://github.com/openmm/pdbfixer
+# Predicted binding affinities may be further refined using the structures output by `FEgrow`, using your favourite free energy calculation engine. See our paper for an example using [SOMD](https://github.com/michellab/Sire) to calculate the relative binding free energies of 13 Mpro inhibitors.
