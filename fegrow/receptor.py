@@ -3,7 +3,6 @@ from typing import List, Tuple
 
 import parmed
 from openmmforcefields.generators import SystemGenerator
-from openmmml import MLPotential
 from pdbfixer import PDBFixer
 from rdkit import Chem
 from rdkit.Geometry.rdGeometry import Point3D
@@ -11,6 +10,7 @@ from tqdm import tqdm
 from typing_extensions import Literal
 
 from .package import RMol
+from .openmmml import MLPotential
 
 import numpy
 
