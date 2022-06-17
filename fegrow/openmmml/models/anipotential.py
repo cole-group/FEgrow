@@ -40,8 +40,8 @@ from typing import Iterable, Optional
 class ANIPotentialImplFactory(MLPotentialImplFactory):
     """This is the factory that creates ANIPotentialImpl objects."""
 
-    def createImpl(self, name: str, **args) -> MLPotentialImpl:
-        return ANIPotentialImpl(name)
+    def createImpl(self, name: str, **kwargs) -> MLPotentialImpl:
+        return ANIPotentialImpl(name, **kwargs)
 
 
 class ANIPotentialImpl(MLPotentialImpl):
@@ -58,8 +58,9 @@ class ANIPotentialImpl(MLPotentialImpl):
     >>> system = potential.createSystem(topology, filename='mymodel.pt')
     """
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, name, platform_name):
+        self.name = name,
+        self.platform_name = platform_name
 
     def addForces(self,
                   topology: openmm.app.Topology,
@@ -67,7 +68,6 @@ class ANIPotentialImpl(MLPotentialImpl):
                   atoms: Optional[Iterable[int]],
                   forceGroup: int,
                   filename: str = 'animodel.pt',
-                  cuda_id: int = 0,
                   **args):
         # Create the TorchANI model.
 
@@ -75,14 +75,18 @@ class ANIPotentialImpl(MLPotentialImpl):
         import torch
         import openmmtorch
 
-        device = torch.device(f'cuda:{cuda_id}' if torch.cuda.is_available() else 'cpu')
+        device = torch.device(self.platform_name.lower())
+
+        # for some reason name is modified to be (name,) strip it off
+        if type(self.name) == tuple and len(self.name) == 1:
+            self.name = self.name[0]
 
         if self.name == 'ani1ccx':
             model = torchani.models.ANI1ccx().to(device)
         elif self.name == 'ani2x':
             model = torchani.models.ANI2x().to(device)
         else:
-            raise ValueError('Unsupported ANI model: '+self.name)
+            raise ValueError(f'Unsupported ANI model: {self.name}')
 
         # Create the PyTorch model that will be invoked by OpenMM.
 
@@ -92,7 +96,7 @@ class ANIPotentialImpl(MLPotentialImpl):
         elements = [atom.element.symbol for atom in includedAtoms]
         species = model.species_to_tensor(elements).unsqueeze(0)
 
-        # move atoms to the right device
+        # move atoms to the device
         atoms = torch.tensor(atoms, dtype=torch.int64).to(device)
 
         class ANIForce(torch.nn.Module):

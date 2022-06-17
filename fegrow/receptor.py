@@ -84,7 +84,8 @@ def optimise_in_receptor(
     use_ani: bool = True,
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
-    water_model = 'tip3p.xml'
+    water_model: str = 'tip3p.xml',
+    platform_name: str = 'CPU',
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -105,6 +106,9 @@ def optimise_in_receptor(
         water_model:
             If set to None, the water model is ignored. Acceptable can be found in the
             openmmforcefields package.
+        platform_name:
+            The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
+            See the OpenMM documentation of Platform.
 
     Returns:
         A copy of the input molecule with the optimised positions.
@@ -114,6 +118,8 @@ def optimise_in_receptor(
         "openff": "openff_unconstrained-1.3.0.offxml",
         "gaff": "gaff-2.11",
     }
+
+    platform = Platform.getPlatformByName(platform_name.upper())
 
     # assume the receptor has already been fixed and hydrogens have been added.
     receptor = app.PDBFile(receptor_file)
@@ -157,7 +163,7 @@ def optimise_in_receptor(
     # if we want to use ani2x check we can and adapt the system
     if use_ani and _can_use_ani2x(openff_mol):
         print("using ani2x")
-        potential = MLPotential("ani2x")
+        potential = MLPotential("ani2x", platform_name=platform_name)
         complex_system = potential.createMixedSystem(
             complex_structure.topology, system, ligand_idx
         )
@@ -174,7 +180,6 @@ def optimise_in_receptor(
     integrator_min = openmm.LangevinIntegrator(temperature, friction, time_step)
 
     # set up an openmm simulation
-    platform = Platform.getPlatformByName('CUDA')
     simulation = app.Simulation(
         complex_structure.topology, complex_system, integrator_min, platform=platform
     )
