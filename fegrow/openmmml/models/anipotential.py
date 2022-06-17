@@ -73,10 +73,14 @@ class ANIPotentialImpl(MLPotentialImpl):
         import torchani
         import torch
         import openmmtorch
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        # device = torch.device('cpu')
+
         if self.name == 'ani1ccx':
-            model = torchani.models.ANI1ccx()
+            model = torchani.models.ANI1ccx().to(device)
         elif self.name == 'ani2x':
-            model = torchani.models.ANI2x()
+            model = torchani.models.ANI2x().to(device)
         else:
             raise ValueError('Unsupported ANI model: '+self.name)
 
@@ -98,9 +102,9 @@ class ANIPotentialImpl(MLPotentialImpl):
                 if atoms is None:
                     self.indices = None
                 else:
-                    self.indices = torch.tensor(sorted(atoms), dtype=torch.int64)
+                    self.indices = torch.tensor(sorted(atoms), dtype=torch.int64, device=device)
                 if periodic:
-                    self.pbc = torch.tensor([True, True, True], dtype=torch.bool)
+                    self.pbc = torch.tensor([True, True, True], dtype=torch.bool, device=device)
                 else:
                     self.pbc = None
 
@@ -116,6 +120,7 @@ class ANIPotentialImpl(MLPotentialImpl):
                 return self.energyScale*energy
 
         aniForce = ANIForce(model, species, atoms, topology.getPeriodicBoxVectors() is not None)
+        # breakpoint();
 
         # Convert it to TorchScript and save it.
 
