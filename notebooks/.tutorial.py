@@ -226,7 +226,7 @@ energies = rmols.optimise_in_receptor(
     sigma_scale_factor=0.8,
     relative_permittivity=4,
     water_model = None,
-    platform_name='CUDA'
+    platform_name='CPU'
 )
 
 
