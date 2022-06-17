@@ -151,7 +151,7 @@ rmols.toxicity()
 # In[ ]:
 
 
-rmols.generate_conformers(num_conf=50, 
+rmols.generate_conformers(num_conf=5,
                           minimum_conf_rms=0.5, 
                           # flexible=[3, 18, 20])
                         )
@@ -222,10 +222,11 @@ rmols[0].rep3D(prody=rec_final)
 energies = rmols.optimise_in_receptor(
     receptor_file="rec_final.pdb", 
     ligand_force_field="openff", 
-    use_ani=False,
+    use_ani=True,
     sigma_scale_factor=0.8,
     relative_permittivity=4,
-    water_model = None
+    water_model = None,
+    platform_name='CUDA'
 )
 
 
