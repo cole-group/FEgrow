@@ -37,5 +37,5 @@ jobs:
         pytest test.py
     - name: Run tutorial.py
       run: |
-        cd ../notebooks
+        cd notebooks
         python .tutorial.py
