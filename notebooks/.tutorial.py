@@ -100,7 +100,7 @@ R_group_cyclopropane = groups.loc[groups['Name'] == '*C1CC1' ]['Mol'].values[0]
 R_group_propanol = Chem.MolFromMolFile('manual_rgroups/propan-1-ol-r.mol', removeHs=False)
 
 # make a list of R-group molecule
-selected_rgroups = [R_group_propanol, R_group_ethanol, R_group_cyclopropane] + interactive_rgroups
+selected_rgroups = [R_group_ethanol] + interactive_rgroups
 selected_rgroups
 
 
