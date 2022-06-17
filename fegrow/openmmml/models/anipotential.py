@@ -67,6 +67,7 @@ class ANIPotentialImpl(MLPotentialImpl):
                   atoms: Optional[Iterable[int]],
                   forceGroup: int,
                   filename: str = 'animodel.pt',
+                  cuda_id: int = 0,
                   **args):
         # Create the TorchANI model.
 
@@ -74,8 +75,7 @@ class ANIPotentialImpl(MLPotentialImpl):
         import torch
         import openmmtorch
 
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        # device = torch.device('cpu')
+        device = torch.device(f'cuda:{cuda_id}' if torch.cuda.is_available() else 'cpu')
 
         if self.name == 'ani1ccx':
             model = torchani.models.ANI1ccx().to(device)
@@ -92,34 +92,38 @@ class ANIPotentialImpl(MLPotentialImpl):
         elements = [atom.element.symbol for atom in includedAtoms]
         species = model.species_to_tensor(elements).unsqueeze(0)
 
+        # move atoms to the right device
+        atoms = torch.tensor(atoms, dtype=torch.int64).to(device)
+
         class ANIForce(torch.nn.Module):
 
-            def __init__(self, model, species, atoms, periodic):
+            def __init__(self, model, species, atoms, periodic, device):
                 super(ANIForce, self).__init__()
                 self.model = model
                 self.species = species
                 self.energyScale = torchani.units.hartree2kjoulemol(1)
+                self.device = device
                 if atoms is None:
                     self.indices = None
                 else:
-                    self.indices = torch.tensor(sorted(atoms), dtype=torch.int64, device=device)
+                    self.indices = torch.tensor(sorted(atoms), dtype=torch.int64, device=self.device)
                 if periodic:
-                    self.pbc = torch.tensor([True, True, True], dtype=torch.bool, device=device)
+                    self.pbc = torch.tensor([True, True, True], dtype=torch.bool, device=self.device)
                 else:
                     self.pbc = None
 
             def forward(self, positions, boxvectors: Optional[torch.Tensor] = None):
-                positions = positions.to(torch.float32)
+                positions = positions.to(self.device, dtype=torch.float32)
                 if self.indices is not None:
                     positions = positions[self.indices]
                 if boxvectors is None:
                     _, energy = self.model((self.species, 10.0*positions.unsqueeze(0)))
                 else:
-                    boxvectors = boxvectors.to(torch.float32)
+                    boxvectors = boxvectors.to(self.device, dtype=torch.float32)
                     _, energy = self.model((self.species, 10.0*positions.unsqueeze(0)), cell=10.0*boxvectors, pbc=self.pbc)
                 return self.energyScale*energy
 
-        aniForce = ANIForce(model, species, atoms, topology.getPeriodicBoxVectors() is not None)
+        aniForce = ANIForce(model, species, atoms, topology.getPeriodicBoxVectors() is not None, device)
         # breakpoint();
 
         # Convert it to TorchScript and save it.

@@ -16,7 +16,7 @@ import numpy
 
 # fix for new openmm versions
 try:
-    from openmm import app, openmm, unit
+    from openmm import app, openmm, unit, Platform
 except (ImportError, ModuleNotFoundError):
     from simtk.openmm import app, openmm
     from simtk import unit
@@ -174,8 +174,9 @@ def optimise_in_receptor(
     integrator_min = openmm.LangevinIntegrator(temperature, friction, time_step)
 
     # set up an openmm simulation
+    platform = Platform.getPlatformByName('CUDA')
     simulation = app.Simulation(
-        complex_structure.topology, complex_system, integrator_min
+        complex_structure.topology, complex_system, integrator_min, platform=platform
     )
 
     # save the receptor coords as they should be consistent
@@ -197,6 +198,7 @@ def optimise_in_receptor(
         # with open(f"system_start_conformer_{i}.pdb", "w") as outfile:
         #     app.PDBFile.writeFile(complex_structure.topology, complex_coords, outfile)
         # set the initial positions
+        # Mat: so here is the issue?
         simulation.context.setPositions(complex_coords)
         # now minimize the energy
         simulation.minimizeEnergy()
