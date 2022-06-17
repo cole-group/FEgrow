@@ -37,7 +37,7 @@ jobs:
         pytest test.py
     - name: Run tutorial.py
       run: |
-        obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7
-        wget -nc https://files.rcsb.org/download/7L10.pdb
         cd notebooks
+        obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7
+        wget -nc https://files.rcsb.org/download/7L10.pdb        
         python .tutorial.py
