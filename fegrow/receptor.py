@@ -3,7 +3,6 @@ from typing import List, Tuple
 
 import parmed
 from openmmforcefields.generators import SystemGenerator
-from openmmml import MLPotential
 from pdbfixer import PDBFixer
 from rdkit import Chem
 from rdkit.Geometry.rdGeometry import Point3D
@@ -11,12 +10,13 @@ from tqdm import tqdm
 from typing_extensions import Literal
 
 from .package import RMol
+from .openmmml import MLPotential
 
 import numpy
 
 # fix for new openmm versions
 try:
-    from openmm import app, openmm, unit
+    from openmm import app, openmm, unit, Platform
 except (ImportError, ModuleNotFoundError):
     from simtk.openmm import app, openmm
     from simtk import unit
@@ -84,7 +84,8 @@ def optimise_in_receptor(
     use_ani: bool = True,
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
-    water_model = 'tip3p.xml'
+    water_model: str = 'tip3p.xml',
+    platform_name: str = 'CPU',
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -105,6 +106,9 @@ def optimise_in_receptor(
         water_model:
             If set to None, the water model is ignored. Acceptable can be found in the
             openmmforcefields package.
+        platform_name:
+            The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
+            See the OpenMM documentation of Platform.
 
     Returns:
         A copy of the input molecule with the optimised positions.
@@ -114,6 +118,8 @@ def optimise_in_receptor(
         "openff": "openff_unconstrained-1.3.0.offxml",
         "gaff": "gaff-2.11",
     }
+
+    platform = Platform.getPlatformByName(platform_name.upper())
 
     # assume the receptor has already been fixed and hydrogens have been added.
     receptor = app.PDBFile(receptor_file)
@@ -157,7 +163,7 @@ def optimise_in_receptor(
     # if we want to use ani2x check we can and adapt the system
     if use_ani and _can_use_ani2x(openff_mol):
         print("using ani2x")
-        potential = MLPotential("ani2x")
+        potential = MLPotential("ani2x", platform_name=platform_name)
         complex_system = potential.createMixedSystem(
             complex_structure.topology, system, ligand_idx
         )
@@ -175,7 +181,7 @@ def optimise_in_receptor(
 
     # set up an openmm simulation
     simulation = app.Simulation(
-        complex_structure.topology, complex_system, integrator_min
+        complex_structure.topology, complex_system, integrator_min, platform=platform
     )
 
     # save the receptor coords as they should be consistent
@@ -197,6 +203,7 @@ def optimise_in_receptor(
         # with open(f"system_start_conformer_{i}.pdb", "w") as outfile:
         #     app.PDBFile.writeFile(complex_structure.topology, complex_coords, outfile)
         # set the initial positions
+        # Mat: so here is the issue?
         simulation.context.setPositions(complex_coords)
         # now minimize the energy
         simulation.minimizeEnergy()
