@@ -23,6 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         conda env update --file env.yml --name base
+        conda install pytest
 #     - name: Lint with flake8
 #       run: |
 #         conda install flake8
@@ -32,9 +33,7 @@ jobs:
 #         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: pytest
       run: |
-        conda install pytest
-        cd testing
-        pytest test.py
+        python -c "import pytest; from fegrow.testing import loc ; pytest.main([loc])"
     - name: Run tutorial.py
       run: |
         cd notebooks
