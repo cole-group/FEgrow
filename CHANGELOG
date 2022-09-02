@@ -1,0 +1,9 @@
+
+
+
+ * 1.0.1
+
+ Summary:
+  * Fix+Feature: optimise_in_receptor function now takes platform_name argument
+    allowing to use cuda or cpu for non-ani or ani optimisation.
+  * Fix: embedding openmm-ml into fegrow in order to create a conda package

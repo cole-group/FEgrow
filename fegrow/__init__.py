@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from .conformers import generate_conformers
 from .package import RList, RMol, rep2D, build_molecules, ic50, RGroupGrid, RLinkerGrid, link
 from .receptor import fix_receptor, optimise_in_receptor, sort_conformers
@@ -7,7 +9,7 @@ RGroups = RGroupGrid()
 RLinkers = RLinkerGrid()
 
 # get the version
-__version__ = open('version.txt').read().strip()
+__version__ = open(Path(__file__).parent / 'version.txt').read().strip()
 
 __all__ = [RMol,
            generate_conformers,

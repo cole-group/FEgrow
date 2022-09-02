@@ -25,7 +25,7 @@ def test_adding_ethanol_1mol():
 
 def test_adding_ethanol_number_of_atoms():
     """
-	Check if merging ethanol with a molecule yields the right number of atoms. 
+	Check if merging ethanol with a molecule yields the right number of atoms.
 	"""
     # load the SDF
     template_mol = Chem.SDMolSupplier('data/sarscov2_coreh.sdf', removeHs=False)[0]
@@ -68,7 +68,7 @@ def test_growing_plural_groups():
 
 def test_added_ethanol_conformer_generation():
     """
-	Check if conformers are generated correctly. 
+	Check if conformers are generated correctly.
 	"""
     # load the SDF
     template_mol = Chem.SDMolSupplier('data/sarscov2_coreh.sdf', removeHs=False)[0]
@@ -99,3 +99,4 @@ def test_linking_1to1():
     assert len(linked) == 1
     final_mol = Chem.AddHs(linked[0])
     assert final_mol.GetNumAtoms() == 13
+
