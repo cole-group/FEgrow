@@ -1,8 +1,5 @@
-from pathlib import Path
-
 import pandas as pd
-from rdkit import Chem
-from rdkit.Chem import AllChem, Descriptors, PandasTools
+from rdkit.Chem import Descriptors
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
 
 from .sascorer import calculateScore
@@ -11,8 +8,10 @@ from .sascorer import calculateScore
 def rule_of_five(mol):
     """
     Function to calculate the Ro5 properties for a molecule. Needs the new R group to be joined to form a single
-    RDKit mol object as input. Returns a series containing the molecular weight, number of hydrogen bond donors and acceptors and the
-    calculated LogP. A flag of True is returned if the molecule complies and False if it doesn't.
+    RDKit mol object as input. Returns a series containing the molecular weight, number of hydrogen bond donors and
+    acceptors and the calculated LogP.
+
+    A flag of True is returned if the molecule complies and False if it doesn't.
     """
 
     # Ro5 descriptors
@@ -33,7 +32,7 @@ def rule_of_five(mol):
         "HBD": HBD,
         "LogP": LogP,
         "Pass_Ro5": pass_ro5,
-    }  # return dict of values
+    }
 
     return ro5
 
