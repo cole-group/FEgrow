@@ -1,9 +1,19 @@
 
+Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, Daniel J. Cole
 
-
- * 1.0.1
-
+ * [UNPUBLISHED] version 1.1.0
  Summary:
-  * Fix+Feature: optimise_in_receptor function now takes platform_name argument
+ ** Fix: [RP] ExactMolWt used in the lipinski Ro5 is for mass spec/crystallography for specific isotopes. Moving on to
+  the more appropriate MolWt.
+
+
+ * version 1.0.2
+ Summary:
+ ** adjusting the files for the conda-release
+
+
+ * version 1.0.1
+ Summary:
+ ** Fix+Feature: optimise_in_receptor function now takes platform_name argument
     allowing to use cuda or cpu for non-ani or ani optimisation.
-  * Fix: embedding openmm-ml into fegrow in order to create a conda package
+ ** Fix: embedding openmm-ml into fegrow in order to create a conda package

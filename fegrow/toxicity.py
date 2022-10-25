@@ -1,8 +1,5 @@
-from pathlib import Path
-
 import pandas as pd
-from rdkit import Chem
-from rdkit.Chem import AllChem, Descriptors, PandasTools
+from rdkit.Chem import Descriptors
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
 
 from .sascorer import calculateScore
@@ -11,24 +8,23 @@ from .sascorer import calculateScore
 def rule_of_five(mol):
     """
     Function to calculate the Ro5 properties for a molecule. Needs the new R group to be joined to form a single
-    RDKit mol object as input. Returns a series containing the molecular weight, number of hydrogen bond donors and acceptors and the
-    calculated LogP. A flag of True is returned if the molecule complies and False if it doesn't.
+    RDKit mol object as input. Returns a series containing the molecular weight, number of hydrogen bond donors and
+    acceptors and the calculated LogP.
+
+    A flag of True is returned if the molecule complies and False if it doesn't.
     """
 
     # Ro5 descriptors
-    MW = Descriptors.ExactMolWt(mol)
+    MW = round(Descriptors.MolWt(mol), 3)
     HBA = Descriptors.NumHAcceptors(mol)
     HBD = Descriptors.NumHDonors(mol)
-    LogP = Descriptors.MolLogP(mol)
+    LogP = round(Descriptors.MolLogP(mol), 3)
 
     # Ro5 conditions
     conditions = [MW <= 500, HBA <= 10, HBD <= 5, LogP <= 5]
 
     # passes Ro5 if no more than one out of four conditions is violated
-    if conditions.count(True) >= 3:
-        pass_ro5 = True  # ro5 compliant
-    else:
-        pass_ro5 = False  # fails ro5
+    pass_ro5 = conditions.count(True) >= 3
 
     ro5 = {
         "MW": MW,
@@ -36,7 +32,7 @@ def rule_of_five(mol):
         "HBD": HBD,
         "LogP": LogP,
         "Pass_Ro5": pass_ro5,
-    }  # return dict of values
+    }
 
     return ro5
 
@@ -85,7 +81,7 @@ def tox_props(data):
         pains = pd.DataFrame([filter_mols(mol, catalog_pains, "has_pains") for mol in mols])
         unwanted_subs = pd.DataFrame([filter_mols(mol, catalog_unwanted, "has_unwanted_subs") for mol in mols])
         nih = pd.DataFrame([filter_mols(mol, catalog_nih, "has_prob_fgs") for mol in mols])
-        sa_score = [calculateScore(mol) for mol in mols]
+        sa_score = [round(calculateScore(mol), 3) for mol in mols]
 
         data = pd.concat([data, ro5, pains, unwanted_subs, nih], axis=1)  # put results together
         data['synthetic_accessibility'] = sa_score
