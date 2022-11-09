@@ -36,3 +36,13 @@ rec_final = prody.parsePDB("rec_final.pdb")
 rmols[0].rep3D(prody=rec_final)
 rmols.remove_clashing_confs(rec_final)
 rmols[0].rep3D(prody=rec_final)
+
+energies = rmols.optimise_in_receptor(
+    receptor_file="rec_final.pdb", 
+    ligand_force_field="openff", 
+    use_ani=True,
+    sigma_scale_factor=0.8,
+    relative_permittivity=4,
+    water_model = None,
+    platform_name='CPU'
+)
