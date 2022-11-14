@@ -44,4 +44,4 @@ jobs:
         cd notebooks
         obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7
         wget -nc https://files.rcsb.org/download/7L10.pdb        
-        python -q -X faulthandler .tutorial.py
+        gdb python -q -X faulthandler .tutorial.py
