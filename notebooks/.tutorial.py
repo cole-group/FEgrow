@@ -4,6 +4,8 @@ from rdkit import Chem
 import fegrow
 from fegrow import RGroups
 
+import faulthandler ; faulthandler.enable()
+
 init_mol = Chem.SDMolSupplier('sarscov2/coreh.sdf', removeHs=False)[0]
 template_mol = fegrow.RMol(init_mol)
 template_mol.rep2D(idx=True, size=(500, 500))
