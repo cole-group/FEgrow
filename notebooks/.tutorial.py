@@ -32,6 +32,7 @@ from rdkit import Chem
 import fegrow
 from fegrow import RGroups
 
+import faulthandler ; faulthandler.enable()
 
 # # Prepare the ligand template
 
@@ -222,7 +223,7 @@ rmols[0].rep3D(prody=rec_final)
 energies = rmols.optimise_in_receptor(
     receptor_file="rec_final.pdb", 
     ligand_force_field="openff", 
-    use_ani=True,
+    use_ani=False,
     sigma_scale_factor=0.8,
     relative_permittivity=4,
     water_model = None,
