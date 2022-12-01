@@ -69,7 +69,7 @@ def __getAttachmentVector(R_group):
     return: tuple (ratom, ratom_neighbour)
     """
     for atom in R_group.GetAtoms():
-        if not atom.GetAtomicNum() == 0:
+        if not atom.GetAtomicNum() == 0 or atom.GetAtomMapNum() != 1:
             continue
 
         neighbours = atom.GetNeighbors()
@@ -640,16 +640,31 @@ class RLinkerGrid(mols2grid.MolGrid):
         return list(df['Mol'])
 
 
-def link(Rgroups, Rlinkers):
+def link(Rgroups, Rlinkers, One2One=False):
+    """
+
+    :param Rgroups:
+    :param Rlinkers:
+    :param One2One: If True, for each selected RGroup, a selected linker with the same index is added.
+        Alternatively, each linker is added to each RGroup resulting in n x m number of combinsions, with n being
+        the number of RGroups and m the number of linkers.
+    :return:
+    """
+
+
     # convert rgroups/linkers to smiles
     rgroup_smiles = [Chem.MolToSmiles(mol) for mol in Rgroups]
     linker_smiles = [Chem.MolToSmiles(mol) for mol in Rlinkers]
 
     # loop over and combine smiles
     combined = []
-    for linker in linker_smiles:
-        for rgroup in rgroup_smiles:
+    if One2One:
+        for linker, rgroup in zip(linker_smiles, rgroup_smiles):
             combined.append(rgroup.replace('*', '*' + linker))
+    else:
+        for linker in linker_smiles:
+            for rgroup in rgroup_smiles:
+                combined.append(rgroup.replace('*', '*' + linker))
 
     # generate 3D conformers for each molecule
     mols = []
@@ -742,7 +757,7 @@ class RList(RInterface, list):
 def build_molecules(core_ligand: RMol,
                     attachment_points: List[int],
                     r_groups: Union[RGroupGrid, List[Chem.Mol]],
-                    ) ->RList[RMol]:
+                    ) :
     """
     For the given core molecule and list of attachment points
      and r groups enumerate the possible molecules and
