@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Bieniek"
+  given-names: "Mateusz K"
+  orcid: "https://orcid.org/0000-0002-3065-5417"
+- family-names: "Cree"
+  given-names: "Ben"
+  orcid: "https://orcid.org/0000-0002-8934-973X"
+- family-names: "Pirie"
+  given-names: "Rachael"
+  orcid: "https://orcid.org/0000-0002-2449-3458"
+- family-names: "Horton"
+  given-names: "Joshua T"
+  orcid: "https://orcid.org/0000-0001-8694-7200"
+- family-names: "Tatum"
+  given-names: "Natalie J"
+  orcid: "https://orcid.org/0000-0003-3878-9265"
+- family-names: "Cole"
+  given-names: "Daniel J"
+  orcid: "https://orcid.org/0000-0003-2933-0719"
+title: "An open-source molecular builder and free energy preparation workflow"
+version: 1.0.2
+doi: 10.1038/s42004-022-00754-9
+date-released: 2022-07-22
+url: "https://github.com/cole-group/FEgrow"

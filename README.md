@@ -3,10 +3,8 @@ An interactive workflow for building user-defined congeneric series of ligands i
 
 ![CI](https://github.com/cole-group/FEgrow/actions/workflows/CI.yml/badge.svg)
 
-### Preprint
 
-[An Open-Source Molecular Builder and Free Energy Preparation Workflow](https://doi.org/10.26434/chemrxiv-2022-hr5q4) by Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, and Daniel J. Cole.
-
+Bieniek, M.K., Cree, B., Pirie, R. et al. An open-source molecular builder and free energy preparation workflow. Commun Chem 5, 136 (2022). [https://doi.org/10.1038/s42004-022-00754-9](https://www.nature.com/articles/s42004-022-00754-9)
 
 ### Further Information
 
