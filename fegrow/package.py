@@ -68,20 +68,28 @@ def __getAttachmentVector(R_group):
     rgroup: fragment passed as rdkit molecule
     return: tuple (ratom, ratom_neighbour)
     """
-    for atom in R_group.GetAtoms():
-        if not atom.GetAtomicNum() == 0 or atom.GetAtomMapNum() != 1:
-            continue
 
-        neighbours = atom.GetNeighbors()
-        if len(neighbours) > 1:
-            raise Exception(
-                "The linking R atom in the R group has two or more attachment points. "
-                "NOT IMPLEMENTED. "
-            )
+    # find the R groups in the molecule
+    R_groups = [atom for atom in R_group.GetAtoms() if atom.GetAtomicNum() == 0]
+    if not len(R_groups):
+        raise Exception("The R-group does not have R-atoms (Atoms with index == 0, often a '*' sign)")
 
-        return atom, neighbours[0]
+    # if it is a linker, it will have more than 1 R group, pick the one with index 0
+    if len(R_groups) > 1:
+        R_groups = [atom for atom in R_groups if atom.GetAtomMapNum() == 0]
+        if len(R_groups) != 1:
+            print("Error: detected a linker (more than one R-group), "
+                  "but none of the R-groups has rdkit.GetAtomMapNum() equal to 0? "
+                  "This is needed to signify the priority connector.  ")
+            raise Exception('Linker with multiple R-groups is missing an atom "label". See the error above. ')
 
-    raise Exception("No R atom in the R group. ")
+    atom = R_groups[0]
+
+    neighbours = atom.GetNeighbors()
+    if len(neighbours) > 1:
+        raise NotImplementedError("The linking R atom in the R group has two or more attachment points. ")
+
+    return atom, neighbours[0]
 
 
 def merge_R_group(mol, R_group, replaceIndex):
