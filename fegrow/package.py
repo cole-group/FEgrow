@@ -375,9 +375,10 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
             view = py3Dmol.view(width=400, height=400, viewergrid=(1, 1))
 
         for conf in self.GetConformers():
-            # ignore the confIds that we're not asked for
+            # ignore the confIds we've not asked for
             if confIds is not None and conf.GetId() not in confIds:
                 continue
+
             mb = Chem.MolToMolBlock(self, confId=conf.GetId())
             view.addModel(mb, "lig")
 
