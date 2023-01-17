@@ -24,6 +24,7 @@ from rdkit.Chem import PandasTools
 import mols2grid
 import pandas
 
+
 from .conformers import generate_conformers
 from .toxicity import tox_props
 
@@ -58,16 +59,6 @@ def rep3D(mol):
     viewer.setStyle({"stick": {}})
     viewer.zoomTo()
     return viewer
-
-
-def is_linker(rmol):
-    """
-    Check if the molecule is a linker by checking if it has 2 R-group points
-    """
-    if len([atom for atom in rmol.GetAtoms() if atom.GetAtomMapNum() in (1,2)]) == 2:
-        return True
-
-    return False
 
 
 def __getAttachmentVector(R_group):

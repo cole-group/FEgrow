@@ -1,7 +1,8 @@
 
 Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, Daniel J. Cole
+ * [UNPUBLISHED] version 1.*.*
 
- * [UNPUBLISHED] version 1.1.0
+ * version 1.1.0
  Summary:
  ** Fix: [RP] ExactMolWt used in the lipinski Ro5 is for mass spec/crystallography for specific isotopes. Moving on to
   the more appropriate MolWt.
