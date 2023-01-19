@@ -61,6 +61,16 @@ def rep3D(mol):
     return viewer
 
 
+def is_linker(rmol):
+    """
+    Check if the molecule is a linker by checking if it has 2 R-group points
+    """
+    if len([atom for atom in rmol.GetAtoms() if atom.GetAtomMapNum() in (1,2)]) == 2:
+        return True
+
+    return False
+
+
 def __getAttachmentVector(R_group):
     """In the R-group or a linker, search for the position of the attachment point (R atom)
     and extract the atom (currently only single bond supported). In case of the linker,
