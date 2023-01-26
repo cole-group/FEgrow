@@ -796,6 +796,14 @@ def build_molecules(core_ligand: RMol,
     :param attachment_points: The list of atom index in the core ligand
       that the r groups should be attached to. If it is empty, connecting points are sought out and matched.
     """
+
+    # This is a temporary warning about the change in the interface.
+    # This change is because there are situations where the attachment_points do not need to be passed to the function.
+    if isinstance(r_groups, int):
+        print('Warning: second argument is detected to be an integer. It is now "r_groups" '
+              'whereas attachement_points are provided as the 3rd argument. ')
+        raise Exception('Change interface to build_molecules(core_ligand, r_groups, attachment_points)')
+
     # get a list of rdkit molecules
     if isinstance(r_groups, mols2grid.MolGrid):
         selection = mols2grid.selection
