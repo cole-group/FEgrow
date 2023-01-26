@@ -799,10 +799,12 @@ def build_molecules(core_ligand: RMol,
 
     # This is a temporary warning about the change in the interface.
     # This change is because there are situations where the attachment_points do not need to be passed to the function.
-    if isinstance(r_groups, int):
+    if isinstance(r_groups, list) and len(r_groups) > 0 and isinstance(r_groups[0], int):
         print('Warning: second argument is detected to be an integer. It is now "r_groups" '
               'whereas attachement_points are provided as the 3rd argument. ')
-        raise Exception('Change interface to build_molecules(core_ligand, r_groups, attachment_points)')
+        raise Exception('Please note that after adding the linker to FEgrow (version 1.1), '
+                        'the "build_molecules" function interface has changed to'
+                        ' "build_molecules(core_ligand, r_groups, attachment_points)". ')
 
     # get a list of rdkit molecules
     if isinstance(r_groups, mols2grid.MolGrid):
