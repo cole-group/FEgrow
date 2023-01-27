@@ -2,7 +2,7 @@ import pathlib
 
 from rdkit import Chem
 import fegrow
-from fegrow import RGroups
+from fegrow import RGroups, RLinkers
 
 root = pathlib.Path(__file__).parent
 
@@ -72,3 +72,25 @@ def test_added_ethanol_conformer_generation():
 
     # there should be multiple conformers
     assert rmols[0].GetNumConformers() > 2
+
+def test_add_a_linker_check_star():
+    """
+    1. load the core
+    2. load the linker
+    3. add the linker to the core
+    4. check if there is a danling R/* atom
+    linker = R1 C R2, *1 C *2, Core-C-*1,
+
+    :return:
+    """
+    # Check if conformers are generated correctly.
+    template_mol = Chem.SDMolSupplier(str(root / 'data' / 'sarscov2_coreh.sdf'), removeHs=False)[0]
+    attachment_index = [40]
+    df = RLinkers.dataframe
+    # Select a linker
+    linker = df.loc[df['mols2grid-id'] == 842]['Mol'].values[0]
+    template_with_linker = fegrow.build_molecules(template_mol, [linker], attachment_index)[0]
+    for atom in template_with_linker.GetAtoms():
+        if atom.GetAtomicNum() == 0:
+            assert len(atom.GetBonds()) == 1
+    pass
