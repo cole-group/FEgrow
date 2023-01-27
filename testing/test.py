@@ -1,6 +1,6 @@
 from rdkit import Chem
 import fegrow
-from fegrow import RGroups, link
+from fegrow import RGroups, link, build_molecules
 
 
 def test_adding_ethanol_1mol():
@@ -100,3 +100,21 @@ def test_linking_1to1():
     final_mol = Chem.AddHs(linked[0])
     assert final_mol.GetNumAtoms() == 13
 
+def test_add_a_linker_check_star():
+    """
+    1. load the core
+    2. load the linker
+    3. add the linker to the core
+    4. check if there is a danling R/* atom
+    linker = R1 C R2, *1 C *2, Core-C-*1,
+
+    :return:
+    """
+    attachment_index = 3
+    core = Chem.MolFromSmiles('C1NCN1')
+    linker = Chem.MolFromMolFile('data/ethanol.mol', removeHs = False)
+    template_mol = fegrow.RMol(core)
+    template_with_linker = build_molecules(template_mol, [linker], attachment_index)[0]
+    pass
+
+test_add_a_linker_check_star()
