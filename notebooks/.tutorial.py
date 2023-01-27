@@ -32,8 +32,6 @@ from rdkit import Chem
 import fegrow
 from fegrow import RGroups
 
-import faulthandler ; faulthandler.enable()
-
 # # Prepare the ligand template
 
 # The provided core structure `lig.pdb` has been extracted from a crystal structure of Mpro in complex with compound **4** from the Jorgensen study (PDB: 7L10), and a Cl atom has been removed to allow growth into the S3/S4 pocket. The template structure of the ligand is protonated with [Open Babel](http://openbabel.org/wiki/Main_Page):
@@ -113,8 +111,8 @@ selected_rgroups
 
 
 rmols = fegrow.build_molecules(template_mol, 
-                               attachment_index, 
-                               selected_rgroups)
+                               selected_rgroups,
+                               attachment_index)
 
 
 # In[ ]:
