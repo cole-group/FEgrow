@@ -2,7 +2,7 @@ import pathlib
 
 from rdkit import Chem
 import fegrow
-from fegrow import RGroups
+from fegrow import RGroups, RLinkers
 
 root = pathlib.Path(__file__).parent
 
@@ -17,9 +17,7 @@ def test_adding_ethanol_1mol():
     ethanol = groups.loc[groups['Name'] == '*CCO']['Mol'].values[0]
 
     # merge
-    rmols = fegrow.build_molecules(template_mol,
-                                   attachment_index,
-                                   [ethanol])
+    rmols = fegrow.build_molecules(template_mol, [ethanol], attachment_index)
 
     assert len(rmols) == 1, 'Did not generate 1 molecule'
 
@@ -36,9 +34,7 @@ def test_adding_ethanol_number_of_atoms():
     ethanol_atoms_num = ethanol.GetNumAtoms()
 
     # merge
-    rmols = fegrow.build_molecules(template_mol,
-                                   attachment_index,
-                                   [ethanol])
+    rmols = fegrow.build_molecules(template_mol, [ethanol], attachment_index)
 
     assert (template_atoms_num + ethanol_atoms_num - 2) == rmols[0].GetNumAtoms()
 
@@ -54,9 +50,7 @@ def test_growing_plural_groups():
     cyclopropane = groups.loc[groups['Name'] == '*C1CC1']['Mol'].values[0]
 
     # merge
-    rmols = fegrow.build_molecules(template_mol,
-                                   attachment_index,
-                                   [ethanol, cyclopropane])
+    rmols = fegrow.build_molecules(template_mol, [ethanol, cyclopropane], attachment_index)
 
     assert len(rmols) == 2
 
@@ -71,12 +65,32 @@ def test_added_ethanol_conformer_generation():
     ethanol = groups.loc[groups['Name'] == '*CCO']['Mol'].values[0]
 
     # merge
-    rmols = fegrow.build_molecules(template_mol,
-                                   attachment_index,
-                                   [ethanol])
+    rmols = fegrow.build_molecules(template_mol, [ethanol], attachment_index)
 
     # generate conformers
     rmols.generate_conformers(num_conf=20, minimum_conf_rms=0.1)
 
     # there should be multiple conformers
     assert rmols[0].GetNumConformers() > 2
+
+def test_add_a_linker_check_star():
+    """
+    1. load the core
+    2. load the linker
+    3. add the linker to the core
+    4. check if there is a danling R/* atom
+    linker = R1 C R2, *1 C *2, Core-C-*1,
+
+    :return:
+    """
+    # Check if conformers are generated correctly.
+    template_mol = Chem.SDMolSupplier(str(root / 'data' / 'sarscov2_coreh.sdf'), removeHs=False)[0]
+    attachment_index = [40]
+    df = RLinkers.dataframe
+    # Select a linker
+    linker = df.loc[df['mols2grid-id'] == 842]['Mol'].values[0]
+    template_with_linker = fegrow.build_molecules(template_mol, [linker], attachment_index)[0]
+    for atom in template_with_linker.GetAtoms():
+        if atom.GetAtomicNum() == 0:
+            assert len(atom.GetBonds()) == 1
+    pass

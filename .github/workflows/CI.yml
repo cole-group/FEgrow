@@ -23,7 +23,8 @@ jobs:
     - name: Install dependencies
       run: |
         conda env update --file env.yml --name base
-        conda install pytest cpuonly -c pytorch
+#        conda activate fegrow
+#        conda install pytest cpuonly -c pytorch
     - name: env summary
       run: conda list
     - name: install fegrow
