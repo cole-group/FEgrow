@@ -4,21 +4,24 @@ Installation
 Linux / MacOS
 -------------
 
-For conda installation, please use the provided environment file *env.yml*:
+Conda installation:
 
 .. code-block:: Bash
 
+    conda install fegrow -c conda-forge
+
+To use the latest git version, download the code and use the provided
+environment file *env.yml*:
+
+.. code-block:: Bash
+
+    git clone https://github.com/cole-group/FEgrow.git
+    cd FEgrow
     conda env create -f env.yml
     conda activate fegrow
+    pip install . # the repository directory
 
-Alternatively, you can install the dependancies manually in the env.yml and use pip to install the package:
-
-.. code-block:: Bash
-
-    cd fegrow
-    pip install .
-
-In order to ensure that the environment is available in your jupyter, you can use::
+In order to ensure that the environment is available in your jupyter, you can then use::
 
     python -m ipykernel install --user --name=fegrow
 
