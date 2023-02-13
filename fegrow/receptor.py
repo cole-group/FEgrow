@@ -10,7 +10,7 @@ from tqdm import tqdm
 from typing_extensions import Literal
 
 from .package import RMol
-from .openmmml import MLPotential
+from openmmml import MLPotential
 
 import numpy
 
