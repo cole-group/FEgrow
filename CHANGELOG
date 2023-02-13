@@ -7,6 +7,8 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
 **version 1.2.0**
 
 - [Feature] Linkers with a library
+- Fix: [PR#20] Using the conda-forge package openmm-ml
+
 
 **version 1.1.0**
 
