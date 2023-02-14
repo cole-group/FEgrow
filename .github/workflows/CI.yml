@@ -28,9 +28,10 @@ jobs:
     - name: install fegrow
       run: |
         pip install .
-    - name: pytest
+    - name: install pytest
       run: mamba install pytest
-           which python
+    - name: which python
+      run: which python
     - name: pytest
       run: python -c "import pytest; from fegrow.testing import loc ; pytest.main([loc])"
     - name: Run tutorial.py
