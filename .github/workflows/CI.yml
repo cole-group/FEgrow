@@ -17,7 +17,7 @@ jobs:
         environment-file: env.yml
         python-version: 3.8
         auto-update-conda: true
-        auto-activate-base: false
+        auto-activate-base: true
         show-channel-urls: true
         mamba-version: "*"
         miniforge-version: latest
