@@ -30,6 +30,7 @@ jobs:
         pip install .
     - name: pytest
       run: |
+        mamba install pytest
         python -c "import pytest; from fegrow.testing import loc ; pytest.main([loc])"
     - name: Run tutorial.py
       run: |
