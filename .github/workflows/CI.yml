@@ -15,7 +15,7 @@ jobs:
       with:
         activate-environment: test
         environment-file: env.yml
-        python-version: ${{ python-version }}
+        python-version: 3.8
         auto-update-conda: true
         auto-activate-base: false
         show-channel-urls: true
