@@ -23,6 +23,10 @@ jobs:
         miniforge-version: latest
         miniforge-variant: Mambaforge
         use-mamba: true
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
     - name: env summary
       run: conda list
     - name: install fegrow
