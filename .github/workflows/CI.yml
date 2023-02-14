@@ -11,18 +11,18 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Create Environment
-        uses: conda-incubator/setup-miniconda@v2.1.1
-        with:
-          activate-environment: test
-          environment-file: env.yml
-          python-version: ${{ python-version }}
-          auto-update-conda: true
-          auto-activate-base: false
-          show-channel-urls: true
-          mamba-version: "*"
-          miniforge-version: latest
-          miniforge-variant: Mambaforge
-          use-mamba: true
+      uses: conda-incubator/setup-miniconda@v2.1.1
+      with:
+        activate-environment: test
+        environment-file: env.yml
+        python-version: ${{ python-version }}
+        auto-update-conda: true
+        auto-activate-base: false
+        show-channel-urls: true
+        mamba-version: "*"
+        miniforge-version: latest
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: env summary
       run: conda list
     - name: install fegrow
