@@ -10,11 +10,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Install Conda environment from environment.yml
-      uses: mamba-org/provision-with-micromamba@main
+    - name: Create Environment
+      uses: conda-incubator/setup-miniconda@v2.1.1
       with:
-        environment-file: env.yaml
-        environment-name: fegrow
+        activate-environment: fegrow
+        environment-file: env.yml
+        python-version: 3.8
+        auto-update-conda: true
+        auto-activate-base: false
+        show-channel-urls: true
+        mamba-version: "*"
+        miniforge-version: latest
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: env summary
       shell: bash -l {0}
       run: conda list
