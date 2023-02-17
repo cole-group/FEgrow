@@ -639,26 +639,32 @@ class RLinkerGrid(mols2grid.MolGrid):
         """
         Load the local linkers into rdkit molecules
         """
-        molecules = []
-        names = []
         builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library"
         linker_files = glob.glob(str(builtin_rlinkers / '*.mol'))
         # sort the linkers so that [R1]C[R2] is next to [R2]C[R1] in the grid
         linker_files = sorted(linker_files, key=lambda smiles:smiles.replace('[R1]', 'R').replace('[R2]', 'R'))
 
+        linkers = []
         for molfile in linker_files:
-            r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
+            r_mol = list(Chem.SDMolSupplier(molfile, removeHs=False)).pop()
             # these files are missing hydrogens
             r_mol = Chem.AddHs(r_mol)
-            molecules.append(r_mol)
             # simplify the names for the user
-            names.append(Path(molfile).stem.replace('[R1]', 'R').replace('[R2]', 'R'))
+            linkers.append(
+                {"Mol": r_mol,
+                 "Name": Path(molfile).stem.replace('[R1]', 'R').replace('[R2]', 'R'),
+                 'Common': r_mol.GetIntProp('SmileIndex')   # extract the index property from the original publication
+                 }
+            )
 
-        return pandas.DataFrame({"Mol": molecules, "Name": names})
+        # presort using the original publication index
+        linkers = sorted(linkers, key=lambda i: i['Common'])
+
+        return pandas.DataFrame(linkers)
 
     def _ipython_display_(self):
         from IPython.display import display
-        subset = ["img", "Name", "mols2grid-id"]
+        subset = ["img", "Name", "mols2grid-id", "Common"]
         return display(self.display(subset=subset, substruct_highlight=True))
 
     def get_selected(self):
