@@ -709,6 +709,8 @@ class RList(RInterface, list):
     """
 
     def rep2D(self, subImgSize=(400, 400), **kwargs):
+        if len(self) == 0:
+            return None
         return Draw.MolsToGridImage([mol.rep2D(rdkit_mol=True, **kwargs) for mol in self], subImgSize=subImgSize)
 
     def toxicity(self):
@@ -781,7 +783,7 @@ class RList(RInterface, list):
         return pandas.concat([rmol.df() for rmol in self])._repr_html_()
 
 
-def build_molecules(core_ligand: RMol,
+def build_molecules(template: Union[RMol, List],
                     r_groups: Union[mols2grid.MolGrid, List[Chem.Mol]],
                     attachment_points: Optional[List[int]] = [],
                     ):
@@ -790,7 +792,7 @@ def build_molecules(core_ligand: RMol,
      and r groups enumerate the possible molecules and
      return a list of them.
 
-    :param core_ligand: The core scaffold molecule to attach the r groups to.
+    :param template: The core scaffold molecule to attach the r groups to, or a list of them.
     :param r_groups: The list of rdkit molecules which should be considered
       r groups or the RGroup Grid with highlighted molecules.
     :param attachment_points: The list of atom index in the core ligand
@@ -808,23 +810,42 @@ def build_molecules(core_ligand: RMol,
 
     # get a list of rdkit molecules
     if isinstance(r_groups, mols2grid.MolGrid):
-        selection = mols2grid.selection
-        # now get a list of the molecules
+        selection = mols2grid.get_selected()
+        # get the molecules
         r_mols = [r_groups.dataframe.iloc[i]["Mol"] for i in selection.keys()]
     else:
+        # just a list
         r_mols = r_groups
 
     combined_mols = RList()
     id_counter = 0
     # loop over the attachment points and r_groups
 
+    # replace the RMol template with
+    if isinstance(template, RMol):
+        rlist = RList()
+        rlist.append(template)
+        template = rlist
+
     if not attachment_points:
         # attempt to generate the attachment points by picking the joining molecule
-        atom, _ = __getAttachmentVector(core_ligand)
-        attachment_points = [atom.GetIdx()]
+        # case: a list of templates previously joined with linkers requires iterating over them
+        for ligand in template:
+            print('template', type(template))
+            atom, _ = __getAttachmentVector(ligand)
+            attachment_points.append(atom.GetIdx())
 
-    for atom_idx in attachment_points:
+    if not attachment_points:
+        raise Exception('Could not find attachement points. ')
+
+    if len(attachment_points) != len(template):
+        raise Exception(f'There must be one attachment point for each template. '
+                        f'Provided attachement points = {len(attachment_points)} '
+                        f'with templates number: {len(template)}')
+
+    for atom_idx, core_ligand in zip(attachment_points, template):
         for r_mol in r_mols:
+            print('next for merging',r_mol)
             core_mol = RMol(copy.deepcopy(core_ligand))
             merged_mol = merge_R_group(mol=core_mol, R_group=r_mol, replaceIndex=atom_idx)
             # assign the identifying index to the molecule
