@@ -38,10 +38,10 @@ def rule_of_five(mol):
 
 
 def filter_mols(mol, catalog, filter_type):
-    '''
+    """
     Function to carry out a filter of a list of molecules dependent on the catalog supplied.
     Returns a flag of True if unwanted features are detected and False if none are found
-    '''
+    """
 
     entry = catalog.GetFirstMatch(mol)  # Get the first matching PAINS
     if entry is not None:
@@ -55,9 +55,9 @@ def filter_mols(mol, catalog, filter_type):
 
 
 def tox_props(data):
-    '''
+    """
     Function to get properties of a list of molecules and return a dataframe of results.
-    '''
+    """
 
     # initialize pains filter
     params_pains = FilterCatalogParams()
@@ -76,15 +76,23 @@ def tox_props(data):
 
     # if a dataframe of mols is supplied
     if isinstance(data, pd.DataFrame):
-        mols = list(data['ROMol'])
+        mols = list(data["ROMol"])
         ro5 = pd.DataFrame([rule_of_five(mol) for mol in mols])
-        pains = pd.DataFrame([filter_mols(mol, catalog_pains, "has_pains") for mol in mols])
-        unwanted_subs = pd.DataFrame([filter_mols(mol, catalog_unwanted, "has_unwanted_subs") for mol in mols])
-        nih = pd.DataFrame([filter_mols(mol, catalog_nih, "has_prob_fgs") for mol in mols])
+        pains = pd.DataFrame(
+            [filter_mols(mol, catalog_pains, "has_pains") for mol in mols]
+        )
+        unwanted_subs = pd.DataFrame(
+            [filter_mols(mol, catalog_unwanted, "has_unwanted_subs") for mol in mols]
+        )
+        nih = pd.DataFrame(
+            [filter_mols(mol, catalog_nih, "has_prob_fgs") for mol in mols]
+        )
         sa_score = [round(calculateScore(mol), 3) for mol in mols]
 
-        data = pd.concat([data, ro5, pains, unwanted_subs, nih], axis=1)  # put results together
-        data['synthetic_accessibility'] = sa_score
+        data = pd.concat(
+            [data, ro5, pains, unwanted_subs, nih], axis=1
+        )  # put results together
+        data["synthetic_accessibility"] = sa_score
 
         return data
 
@@ -93,12 +101,13 @@ def tox_props(data):
         mol = data
         ro5 = pd.DataFrame([rule_of_five(data)])
         pains = pd.DataFrame([filter_mols(mol, catalog_pains, "has_pains")])
-        unwanted_subs = pd.DataFrame([filter_mols(mol, catalog_unwanted, "has_unwanted_subs")])
+        unwanted_subs = pd.DataFrame(
+            [filter_mols(mol, catalog_unwanted, "has_unwanted_subs")]
+        )
         nih = pd.DataFrame([filter_mols(mol, catalog_nih, "has_prob_fgs")])
         sa_score = [calculateScore(mol)]
 
         data = pd.concat([ro5, pains, unwanted_subs, nih], axis=1)
-        data['synthetic_accessibility'] = sa_score
+        data["synthetic_accessibility"] = sa_score
 
         return data
-

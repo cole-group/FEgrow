@@ -7,7 +7,7 @@ from rdkit.Chem import AllChem, rdFMCS
 
 
 def duplicate_conformers(
-        m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5
+    m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5
 ) -> bool:
     rmslist = []
     for conf_idx in range(m.GetNumConformers()):
@@ -19,11 +19,12 @@ def duplicate_conformers(
     return any(rms < rms_limit for rms in rmslist)
 
 
-def generate_conformers(RMol: Chem.rdchem.Mol,
-                        num_conf: int,
-                        minimum_conf_rms: Optional[float] = None,
-                        flexible: Optional[List[int]] = [],
-                        ) -> List[Chem.rdchem.Mol]:
+def generate_conformers(
+    RMol: Chem.rdchem.Mol,
+    num_conf: int,
+    minimum_conf_rms: Optional[float] = None,
+    flexible: Optional[List[int]] = [],
+) -> List[Chem.rdchem.Mol]:
     """
     flexible:
             The list of atomic indices on the @core_ligand that should not be constrained during the conformer generation
@@ -66,15 +67,24 @@ def generate_conformers(RMol: Chem.rdchem.Mol,
     dup_count = 0
     for coreI in range(num_conf):
         # temp_mol = AllChem.ConstrainedEmbed(deepcopy(mol), template_mol, useTethers=False, randomseed=random.randint(1, 9e5))
-        temp_mol = ConstrainedEmbedR2(deepcopy(rmol), template_mol, coordMap, match, manmap, flexible,
-                                      randomseed=randomseed + coreI)
+        temp_mol = ConstrainedEmbedR2(
+            deepcopy(rmol),
+            template_mol,
+            coordMap,
+            match,
+            manmap,
+            flexible,
+            randomseed=randomseed + coreI,
+        )
         conf_idx = rmol.AddConformer(temp_mol.GetConformer(-1), assignId=True)
         if minimum_conf_rms is not None:
             if duplicate_conformers(rmol, conf_idx, rms_limit=minimum_conf_rms):
                 dup_count += 1
                 rmol.RemoveConformer(conf_idx)
     if dup_count:
-        print(f'Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. ')
+        print(
+            f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. "
+        )
     return rmol
 
 
@@ -98,22 +108,44 @@ from rdkit.Chem.rdqueries import *
 from rdkit.Chem.rdMolEnumerator import *
 from rdkit.Geometry import rdGeometry
 from rdkit.RDLogger import logger
-from rdkit.Chem.EnumerateStereoisomers import StereoEnumerationOptions, EnumerateStereoisomers
+from rdkit.Chem.EnumerateStereoisomers import (
+    StereoEnumerationOptions,
+    EnumerateStereoisomers,
+)
 
 
-def ConstrainedEmbedR2(mol, core, coordMap, match, manmap, flexible, useTethers=True, coreConfId=-1, randomseed=2342,
-                       getForceField=UFFGetMoleculeForceField, **kwargs):
-    ci = EmbedMolecule(mol, coordMap=coordMap, randomSeed=randomseed, **kwargs, useExpTorsionAnglePrefs=True,
-                       useBasicKnowledge=True, enforceChirality=True, useSmallRingTorsions=True)
+def ConstrainedEmbedR2(
+    mol,
+    core,
+    coordMap,
+    match,
+    manmap,
+    flexible,
+    useTethers=True,
+    coreConfId=-1,
+    randomseed=2342,
+    getForceField=UFFGetMoleculeForceField,
+    **kwargs,
+):
+    ci = EmbedMolecule(
+        mol,
+        coordMap=coordMap,
+        randomSeed=randomseed,
+        **kwargs,
+        useExpTorsionAnglePrefs=True,
+        useBasicKnowledge=True,
+        enforceChirality=True,
+        useSmallRingTorsions=True,
+    )
     if ci < 0:
-        raise ValueError('Could not embed molecule.')
+        raise ValueError("Could not embed molecule.")
 
     # rms = AlignMol(mol, core, atomMap=manmap)
     # mol.SetProp('EmbedRMS', str(rms))
     # return mol
 
     if not useTethers:
-        print('not using tethers')
+        print("not using tethers")
         # clean up the conformation
         ff = getForceField(mol, confId=0)
         for i, idxI in enumerate(match):
@@ -126,7 +158,7 @@ def ConstrainedEmbedR2(mol, core, coordMap, match, manmap, flexible, useTethers=
 
                 idxJ = match[j]
                 d = coordMap[idxI].Distance(coordMap[idxJ])
-                ff.AddDistanceConstraint(idxI, idxJ, d, d, 100. * 999999)
+                ff.AddDistanceConstraint(idxI, idxJ, d, d, 100.0 * 999999)
         ff.Initialize()
         n = 4
         more = ff.Minimize()
@@ -141,10 +173,10 @@ def ConstrainedEmbedR2(mol, core, coordMap, match, manmap, flexible, useTethers=
         ff = getForceField(mol, confId=0)
         conf = core.GetConformer()
         for matchedMolI, coreI in manmap:
-        # for i in range(core.GetNumAtoms()):
+            # for i in range(core.GetNumAtoms()):
             p = conf.GetAtomPosition(coreI)
             pIdx = ff.AddExtraPoint(p.x, p.y, p.z, fixed=True) - 1
-            ff.AddDistanceConstraint(pIdx, matchedMolI, 0, 0, 100. * 100)
+            ff.AddDistanceConstraint(pIdx, matchedMolI, 0, 0, 100.0 * 100)
         ff.Initialize()
         n = 4
         more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
@@ -153,13 +185,20 @@ def ConstrainedEmbedR2(mol, core, coordMap, match, manmap, flexible, useTethers=
             n -= 1
         # realign
         rms = AlignMol(mol, core, atomMap=manmap)
-    mol.SetProp('EmbedRMS', str(rms))
+    mol.SetProp("EmbedRMS", str(rms))
     return mol
 
 
-def ConstrainedEmbedR(mol, core, useTethers=True, coreConfId=-1, randomseed=2342,
-                      getForceField=UFFGetMoleculeForceField, **kwargs):
-    """ generates an embedding of a molecule where part of the molecule
+def ConstrainedEmbedR(
+    mol,
+    core,
+    useTethers=True,
+    coreConfId=-1,
+    randomseed=2342,
+    getForceField=UFFGetMoleculeForceField,
+    **kwargs,
+):
+    """generates an embedding of a molecule where part of the molecule
     is constrained to have particular coordinates
 
     Arguments
@@ -205,7 +244,7 @@ def ConstrainedEmbedR(mol, core, useTethers=True, coreConfId=-1, randomseed=2342
 
     ci = EmbedMolecule(mol, coordMap=coordMap, randomSeed=randomseed, **kwargs)
     if ci < 0:
-        raise ValueError('Could not embed molecule.')
+        raise ValueError("Could not embed molecule.")
 
     algMap = [(j, i) for i, j in enumerate(match)]
 
@@ -216,7 +255,7 @@ def ConstrainedEmbedR(mol, core, useTethers=True, coreConfId=-1, randomseed=2342
             for j in range(i + 1, len(match)):
                 idxJ = match[j]
                 d = coordMap[idxI].Distance(coordMap[idxJ])
-                ff.AddDistanceConstraint(idxI, idxJ, d, d, 100. * 999999)
+                ff.AddDistanceConstraint(idxI, idxJ, d, d, 100.0 * 999999)
         ff.Initialize()
         n = 4
         more = ff.Minimize()
@@ -233,7 +272,7 @@ def ConstrainedEmbedR(mol, core, useTethers=True, coreConfId=-1, randomseed=2342
         for i in range(core.GetNumAtoms()):
             p = conf.GetAtomPosition(i)
             pIdx = ff.AddExtraPoint(p.x, p.y, p.z, fixed=True) - 1
-            ff.AddDistanceConstraint(pIdx, match[i], 0, 0, 100.)
+            ff.AddDistanceConstraint(pIdx, match[i], 0, 0, 100.0)
         ff.Initialize()
         n = 4
         more = ff.Minimize(energyTol=1e-4, forceTol=1e-3)
@@ -242,5 +281,5 @@ def ConstrainedEmbedR(mol, core, useTethers=True, coreConfId=-1, randomseed=2342
             n -= 1
         # realign
         rms = AlignMol(mol, core, atomMap=algMap)
-    mol.SetProp('EmbedRMS', str(rms))
+    mol.SetProp("EmbedRMS", str(rms))
     return mol
