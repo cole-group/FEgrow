@@ -108,4 +108,3 @@ def test_add_a_linker_check_star():
     for atom in template_with_linker.GetAtoms():
         if atom.GetAtomicNum() == 0:
             assert len(atom.GetBonds()) == 1
-    pass

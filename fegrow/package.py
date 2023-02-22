@@ -911,8 +911,11 @@ def build_molecules(
         # get the molecules
         r_mols = [r_groups.dataframe.iloc[i]["Mol"] for i in selection.keys()]
     else:
-        # just a list
+        # it is a list
         r_mols = r_groups
+
+    # make a deep copy of r_groups/linkers to ensrue we don't modify the library
+    r_mols = [copy.deepcopy(mol) for mol in r_mols]
 
     combined_mols = RList()
     id_counter = 0
