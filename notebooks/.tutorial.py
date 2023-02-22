@@ -24,13 +24,12 @@
 # In[ ]:
 
 
-import copy
-
 import prody
 from rdkit import Chem
 
 import fegrow
-from fegrow import RGroups
+from fegrow import RGroups, RLinkers
+
 
 # # Prepare the ligand template
 
@@ -50,7 +49,7 @@ from fegrow import RGroups
 init_mol = Chem.SDMolSupplier('sarscov2/coreh.sdf', removeHs=False)[0]
 
 # get the FEgrow representation of the rdkit Mol
-template_mol = fegrow.RMol(init_mol)
+template = fegrow.RMol(init_mol)
 
 
 # Show the 2D (with indices) representation of the core. This is used to select the desired growth vector.
@@ -58,7 +57,7 @@ template_mol = fegrow.RMol(init_mol)
 # In[ ]:
 
 
-template_mol.rep2D(idx=True, size=(500, 500))
+template.rep2D(idx=True, size=(500, 500))
 
 
 # Using the 2D drawing, select an index for the growth vector. Note that it is currently only possible to grow from hydrogen atom positions. In this case, we are selecting the hydrogen atom labelled H:40 to enable growth into the S3/S4 pocket of Mpro.
@@ -68,6 +67,43 @@ template_mol.rep2D(idx=True, size=(500, 500))
 
 attachment_index = [40]
 
+
+# # Optional: insert a linker
+# We have added a library of linkers suggested by [Erti et al](https://chemrxiv.org/engage/api-gateway/chemrxiv/assets/orp/resource/item/63845d130949e1fd5f589527/original/the-most-common-linkers-in-bioactive-molecules-and-their-bioisosteric-replacement-network.pdf).
+# If you wish to extend your R groups selection via a linker, select them below. *:1 is defined to be attached to the core (there exists a mirror image of each linker i.e. *:1 & *:2 swapped).
+# 
+# Linkers combinatorially augment chosen R groups, so if you choose 2 linkers and 3 R groups, this will result in 6 molecules being built.
+# 
+# ### Note : If you want to use linkers make sure that you use the correct function below, in cell [11].
+
+# In[ ]:
+
+
+RLinkers
+
+
+# In[ ]:
+
+
+# select the linker from the grid
+linker = RGroups.get_selected()
+
+# or select one programmatically
+df = RLinkers.dataframe
+linker = df.loc[df['Name']=='RCOR']['Mol'].values[0]
+
+# create just one template merged with a linker
+template_with_linker = fegrow.build_molecules(template, [linker], attachment_index)[0]
+
+
+# In[ ]:
+
+
+# note that the linker leaves the second attachement point prespecified (* character)
+template_with_linker.rep2D(idx=True, size=(500, 500))
+
+
+# # Select RGroups for your template
 
 # R-groups can be selected interactively or programmaticaly.
 # 
@@ -80,7 +116,6 @@ attachment_index = [40]
 # In[ ]:
 
 
-# interactive selection
 RGroups
 
 
@@ -99,20 +134,26 @@ R_group_cyclopropane = groups.loc[groups['Name'] == '*C1CC1' ]['Mol'].values[0]
 R_group_propanol = Chem.MolFromMolFile('manual_rgroups/propan-1-ol-r.mol', removeHs=False)
 
 # make a list of R-group molecule
-selected_rgroups = [R_group_ethanol] + interactive_rgroups
+selected_rgroups = [R_group_propanol, R_group_ethanol, R_group_cyclopropane] + interactive_rgroups
 selected_rgroups
 
 
 # # Build a congeneric series
 
 # Now that the R-groups have been selected, we merge them with the ligand core:
+# 
+# ### Note : Use `rmols = fegrow.build_molecules(template_with_linker, selected_rgroups)` if using a linker.
 
 # In[ ]:
 
 
-rmols = fegrow.build_molecules(template_mol, 
-                               selected_rgroups,
-                               attachment_index)
+# we can either use the original template (so no linker)
+# in this case we have to specify the attachment index
+rmols = fegrow.build_molecules(template, selected_rgroups, attachment_index)
+
+# or we can use the template merged with the linker
+# in which case the attachement point is not needed (R* atom is used)
+# rmols = fegrow.build_molecules(template_with_linker, selected_rgroups)
 
 
 # In[ ]:
@@ -150,7 +191,7 @@ rmols.toxicity()
 # In[ ]:
 
 
-rmols.generate_conformers(num_conf=5,
+rmols.generate_conformers(num_conf=50, 
                           minimum_conf_rms=0.5, 
                           # flexible=[3, 18, 20])
                         )
@@ -221,11 +262,10 @@ rmols[0].rep3D(prody=rec_final)
 energies = rmols.optimise_in_receptor(
     receptor_file="rec_final.pdb", 
     ligand_force_field="openff", 
-    use_ani=False,
+    use_ani=True,
     sigma_scale_factor=0.8,
     relative_permittivity=4,
-    water_model = None,
-    platform_name='CPU'
+    water_model = None
 )
 
 
@@ -277,3 +317,9 @@ affinities
 
 
 # Predicted binding affinities may be further refined using the structures output by `FEgrow`, using your favourite free energy calculation engine. See our paper for an example using [SOMD](https://github.com/michellab/Sire) to calculate the relative binding free energies of 13 Mpro inhibitors.
+
+# In[ ]:
+
+
+
+

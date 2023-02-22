@@ -1,0 +1,468 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>fegrow.receptor &mdash; FEgrow 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex/" />
+    <link rel="search" title="Search" href="../../../search/" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../" class="icon icon-home"> FEgrow
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../main/">FEgrow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation/">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgments/">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license/">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../">FEgrow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../">Module code</a> &raquo;</li>
+        
+      <li>fegrow.receptor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fegrow.receptor</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">parmed</span>
+<span class="kn">from</span> <span class="nn">openmmforcefields.generators</span> <span class="kn">import</span> <span class="n">SystemGenerator</span>
+<span class="kn">from</span> <span class="nn">pdbfixer</span> <span class="kn">import</span> <span class="n">PDBFixer</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">rdkit.Geometry.rdGeometry</span> <span class="kn">import</span> <span class="n">Point3D</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">from</span> <span class="nn">.package</span> <span class="kn">import</span> <span class="n">RMol</span>
+<span class="kn">from</span> <span class="nn">.openmmml</span> <span class="kn">import</span> <span class="n">MLPotential</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="c1"># fix for new openmm versions</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">openmm</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">Platform</span>
+<span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">openmm</span>
+    <span class="kn">from</span> <span class="nn">simtk</span> <span class="kn">import</span> <span class="n">unit</span>
+
+<span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span> <span class="k">as</span> <span class="n">OFFMolecule</span>
+
+
+<div class="viewcode-block" id="fix_receptor"><a class="viewcode-back" href="../../../classes/functions/#fegrow.fix_receptor">[docs]</a><span class="k">def</span> <span class="nf">fix_receptor</span><span class="p">(</span><span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pH</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use PDBFixer to correct the input and add hydrogens with the given pH.</span>
+
+<span class="sd">    :param input_file: The name of the pdb file which contains the receptor.</span>
+<span class="sd">    :param output_file: The name of the pdb file the fixed receptor should be wrote to.</span>
+<span class="sd">    :param pH:The ph the pronation state should be fixed for.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fixer</span> <span class="o">=</span> <span class="n">PDBFixer</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">input_file</span><span class="p">)</span>
+    <span class="n">fixer</span><span class="o">.</span><span class="n">findMissingResidues</span><span class="p">()</span>
+    <span class="n">fixer</span><span class="o">.</span><span class="n">findMissingAtoms</span><span class="p">()</span>
+    <span class="n">fixer</span><span class="o">.</span><span class="n">addMissingAtoms</span><span class="p">()</span>
+    <span class="n">fixer</span><span class="o">.</span><span class="n">addMissingHydrogens</span><span class="p">(</span><span class="n">pH</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">writeFile</span><span class="p">(</span><span class="n">fixer</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">fixer</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">))</span></div>
+
+
+<span class="k">def</span> <span class="nf">_can_use_ani2x</span><span class="p">(</span><span class="n">molecule</span><span class="p">:</span> <span class="n">OFFMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if ani2x can be used for this molecule by inspecting the elements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mol_elements</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">symbol</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">molecule</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+    <span class="n">ani2x_elements</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;Cl&quot;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">mol_elements</span> <span class="o">-</span> <span class="n">ani2x_elements</span>
+    <span class="p">):</span>
+        <span class="c1"># if there is any difference in the sets or a net charge ani2x can not be used.</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_scale_system</span><span class="p">(</span><span class="n">system</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">System</span><span class="p">,</span> <span class="n">sigma_scale_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">relative_permittivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scale the sigma and charges of the openMM system in place.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">relative_permittivity</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">charge_scale_factor</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">relative_permittivity</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">charge_scale_factor</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">forces</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">getForce</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">system</span><span class="o">.</span><span class="n">getForce</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumForces</span><span class="p">())</span>
+    <span class="p">}</span>
+    <span class="c1"># assuming all nonbonded interactions are via the standard force</span>
+    <span class="n">nonbonded_force</span> <span class="o">=</span> <span class="n">forces</span><span class="p">[</span><span class="s2">&quot;NonbondedForce&quot;</span><span class="p">]</span>
+    <span class="c1"># scale all particle parameters</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nonbonded_force</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
+        <span class="n">charge</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="n">nonbonded_force</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">nonbonded_force</span><span class="o">.</span><span class="n">setParticleParameters</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">charge</span> <span class="o">*</span> <span class="n">charge_scale_factor</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">sigma_scale_factor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
+
+
+<span class="n">ForceField</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;openff&quot;</span><span class="p">,</span> <span class="s2">&quot;gaff&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">optimise_in_receptor</span><span class="p">(</span>
+    <span class="n">ligand</span><span class="p">:</span> <span class="n">RMol</span><span class="p">,</span>
+    <span class="n">receptor_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">ligand_force_field</span><span class="p">:</span> <span class="n">ForceField</span><span class="p">,</span>
+    <span class="n">use_ani</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sigma_scale_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">relative_permittivity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">water_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;tip3p.xml&#39;</span><span class="p">,</span>
+    <span class="n">platform_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;CPU&#39;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RMol</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ligand:</span>
+<span class="sd">            The ligand with starting conformers already filtered for clashes with the receptor.</span>
+<span class="sd">        receptor_file:</span>
+<span class="sd">            The pdb file of the fixed and pronated receptor.</span>
+<span class="sd">        ligand_force_field:</span>
+<span class="sd">            The base ligand force field that should be used.</span>
+<span class="sd">        use_ani:</span>
+<span class="sd">            If we should try and use ani2x for the internal energy of the ligand.</span>
+<span class="sd">        sigma_scale_factor:</span>
+<span class="sd">            The factor by which all sigma values should be scaled</span>
+<span class="sd">        relative_permittivity:</span>
+<span class="sd">            The relativity permittivity which should be used to scale all charges 1/sqrt(permittivity)</span>
+<span class="sd">        water_model:</span>
+<span class="sd">            If set to None, the water model is ignored. Acceptable can be found in the</span>
+<span class="sd">            openmmforcefields package.</span>
+<span class="sd">        platform_name:</span>
+<span class="sd">            The OpenMM platform name, &#39;cuda&#39; if available, with the &#39;cpu&#39; used by default.</span>
+<span class="sd">            See the OpenMM documentation of Platform.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A copy of the input molecule with the optimised positions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ligand_force_fields</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;openff&quot;</span><span class="p">:</span> <span class="s2">&quot;openff_unconstrained-1.3.0.offxml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gaff&quot;</span><span class="p">:</span> <span class="s2">&quot;gaff-2.11&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">platform</span> <span class="o">=</span> <span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="n">platform_name</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+
+    <span class="c1"># assume the receptor has already been fixed and hydrogens have been added.</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">(</span><span class="n">receptor_file</span><span class="p">)</span>
+    <span class="c1"># receptor forcefield</span>
+    <span class="n">receptor_ff</span> <span class="o">=</span> <span class="s2">&quot;amber14/protein.ff14SB.xml&quot;</span>
+
+    <span class="c1"># load the molecule into openff</span>
+    <span class="n">openff_mol</span> <span class="o">=</span> <span class="n">OFFMolecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">ligand</span><span class="p">,</span> <span class="n">allow_undefined_stereo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">forcefields</span> <span class="o">=</span> <span class="p">[</span><span class="n">receptor_ff</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">water_model</span><span class="p">:</span>
+        <span class="n">forcefields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">water_model</span><span class="p">)</span>
+
+    <span class="c1"># now we need to make our parameterised system, make a system generator</span>
+    <span class="n">system_generator</span> <span class="o">=</span> <span class="n">SystemGenerator</span><span class="p">(</span>
+        <span class="n">forcefields</span><span class="o">=</span><span class="n">forcefields</span><span class="p">,</span>
+        <span class="n">small_molecule_forcefield</span><span class="o">=</span><span class="n">ligand_force_fields</span><span class="p">[</span><span class="n">ligand_force_field</span><span class="p">],</span>
+        <span class="n">cache</span><span class="o">=</span><span class="s2">&quot;db.json&quot;</span><span class="p">,</span>
+        <span class="n">molecules</span><span class="o">=</span><span class="n">openff_mol</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># now make a combined receptor and ligand topology</span>
+    <span class="n">parmed_receptor</span> <span class="o">=</span> <span class="n">parmed</span><span class="o">.</span><span class="n">openmm</span><span class="o">.</span><span class="n">load_topology</span><span class="p">(</span>
+        <span class="n">receptor</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="n">receptor</span><span class="o">.</span><span class="n">positions</span>
+    <span class="p">)</span>
+    <span class="n">parmed_ligand</span> <span class="o">=</span> <span class="n">parmed</span><span class="o">.</span><span class="n">openmm</span><span class="o">.</span><span class="n">load_topology</span><span class="p">(</span>
+        <span class="n">openff_mol</span><span class="o">.</span><span class="n">to_topology</span><span class="p">()</span><span class="o">.</span><span class="n">to_openmm</span><span class="p">(),</span> <span class="n">xyz</span><span class="o">=</span><span class="n">openff_mol</span><span class="o">.</span><span class="n">conformers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">complex_structure</span> <span class="o">=</span> <span class="n">parmed_receptor</span> <span class="o">+</span> <span class="n">parmed_ligand</span>
+    <span class="c1"># build the complex system</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">system_generator</span><span class="o">.</span><span class="n">create_system</span><span class="p">(</span><span class="n">complex_structure</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+
+    <span class="c1"># work out the index of the atoms in the ligand assuming the are the last chain?</span>
+    <span class="c1"># is this always true if we add the ligand to the receptor?</span>
+    <span class="n">ligand_res</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">complex_structure</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ligand_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">ligand_res</span><span class="o">.</span><span class="n">atoms</span><span class="p">()]</span>
+    <span class="c1"># now set all atom mass to 0 if not in the ligand</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ligand_idx</span><span class="p">:</span>
+            <span class="n">system</span><span class="o">.</span><span class="n">setParticleMass</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># if we want to use ani2x check we can and adapt the system</span>
+    <span class="k">if</span> <span class="n">use_ani</span> <span class="ow">and</span> <span class="n">_can_use_ani2x</span><span class="p">(</span><span class="n">openff_mol</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;using ani2x&quot;</span><span class="p">)</span>
+        <span class="n">potential</span> <span class="o">=</span> <span class="n">MLPotential</span><span class="p">(</span><span class="s2">&quot;ani2x&quot;</span><span class="p">,</span> <span class="n">platform_name</span><span class="o">=</span><span class="n">platform_name</span><span class="p">)</span>
+        <span class="n">complex_system</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">createMixedSystem</span><span class="p">(</span>
+            <span class="n">complex_structure</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">ligand_idx</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using force field&quot;</span><span class="p">)</span>
+        <span class="n">complex_system</span> <span class="o">=</span> <span class="n">system</span>
+    <span class="c1"># scale the charges and sigma values</span>
+    <span class="n">_scale_system</span><span class="p">(</span><span class="n">system</span><span class="o">=</span><span class="n">complex_system</span><span class="p">,</span> <span class="n">sigma_scale_factor</span><span class="o">=</span><span class="n">sigma_scale_factor</span><span class="p">,</span> <span class="n">relative_permittivity</span><span class="o">=</span><span class="n">relative_permittivity</span><span class="p">)</span>
+
+    <span class="c1"># propagate the System with Langevin dynamics note integrator note used.</span>
+    <span class="n">time_step</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">femtoseconds</span>  <span class="c1"># simulation timestep</span>
+    <span class="n">temperature</span> <span class="o">=</span> <span class="mi">300</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kelvin</span>  <span class="c1"># simulation temperature</span>
+    <span class="n">friction</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">picosecond</span>  <span class="c1"># collision rate</span>
+    <span class="n">integrator_min</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">LangevinIntegrator</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">friction</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
+
+    <span class="c1"># set up an openmm simulation</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span>
+        <span class="n">complex_structure</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">complex_system</span><span class="p">,</span> <span class="n">integrator_min</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">platform</span>
+    <span class="p">)</span>
+
+    <span class="c1"># save the receptor coords as they should be consistent</span>
+    <span class="n">receptor_coords</span> <span class="o">=</span> <span class="n">parmed_receptor</span><span class="o">.</span><span class="n">positions</span>
+
+    <span class="c1"># loop over the conformers and energy minimise and store the final positions</span>
+    <span class="n">final_mol</span> <span class="o">=</span> <span class="n">RMol</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ligand</span><span class="p">))</span>
+    <span class="n">final_mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
+    <span class="n">energies</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">conformer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+        <span class="n">tqdm</span><span class="p">(</span><span class="n">openff_mol</span><span class="o">.</span><span class="n">conformers</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Optimising conformer: &quot;</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="c1"># now we need to make the ligand coords</span>
+        <span class="n">lig_coords</span> <span class="o">=</span> <span class="n">conformer</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
+        <span class="c1"># make the vec3 list</span>
+        <span class="n">lig_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">openmm</span><span class="o">.</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lig_coords</span><span class="p">]</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span>
+        <span class="n">complex_coords</span> <span class="o">=</span> <span class="n">receptor_coords</span> <span class="o">+</span> <span class="n">lig_vec</span>
+        <span class="c1"># write out the starting positions</span>
+        <span class="c1"># with open(f&quot;system_start_conformer_{i}.pdb&quot;, &quot;w&quot;) as outfile:</span>
+        <span class="c1">#     app.PDBFile.writeFile(complex_structure.topology, complex_coords, outfile)</span>
+        <span class="c1"># set the initial positions</span>
+        <span class="c1"># Mat: so here is the issue?</span>
+        <span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">complex_coords</span><span class="p">)</span>
+        <span class="c1"># now minimize the energy</span>
+        <span class="n">simulation</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">()</span>
+
+        <span class="c1"># now write out the final coords</span>
+        <span class="n">min_state</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getPositions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">min_state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">min_state</span><span class="o">.</span><span class="n">getPositions</span><span class="p">(</span><span class="n">asNumpy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
+        <span class="n">final_conformer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Conformer</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="n">ligand_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]:]):</span>
+            <span class="n">atom_position</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">coord</span><span class="p">)</span>
+            <span class="n">final_conformer</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">atom_position</span><span class="p">)</span>
+        <span class="n">final_mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">final_conformer</span><span class="p">,</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># with open(f&quot;system_min_conformer_{i}.pdb&quot;, &quot;w&quot;) as outfile:</span>
+        <span class="c1">#     app.PDBFile.writeFile(complex_structure.topology, min_state.getPositions().value_in_unit(unit.angstrom), outfile)</span>
+
+    <span class="k">return</span> <span class="n">final_mol</span><span class="p">,</span> <span class="n">energies</span>
+
+
+<span class="k">def</span> <span class="nf">sort_conformers</span><span class="p">(</span><span class="n">ligand</span><span class="p">:</span> <span class="n">RMol</span><span class="p">,</span> <span class="n">energies</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">energy_range</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RMol</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For the given molecule and the conformer energies order the energies and only keep any conformers with in the energy</span>
+<span class="sd">    range of the lowest energy conformer.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This sorting is done on a copy of the molecule.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ligand:</span>
+<span class="sd">            A molecule instance whose optimised conformers should be sorted.</span>
+<span class="sd">        energies:</span>
+<span class="sd">            The list of energies in the same order as the conformers.</span>
+<span class="sd">        energy_range:</span>
+<span class="sd">            The energy range (kcal/mol), above the minimum, for which conformers should be kept.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">copy_mol</span> <span class="o">=</span> <span class="n">RMol</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ligand</span><span class="p">))</span>
+    <span class="n">copy_mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
+    <span class="n">energies</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span>
+    <span class="c1"># normalise</span>
+    <span class="n">energies</span> <span class="o">-=</span> <span class="n">energies</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="c1"># order by lowest energy</span>
+    <span class="n">energy_and_conformers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">conformer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ligand</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">()):</span>
+        <span class="n">energy_and_conformers</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">conformer</span><span class="p">))</span>
+    <span class="n">energy_and_conformers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">final_energies</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">energy</span><span class="p">,</span> <span class="n">conformer</span> <span class="ow">in</span> <span class="n">energy_and_conformers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">energy</span> <span class="o">&lt;=</span> <span class="n">energy_range</span><span class="p">:</span>
+            <span class="n">copy_mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">,</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">final_energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">copy_mol</span><span class="p">,</span> <span class="n">final_energies</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Daniel J Cole.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

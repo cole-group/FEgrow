@@ -1,6 +1,6 @@
 name: CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build-linux:
@@ -10,29 +10,33 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v3
+    - name: Create Environment
+      uses: conda-incubator/setup-miniconda@v2.1.1
       with:
+        activate-environment: fegrow
+        environment-file: env.yml
         python-version: 3.8
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Add conda-forge
-      run: conda config --env --add channels conda-forge
-    - name: Install dependencies
-      run: |
-        conda env update --file env.yml --name base
-        conda install pytest cpuonly -c pytorch
+        auto-update-conda: true
+        auto-activate-base: false
+        show-channel-urls: true
+        mamba-version: "*"
+        miniforge-version: latest
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: env summary
+      shell: bash -l {0}
       run: conda list
     - name: install fegrow
-      run: |
-        pip install .
+      shell: bash -l {0}
+      run: pip install .
+    - name: install pytest
+      shell: bash -l {0}
+      run: mamba install pytest
     - name: pytest
-      run: |
-        python -c "import pytest; from fegrow.testing import loc ; pytest.main([loc])"
+      shell: bash -l {0}
+      run: python -c "import pytest; from fegrow.testing import loc ; pytest.main([loc])"
     - name: Run tutorial.py
+      shell: bash -l {0}
       run: |
         cd notebooks
         obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7

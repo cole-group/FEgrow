@@ -10,7 +10,7 @@ from tqdm import tqdm
 from typing_extensions import Literal
 
 from .package import RMol
-from .openmmml import MLPotential
+from openmmml import MLPotential
 
 import numpy
 
@@ -46,15 +46,15 @@ def _can_use_ani2x(molecule: OFFMolecule) -> bool:
     """
     mol_elements = set([atom.element.symbol for atom in molecule.atoms])
     ani2x_elements = {"H", "C", "N", "O", "S", "F", "Cl"}
-    if (
-        mol_elements - ani2x_elements
-    ):
+    if mol_elements - ani2x_elements:
         # if there is any difference in the sets or a net charge ani2x can not be used.
         return False
     return True
 
 
-def _scale_system(system: openmm.System, sigma_scale_factor: float, relative_permittivity: float):
+def _scale_system(
+    system: openmm.System, sigma_scale_factor: float, relative_permittivity: float
+):
     """
     Scale the sigma and charges of the openMM system in place.
     """
@@ -71,7 +71,9 @@ def _scale_system(system: openmm.System, sigma_scale_factor: float, relative_per
     # scale all particle parameters
     for i in range(nonbonded_force.getNumParticles()):
         charge, sigma, epsilon = nonbonded_force.getParticleParameters(i)
-        nonbonded_force.setParticleParameters(i, charge * charge_scale_factor, sigma * sigma_scale_factor, epsilon)
+        nonbonded_force.setParticleParameters(
+            i, charge * charge_scale_factor, sigma * sigma_scale_factor, epsilon
+        )
 
 
 ForceField = Literal["openff", "gaff"]
@@ -84,8 +86,8 @@ def optimise_in_receptor(
     use_ani: bool = True,
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
-    water_model: str = 'tip3p.xml',
-    platform_name: str = 'CPU',
+    water_model: str = "tip3p.xml",
+    platform_name: str = "CPU",
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -171,7 +173,11 @@ def optimise_in_receptor(
         print("Using force field")
         complex_system = system
     # scale the charges and sigma values
-    _scale_system(system=complex_system, sigma_scale_factor=sigma_scale_factor, relative_permittivity=relative_permittivity)
+    _scale_system(
+        system=complex_system,
+        sigma_scale_factor=sigma_scale_factor,
+        relative_permittivity=relative_permittivity,
+    )
 
     # propagate the System with Langevin dynamics note integrator note used.
     time_step = 1 * unit.femtoseconds  # simulation timestep
@@ -215,7 +221,7 @@ def optimise_in_receptor(
         )
         positions = min_state.getPositions(asNumpy=True).value_in_unit(unit.angstrom)
         final_conformer = Chem.Conformer()
-        for j, coord in enumerate(positions[ligand_idx[0]:]):
+        for j, coord in enumerate(positions[ligand_idx[0] :]):
             atom_position = Point3D(*coord)
             final_conformer.SetAtomPosition(j, atom_position)
         final_mol.AddConformer(final_conformer, assignId=True)
@@ -226,7 +232,9 @@ def optimise_in_receptor(
     return final_mol, energies
 
 
-def sort_conformers(ligand: RMol, energies: List[float], energy_range: float = 5) -> Tuple[RMol, List[float]]:
+def sort_conformers(
+    ligand: RMol, energies: List[float], energy_range: float = 5
+) -> Tuple[RMol, List[float]]:
     """
     For the given molecule and the conformer energies order the energies and only keep any conformers with in the energy
     range of the lowest energy conformer.

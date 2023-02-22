@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>RMol &mdash; FEgrow 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="RList" href="../RList/" />
+    <link rel="prev" title="API" href="../../api/" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../" class="icon icon-home"> FEgrow
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../main/">FEgrow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../api/">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RMol</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fegrow.RMol"><code class="docutils literal notranslate"><span class="pre">RMol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.df"><code class="docutils literal notranslate"><span class="pre">RMol.df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.generate_conformers"><code class="docutils literal notranslate"><span class="pre">RMol.generate_conformers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.gnina"><code class="docutils literal notranslate"><span class="pre">RMol.gnina()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.optimise_in_receptor"><code class="docutils literal notranslate"><span class="pre">RMol.optimise_in_receptor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.remove_clashing_confs"><code class="docutils literal notranslate"><span class="pre">RMol.remove_clashing_confs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.rep2D"><code class="docutils literal notranslate"><span class="pre">RMol.rep2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.rep3D"><code class="docutils literal notranslate"><span class="pre">RMol.rep3D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.set_gnina"><code class="docutils literal notranslate"><span class="pre">RMol.set_gnina()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.sort_conformers"><code class="docutils literal notranslate"><span class="pre">RMol.sort_conformers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.to_file"><code class="docutils literal notranslate"><span class="pre">RMol.to_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fegrow.RMol.toxicity"><code class="docutils literal notranslate"><span class="pre">RMol.toxicity()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../RList/">RList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../RGroups/">RGroups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../functions/">functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../acknowledgments/">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license/">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../">FEgrow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../api/">API</a> &raquo;</li>
+        
+      <li>RMol</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/classes/RMol.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="rmol">
+<h1>RMol<a class="headerlink" href="#rmol" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fegrow.RMol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fegrow.</span></span><span class="sig-name descname"><span class="pre">RMol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol" title="Permalink to this definition">¶</a></dt>
+<dd><p>RMol is essentially a wrapper around RDKit Mol with
+tailored functionalities for attaching R groups, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rmol</strong> (<a class="reference internal" href="#fegrow.RMol" title="fegrow.RMol"><em>RMol</em></a>) – when provided, energies and additional metadata is preserved.</p></li>
+<li><p><strong>template</strong> – Provide the original molecule template
+used for this RMol.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.df">
+<span class="sig-name descname"><span class="pre">df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a pandas dataframe row for this molecule, with SMILES and a picture.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas dataframe row.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.generate_conformers">
+<span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_conf_rms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.generate_conformers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate conformers using the RDKIT’s ETKDG. The generated conformers
+are embedded into the template structure. In other words,
+any atoms that are common with the template structure,
+should have the same coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_conf</strong> – fixme</p></li>
+<li><p><strong>minimum_conf_rms</strong> (<em>float</em>) – The minimum acceptable difference in the RMS in any new generated conformer.
+Conformers that are too similar are discarded.</p></li>
+<li><p><strong>flexible</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – A list of indices that are common with the template molecule
+that should have new coordinates.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.gnina">
+<span class="sig-name descname"><span class="pre">gnina</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receptor_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.gnina"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.gnina" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use gnina to extract CNNaffinity, and convert it into IC50.</p>
+<p>LIMITATION: currenly the gnina binaries do not support Mac.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>receptor_file</strong> (<em>str</em>) – Path to the receptor file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.optimise_in_receptor">
+<span class="sig-name descname"><span class="pre">optimise_in_receptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.optimise_in_receptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.optimise_in_receptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumerate the conformers inside of the receptor by employing
+ANI2x, a hybrid machine learning / molecular mechanics (ML/MM) approach.
+ANI2x is neural nework potential for the ligand energetics
+but works only for the following atoms: H, C, N, O, F, S, Cl.</p>
+<p>Open Force Field Parsley force field is used for intermolecular interactions with the receptor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma_scale_factor</strong> – is used to scale the Lennard-Jones radii of the atoms.</p></li>
+<li><p><strong>relative_permittivity</strong> – is used to scale the electrostatic interactions with the protein.</p></li>
+<li><p><strong>water_model</strong> – can be used to set the force field for any water molecules present in the binding site.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.remove_clashing_confs">
+<span class="sig-name descname"><span class="pre">remove_clashing_confs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dst_allowed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.remove_clashing_confs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.remove_clashing_confs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removing conformations that class with the protein.
+Note that the original conformer should be well docked into the protein,
+ideally with some space between the area of growth and the protein,
+so that any growth on the template doesn’t automatically cause
+clashes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prot</strong> (<em>Prody instance</em>) – The protein against which the conformers should be tested.</p></li>
+<li><p><strong>min_dst_allowed</strong> (<em>float in Angstroms</em>) – If any atom is within this distance in a conformer, the
+conformer will be deleted.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.rep2D">
+<span class="sig-name descname"><span class="pre">rep2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.rep2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.rep2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use RDKit and get a 2D diagram.
+Uses Compute2DCoords and Draw.MolToImage function</p>
+<p>Works with IPython Notebook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – <p>are passed further to Draw.MolToImage function.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.rep3D">
+<span class="sig-name descname"><span class="pre">rep3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prody</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confIds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.rep3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.rep3D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use py3Dmol to obtain the 3D view of the molecule.</p>
+<p>Works with IPython Notebook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>view</strong> (<em>py3Dmol view instance</em><em> (</em><em>None</em><em>)</em>) – a view to which add the visualisation. Useful if one wants to 3D view
+multiple conformers in one view.</p></li>
+<li><p><strong>prody</strong> (<em>Prody instance</em><em> (</em><em>Default: None</em><em>)</em>) – A prody protein around which a view 3D can be created</p></li>
+<li><p><strong>template</strong> (<em>bool</em><em> (</em><em>False</em><em>)</em>) – Whether to visualise the original 3D template as well from which the molecule was made.</p></li>
+<li><p><strong>confIds</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – Select the conformations for display.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.set_gnina">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_gnina</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.set_gnina"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.set_gnina" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the location of the binary file gnina. This could be your own compiled directory,
+or a directory where you’d like it to be downloaded.</p>
+<p>By default, gnina path is to the working directory (~500MB).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>loc</strong> (<em>str</em>) – path to gnina binary file. E.g. /dir/path/gnina. Note that right now gnina should
+be a binary file with that specific filename “gnina”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.sort_conformers">
+<span class="sig-name descname"><span class="pre">sort_conformers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.sort_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.sort_conformers" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>For the given molecule and the conformer energies order the energies</dt><dd><p>and only keep any conformers with in the energy range of the
+lowest energy conformer.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>energy_range</strong> – The energy range (kcal/mol),
+above the minimum, for which conformers should be kept.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.to_file">
+<span class="sig-name descname"><span class="pre">to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the molecule and all conformers to file.</p>
+<dl class="simple">
+<dt>Note:</dt><dd><p>The file type is worked out from the name extension by splitting on <cite>.</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fegrow.RMol.toxicity">
+<span class="sig-name descname"><span class="pre">toxicity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fegrow/package/#RMol.toxicity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fegrow.RMol.toxicity" title="Permalink to this definition">¶</a></dt>
+<dd><dl>
+<dt>Assessed various ADMET properties, including</dt><dd><ul class="simple">
+<li><p>Lipinksi rule of 5 properties,</p></li>
+<li><p>the presence of unwanted substructures</p></li>
+<li><p>problematic functional groups</p></li>
+<li><p>synthetic accessibility</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">return<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a row of a dataframe with the descriptors</p>
+</dd>
+<dt class="field-even">rtype<span class="colon">:</span></dt>
+<dd class="field-even"><p>dataframe</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../RList/" class="btn btn-neutral float-right" title="RList" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../../api/" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Daniel J Cole.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
