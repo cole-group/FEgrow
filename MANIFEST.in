@@ -1,5 +1,4 @@
 include fegrow/data/rgroups/molecules/*/*-r.mol
-include fegrow/data/rgroups/library/*.mol
 include fegrow/data/linkers/library/*.sdf
 include fegrow/data/fpscores.pkl.gz
 include fegrow/version.txt
