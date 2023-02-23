@@ -720,13 +720,18 @@ class RLinkerGrid(mols2grid.MolGrid):
         for molfile in linker_files:
             r_mol = list(Chem.SDMolSupplier(molfile, removeHs=False)).pop()
 
+            # generate a searchable name in the form of a simple SMILE without hydrogens
+            name = (
+                Chem.MolToSmiles(Chem.RemoveHs(r_mol), canonical=False)
+                .replace("[*:1]", "R1")
+                .replace("[*:2]", "R2")
+            )
+
             # simplify the names for the user
             linkers.append(
                 {
                     "Mol": r_mol,
-                    "Name": Path(molfile)
-                    .stem.replace("[*:1]", "R")
-                    .replace("[*:2]", "R"),
+                    "Name": name,
                     "Common": r_mol.GetIntProp(
                         "SmileIndex"
                     ),  # extract the index property from the original publication
