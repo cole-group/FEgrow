@@ -90,7 +90,7 @@ linker = RGroups.get_selected()
 
 # or select one programmatically
 df = RLinkers.dataframe
-linker = df.loc[df['Name']=='RCOR']['Mol'].values[0]
+linker = df.loc[df['Name']=='[H]C([H])(R)R']['Mol'].values[0]
 
 # create just one template merged with a linker
 template_with_linker = fegrow.build_molecules(template, [linker], attachment_index)[0]
