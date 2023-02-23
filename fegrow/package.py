@@ -709,31 +709,30 @@ class RLinkerGrid(mols2grid.MolGrid):
         Load the local linkers into rdkit molecules
         """
         builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library"
-        linker_files = glob.glob(str(builtin_rlinkers / "*.mol"))
+        linker_files = glob.glob(str(builtin_rlinkers / "*.sdf"))
         # sort the linkers so that [R1]C[R2] is next to [R2]C[R1] in the grid
         linker_files = sorted(
             linker_files,
-            key=lambda smiles: smiles.replace("[R1]", "R").replace("[R2]", "R"),
+            key=lambda smiles: smiles.replace("[*:1]", "R").replace("[*:2]", "R"),
         )
 
         linkers = []
         for molfile in linker_files:
             r_mol = list(Chem.SDMolSupplier(molfile, removeHs=False)).pop()
-            # these files are missing hydrogens
-            r_mol = Chem.AddHs(r_mol)
+
             # simplify the names for the user
             linkers.append(
                 {
                     "Mol": r_mol,
                     "Name": Path(molfile)
-                    .stem.replace("[R1]", "R")
-                    .replace("[R2]", "R"),
+                    .stem.replace("[*:1]", "R")
+                    .replace("[*:2]", "R"),
                     "Common": r_mol.GetIntProp(
                         "SmileIndex"
                     ),  # extract the index property from the original publication
                 }
             )
-
+            
         # presort using the original publication index
         linkers = sorted(linkers, key=lambda i: i["Common"])
 
@@ -742,7 +741,7 @@ class RLinkerGrid(mols2grid.MolGrid):
     def _ipython_display_(self):
         from IPython.display import display
 
-        subset = ["img", "Name", "mols2grid-id", "Common"]
+        subset = ["img", "Name", "mols2grid-id"]
         return display(self.display(subset=subset, substruct_highlight=True))
 
     def get_selected(self):
@@ -793,8 +792,6 @@ class RList(RInterface, list):
     """
 
     def rep2D(self, subImgSize=(400, 400), **kwargs):
-        if len(self) == 0:
-            return None
         return Draw.MolsToGridImage(
             [mol.rep2D(rdkit_mol=True, **kwargs) for mol in self], subImgSize=subImgSize
         )
@@ -872,7 +869,7 @@ class RList(RInterface, list):
 
 
 def build_molecules(
-    template: Union[RMol, List],
+    core_ligand: RMol,
     r_groups: Union[mols2grid.MolGrid, List[Chem.Mol]],
     attachment_points: Optional[List[int]] = [],
 ):
@@ -881,7 +878,7 @@ def build_molecules(
      and r groups enumerate the possible molecules and
      return a list of them.
 
-    :param template: The core scaffold molecule to attach the r groups to, or a list of them.
+    :param core_ligand: The core scaffold molecule to attach the r groups to.
     :param r_groups: The list of rdkit molecules which should be considered
       r groups or the RGroup Grid with highlighted molecules.
     :param attachment_points: The list of atom index in the core ligand
@@ -907,47 +904,25 @@ def build_molecules(
 
     # get a list of rdkit molecules
     if isinstance(r_groups, mols2grid.MolGrid):
-        selection = mols2grid.get_selected()
-        # get the molecules
+        selection = mols2grid.selection
+        # now get a list of the molecules
         r_mols = [r_groups.dataframe.iloc[i]["Mol"] for i in selection.keys()]
     else:
         # it is a list
+        # just a list
         r_mols = r_groups
-
-    # make a deep copy of r_groups/linkers to ensrue we don't modify the library
-    r_mols = [copy.deepcopy(mol) for mol in r_mols]
 
     combined_mols = RList()
     id_counter = 0
     # loop over the attachment points and r_groups
 
-    # replace the RMol template with
-    if isinstance(template, RMol):
-        rlist = RList()
-        rlist.append(template)
-        template = rlist
-
     if not attachment_points:
         # attempt to generate the attachment points by picking the joining molecule
-        # case: a list of templates previously joined with linkers requires iterating over them
-        for ligand in template:
-            print("template", type(template))
-            atom, _ = __getAttachmentVector(ligand)
-            attachment_points.append(atom.GetIdx())
+        atom, _ = __getAttachmentVector(core_ligand)
+        attachment_points = [atom.GetIdx()]
 
-    if not attachment_points:
-        raise Exception("Could not find attachement points. ")
-
-    if len(attachment_points) != len(template):
-        raise Exception(
-            f"There must be one attachment point for each template. "
-            f"Provided attachement points = {len(attachment_points)} "
-            f"with templates number: {len(template)}"
-        )
-
-    for atom_idx, core_ligand in zip(attachment_points, template):
+    for atom_idx in attachment_points:
         for r_mol in r_mols:
-            print("next for merging", r_mol)
             core_mol = RMol(copy.deepcopy(core_ligand))
             merged_mol = merge_R_group(
                 mol=core_mol, R_group=r_mol, replaceIndex=atom_idx
