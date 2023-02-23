@@ -917,6 +917,11 @@ def build_molecules(
         # just a list
         r_mols = r_groups
 
+    if len(r_mols) == 0:
+        raise Exception(
+            'Please provide at least one linker or R-group instead of an empty list for "r_groups"'
+        )
+
     combined_mols = RList()
     id_counter = 0
     # loop over the attachment points and r_groups
