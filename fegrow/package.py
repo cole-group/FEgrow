@@ -732,7 +732,7 @@ class RLinkerGrid(mols2grid.MolGrid):
                     ),  # extract the index property from the original publication
                 }
             )
-            
+
         # presort using the original publication index
         linkers = sorted(linkers, key=lambda i: i["Common"])
 
