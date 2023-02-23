@@ -733,7 +733,7 @@ class RLinkerGrid(mols2grid.MolGrid):
                 }
             )
 
-        return pandas.DataFrame({"Mol": molecules, "Name": names})
+        return pandas.DataFrame(linkers)
 
     def _ipython_display_(self):
         from IPython.display import display
