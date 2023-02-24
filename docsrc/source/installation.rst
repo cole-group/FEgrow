@@ -11,13 +11,14 @@ Conda installation:
     conda install fegrow -c conda-forge
 
 To use the latest git version, download the code and use the provided
-environment file *env.yml*:
+environment file *env.yml*. We recommend using Mambaforge (https://github.com/conda-forge/miniforge#mambaforge)
+which is a flavour of conda. Conda struggles with resolving the environment. 
 
 .. code-block:: Bash
 
     git clone https://github.com/cole-group/FEgrow.git
     cd FEgrow
-    conda env create -f env.yml
+    mamba env create -f env.yml
     conda activate fegrow
     pip install . # the repository directory
 
