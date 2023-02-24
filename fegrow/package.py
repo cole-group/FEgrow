@@ -874,7 +874,7 @@ class RList(RInterface, list):
 
 
 def build_molecules(
-    core_ligand: RMol,
+    template: Union[RMol, List],
     r_groups: Union[mols2grid.MolGrid, List[Chem.Mol]],
     attachment_points: Optional[List[int]] = [],
 ):
@@ -883,7 +883,7 @@ def build_molecules(
      and r groups enumerate the possible molecules and
      return a list of them.
 
-    :param core_ligand: The core scaffold molecule to attach the r groups to.
+    :param template: The core scaffold molecule to attach the r groups to, or a list of them.
     :param r_groups: The list of rdkit molecules which should be considered
       r groups or the RGroup Grid with highlighted molecules.
     :param attachment_points: The list of atom index in the core ligand
@@ -909,29 +909,45 @@ def build_molecules(
 
     # get a list of rdkit molecules
     if isinstance(r_groups, mols2grid.MolGrid):
-        selection = mols2grid.selection
-        # now get a list of the molecules
+        selection = mols2grid.get_selected()
+        # get the molecules
         r_mols = [r_groups.dataframe.iloc[i]["Mol"] for i in selection.keys()]
     else:
         # it is a list
-        # just a list
         r_mols = r_groups
 
-    if len(r_mols) == 0:
-        raise Exception(
-            'Please provide at least one linker or R-group instead of an empty list for "r_groups"'
-        )
+    # make a deep copy of r_groups/linkers to ensrue we don't modify the library
+    r_mols = [copy.deepcopy(mol) for mol in r_mols]
 
     combined_mols = RList()
     id_counter = 0
     # loop over the attachment points and r_groups
 
+    # replace the RMol template with
+    if isinstance(template, RMol):
+        rlist = RList()
+        rlist.append(template)
+        template = rlist
+
     if not attachment_points:
         # attempt to generate the attachment points by picking the joining molecule
-        atom, _ = __getAttachmentVector(core_ligand)
-        attachment_points = [atom.GetIdx()]
+        # case: a list of templates previously joined with linkers requires iterating over them
+        for ligand in template:
+            print("template", type(template))
+            atom, _ = __getAttachmentVector(ligand)
+            attachment_points.append(atom.GetIdx())
 
-    for atom_idx in attachment_points:
+    if not attachment_points:
+        raise Exception("Could not find attachement points. ")
+
+    if len(attachment_points) != len(template):
+        raise Exception(
+            f"There must be one attachment point for each template. "
+            f"Provided attachement points = {len(attachment_points)} "
+            f"with templates number: {len(template)}"
+        )
+
+    for atom_idx, core_ligand in zip(attachment_points, template):
         for r_mol in r_mols:
             core_mol = RMol(copy.deepcopy(core_ligand))
             merged_mol = merge_R_group(
