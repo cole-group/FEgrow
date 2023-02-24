@@ -6,7 +6,7 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
 
 **version 1.2.0**
 
-- [Feature] Linkers with a library
+- [Feature] Linkers with a library, with simpler searchable SMILEs
 - Fix: [PR#20] Using the conda-forge package openmm-ml
 
 
