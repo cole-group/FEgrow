@@ -108,3 +108,21 @@ def test_add_a_linker_check_star():
     for atom in template_with_linker.GetAtoms():
         if atom.GetAtomicNum() == 0:
             assert len(atom.GetBonds()) == 1
+
+
+def test_two_linkers_two_rgroups():
+    # Check combinatorial: ie 2 rgroups and 2 linkers create 4 molecles that contain both
+
+    # get two R-groups
+    groups = RGroups.dataframe
+    R_group_ethanol = groups.loc[groups['Name'] == '*CCO']['Mol'].values[0]
+    R_group_cyclopropane = groups.loc[groups['Name'] == '*C1CC1']['Mol'].values[0]
+
+    # get two linkers
+    df = RLinkers.dataframe
+    linker1 = df.loc[df['Name'] == 'R1CR2']['Mol'].values[0]
+    linker2 = df.loc[df['Name'] == 'R1CR2']['Mol'].values[0]
+
+    built_molecules = fegrow.build_molecules([linker1, linker2], [R_group_ethanol, R_group_cyclopropane])
+
+    assert len(built_molecules) == 4

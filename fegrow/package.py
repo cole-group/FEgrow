@@ -915,13 +915,14 @@ def build_molecules(
         r_groups = [r_groups]
 
     # make a deep copy of r_groups/linkers to ensure we don't modify the library
-    r_mols = [copy.deepcopy(mol) for mol in r_groups]
+    templates = [copy.deepcopy(mol) for mol in templates]
+    r_groups = [copy.deepcopy(mol) for mol in r_groups]
 
     # get attachment points for each template
     if not attachment_points:
         # attempt to generate the attachment points by picking the joining molecule
         # case: a list of templates previously joined with linkers requires iterating over them
-        attachment_points = [__getAttachmentVector(lig)[0].getIdx() for lig in templates]
+        attachment_points = [__getAttachmentVector(lig)[0].GetIdx() for lig in templates]
 
     if not attachment_points:
         raise Exception("Could not find attachement points. ")
@@ -936,7 +937,7 @@ def build_molecules(
     combined_mols = RList()
     id_counter = 0
     for atom_idx, core_ligand in zip(attachment_points, templates):
-        for r_mol in r_mols:
+        for r_mol in r_groups:
             core_mol = RMol(copy.deepcopy(core_ligand))
             merged_mol = merge_R_group(
                 mol=core_mol, R_group=r_mol, replaceIndex=atom_idx
