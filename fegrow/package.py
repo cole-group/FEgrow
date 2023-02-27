@@ -261,10 +261,6 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
         # add a column with smiles
         df = df.assign(Smiles=[Chem.MolToSmiles(self)])
-        # add a column with the visualisation
-        PandasTools.AddMoleculeColumnToFrame(
-            df, "Smiles", "Molecule", includeFingerprints=True
-        )
 
         return df
 
@@ -795,7 +791,13 @@ class RList(RInterface, list):
         )
 
     def toxicity(self):
-        return pandas.concat([m.toxicity() for m in self])
+        df =  pandas.concat([m.toxicity() for m in self])
+        # add a column with the visualisation
+        PandasTools.AddMoleculeColumnToFrame(
+            df, "Smiles", "Molecule", includeFingerprints=True
+        )
+
+        return df
 
     def generate_conformers(
         self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
