@@ -874,9 +874,9 @@ class RList(RInterface, list):
 
 
 def build_molecules(
-    template: Union[RMol, List],
-    r_groups: Union[mols2grid.MolGrid, List[Chem.Mol]],
-    attachment_points: Optional[List[int]] = [],
+    templates: Union[Chem.Mol, List[Chem.Mol]],
+    r_groups: Union[Chem.Mol, List[Chem.Mol], int],
+    attachment_points: Optional[List[int]] = None,
 ):
     """
     For the given core molecule and list of attachment points
@@ -884,12 +884,13 @@ def build_molecules(
      return a list of them.
 
     :param template: The core scaffold molecule to attach the r groups to, or a list of them.
-    :param r_groups: The list of rdkit molecules which should be considered
+    :param r_group: The list of rdkit molecules which should be considered
       r groups or the RGroup Grid with highlighted molecules.
     :param attachment_points: The list of atom index in the core ligand
       that the r groups should be attached to. If it is empty, connecting points are sought out and matched.
     """
 
+    # fixme - special case after changing the API: remove in the future
     # This is a temporary warning about the change in the interface.
     # This change is because there are situations where the attachment_points do not need to be passed to the function.
     if (
@@ -907,47 +908,34 @@ def build_molecules(
             ' "build_molecules(core_ligand, r_groups, attachment_points)". '
         )
 
-    # get a list of rdkit molecules
-    if isinstance(r_groups, mols2grid.MolGrid):
-        selection = mols2grid.get_selected()
-        # get the molecules
-        r_mols = [r_groups.dataframe.iloc[i]["Mol"] for i in selection.keys()]
-    else:
-        # it is a list
-        r_mols = r_groups
+    # ensure template and r_group are lists
+    if not issubclass(templates.__class__, List):
+        templates = [templates]
+    if not issubclass(r_groups.__class__, List):
+        r_groups = [r_groups]
 
-    # make a deep copy of r_groups/linkers to ensrue we don't modify the library
-    r_mols = [copy.deepcopy(mol) for mol in r_mols]
+    # make a deep copy of r_groups/linkers to ensure we don't modify the library
+    r_mols = [copy.deepcopy(mol) for mol in r_groups]
 
-    combined_mols = RList()
-    id_counter = 0
-    # loop over the attachment points and r_groups
-
-    # replace the RMol template with
-    if isinstance(template, RMol):
-        rlist = RList()
-        rlist.append(template)
-        template = rlist
-
+    # get attachment points for each template
     if not attachment_points:
         # attempt to generate the attachment points by picking the joining molecule
         # case: a list of templates previously joined with linkers requires iterating over them
-        for ligand in template:
-            print("template", type(template))
-            atom, _ = __getAttachmentVector(ligand)
-            attachment_points.append(atom.GetIdx())
+        attachment_points = [__getAttachmentVector(lig)[0].getIdx() for lig in templates]
 
     if not attachment_points:
         raise Exception("Could not find attachement points. ")
 
-    if len(attachment_points) != len(template):
+    if len(attachment_points) != len(templates):
         raise Exception(
             f"There must be one attachment point for each template. "
             f"Provided attachement points = {len(attachment_points)} "
-            f"with templates number: {len(template)}"
+            f"with templates number: {len(templates)}"
         )
 
-    for atom_idx, core_ligand in zip(attachment_points, template):
+    combined_mols = RList()
+    id_counter = 0
+    for atom_idx, core_ligand in zip(attachment_points, templates):
         for r_mol in r_mols:
             core_mol = RMol(copy.deepcopy(core_ligand))
             merged_mol = merge_R_group(
