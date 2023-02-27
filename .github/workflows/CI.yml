@@ -34,7 +34,7 @@ jobs:
       run: mamba install pytest
     - name: pytest
       shell: bash -l {0}
-      run: python -c "import pytest; from fegrow.testing import loc ; pytest.main([loc])"
+      run: pytest fegrow/testing
     - name: Run tutorial.py
       shell: bash -l {0}
       run: |
