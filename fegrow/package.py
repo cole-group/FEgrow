@@ -487,7 +487,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
     @staticmethod
     def _check_download_gnina():
         """
-        Check if gnina works. Otherwise download it.
+        Check if gnina works. Otherwise, download it.
         """
         if RMol.gnina_dir is None:
             # assume it is in the current directory
@@ -604,7 +604,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
     def df(self):
         """
-        Generate a pandas dataframe row for this molecule, with SMILES and a picture.
+        Generate a pandas dataframe row for this molecule with SMILES.
 
         :returns: pandas dataframe row.
         """
@@ -620,22 +620,15 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
                 Energies=", ".join([str(e) for e in sorted(self.opt_energies)])
             )
 
-        # add a column with the visualisation
-        PandasTools.AddMoleculeColumnToFrame(
-            df, "Smiles", "Molecule", includeFingerprints=True
-        )
         df.set_index(["ID"], inplace=True)
         return df
 
     def _repr_html_(self):
-        df = pandas.DataFrame(
-            {
-                "ID": [self.id],
-                "Smiles": [Chem.MolToSmiles(self)],
-            }
-        )
+        # return a dataframe with the rdkit visualisation
 
-        # add a column with the visualisation
+        df = self.df()
+
+        # add a visualisation column
         PandasTools.AddMoleculeColumnToFrame(
             df, "Smiles", "Molecule", includeFingerprints=True
         )
@@ -870,7 +863,15 @@ class RList(RInterface, list):
         return removed
 
     def _repr_html_(self):
-        return pandas.concat([rmol.df() for rmol in self])._repr_html_()
+        # return the dataframe with the visualisation column of the dataframe
+
+        df = pandas.concat([rmol.df() for rmol in self])
+
+        # add a column with the visualisation
+        PandasTools.AddMoleculeColumnToFrame(
+            df, "Smiles", "Molecule", includeFingerprints=True
+        )
+        return df._repr_html_()
 
 
 def build_molecules(
