@@ -1,92 +1,43 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>fegrow.package &mdash; FEgrow 1.0.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex/" />
     <link rel="search" title="Search" href="../../../search/" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../../" class="icon icon-home"> FEgrow
           
-
-          
+          <a href="../../../" class="icon icon-home">
+            FEgrow
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search/" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../main/">FEgrow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation/">Installation</a></li>
@@ -96,69 +47,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../license/">License</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../">FEgrow</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../../" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../../">Module code</a> &raquo;</li>
-        
-      <li>fegrow.package</li>
-    
-    
+      <li><a href="../../../" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../">Module code</a></li>
+      <li class="breadcrumb-item active">fegrow.package</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for fegrow.package</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
@@ -224,7 +136,7 @@
 
 
 <span class="k">def</span> <span class="nf">is_linker</span><span class="p">(</span><span class="n">rmol</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if the molecule is a linker by checking if it has 2 R-group points</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">rmol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomMapNum</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
@@ -234,7 +146,7 @@
 
 
 <span class="k">def</span> <span class="nf">__getAttachmentVector</span><span class="p">(</span><span class="n">R_group</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;In the R-group or a linker, search for the position of the attachment point (R atom)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;In the R-group or a linker, search for the position of the attachment point (R atom)</span>
 <span class="sd">    and extract the atom (currently only single bond supported). In case of the linker,</span>
 <span class="sd">    the R1 atom is selected.</span>
 <span class="sd">    rgroup: fragment passed as rdkit molecule</span>
@@ -272,7 +184,7 @@
 
 
 <span class="k">def</span> <span class="nf">merge_R_group</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">R_group</span><span class="p">,</span> <span class="n">replaceIndex</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;function originally copied from</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;function originally copied from</span>
 <span class="sd">    https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -346,7 +258,7 @@
 
 
 <span class="k">class</span> <span class="nc">RInterface</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a shared interface for a molecule and a list of molecules.</span>
 
 <span class="sd">    The main purpose is to allow using the same functions on a single molecule and on a group of them.</span>
@@ -368,7 +280,7 @@
 
 
 <div class="viewcode-block" id="RMol"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol">[docs]</a><span class="k">class</span> <span class="nc">RMol</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">RInterface</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    RMol is essentially a wrapper around RDKit Mol with</span>
 <span class="sd">    tailored functionalities for attaching R groups, etc.</span>
 
@@ -406,7 +318,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">opt_energies</span> <span class="o">=</span> <span class="n">energies</span>
 
 <div class="viewcode-block" id="RMol.toxicity"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.toxicity">[docs]</a>    <span class="k">def</span> <span class="nf">toxicity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assessed various ADMET properties, including</span>
 <span class="sd">         - Lipinksi rule of 5 properties,</span>
 <span class="sd">         - the presence of unwanted substructures</span>
@@ -423,17 +335,13 @@
 
         <span class="c1"># add a column with smiles</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Smiles</span><span class="o">=</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)])</span>
-        <span class="c1"># add a column with the visualisation</span>
-        <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">,</span> <span class="s2">&quot;Smiles&quot;</span><span class="p">,</span> <span class="s2">&quot;Molecule&quot;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="RMol.generate_conformers"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.generate_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">generate_conformers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">num_conf</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">minimum_conf_rms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate conformers using the RDKIT&#39;s ETKDG. The generated conformers</span>
 <span class="sd">        are embedded into the template structure. In other words,</span>
 <span class="sd">        any atoms that are common with the template structure,</span>
@@ -452,7 +360,7 @@
         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">cons</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">()]</span></div>
 
 <div class="viewcode-block" id="RMol.optimise_in_receptor"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.optimise_in_receptor">[docs]</a>    <span class="k">def</span> <span class="nf">optimise_in_receptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Enumerate the conformers inside of the receptor by employing</span>
 <span class="sd">        ANI2x, a hybrid machine learning / molecular mechanics (ML/MM) approach.</span>
 <span class="sd">        ANI2x is neural nework potential for the ligand energetics</span>
@@ -493,7 +401,7 @@
         <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="RMol.sort_conformers"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.sort_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">sort_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_range</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For the given molecule and the conformer energies order the energies</span>
 <span class="sd">         and only keep any conformers with in the energy range of the</span>
 <span class="sd">         lowest energy conformer.</span>
@@ -535,7 +443,7 @@
         <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="RMol.rep2D"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.rep2D">[docs]</a>    <span class="k">def</span> <span class="nf">rep2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Use RDKit and get a 2D diagram.</span>
 <span class="sd">        Uses Compute2DCoords and Draw.MolToImage function</span>
 
@@ -548,7 +456,7 @@
 <div class="viewcode-block" id="RMol.rep3D"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.rep3D">[docs]</a>    <span class="k">def</span> <span class="nf">rep3D</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prody</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">confIds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Use py3Dmol to obtain the 3D view of the molecule.</span>
 
 <span class="sd">        Works with IPython Notebook.</span>
@@ -594,7 +502,7 @@
         <span class="k">return</span> <span class="n">view</span></div>
 
 <div class="viewcode-block" id="RMol.remove_clashing_confs"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.remove_clashing_confs">[docs]</a>    <span class="k">def</span> <span class="nf">remove_clashing_confs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prot</span><span class="p">,</span> <span class="n">min_dst_allowed</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removing conformations that class with the protein.</span>
 <span class="sd">        Note that the original conformer should be well docked into the protein,</span>
 <span class="sd">        ideally with some space between the area of growth and the protein,</span>
@@ -627,7 +535,7 @@
 
 <div class="viewcode-block" id="RMol.set_gnina"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.set_gnina">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">set_gnina</span><span class="p">(</span><span class="n">loc</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the location of the binary file gnina. This could be your own compiled directory,</span>
 <span class="sd">        or a directory where you&#39;d like it to be downloaded.</span>
 
@@ -648,8 +556,8 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_check_download_gnina</span><span class="p">():</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if gnina works. Otherwise download it.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if gnina works. Otherwise, download it.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">RMol</span><span class="o">.</span><span class="n">gnina_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># assume it is in the current directory</span>
@@ -680,7 +588,7 @@
         <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;./gnina&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">],</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">RMol</span><span class="o">.</span><span class="n">gnina_dir</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RMol.gnina"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.gnina">[docs]</a>    <span class="k">def</span> <span class="nf">gnina</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receptor_file</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Use gnina to extract CNNaffinity, and convert it into IC50.</span>
 
 <span class="sd">        LIMITATION: currenly the gnina binaries do not support Mac.</span>
@@ -740,7 +648,7 @@
         <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="RMol.to_file"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.to_file">[docs]</a>    <span class="k">def</span> <span class="nf">to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write the molecule and all conformers to file.</span>
 
 <span class="sd">        Note:</span>
@@ -765,8 +673,8 @@
                 <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">conformer</span><span class="o">.</span><span class="n">GetId</span><span class="p">()))</span></div>
 
 <div class="viewcode-block" id="RMol.df"><a class="viewcode-back" href="../../../classes/RMol/#fegrow.RMol.df">[docs]</a>    <span class="k">def</span> <span class="nf">df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a pandas dataframe row for this molecule, with SMILES and a picture.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a pandas dataframe row for this molecule with SMILES.</span>
 
 <span class="sd">        :returns: pandas dataframe row.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -782,22 +690,15 @@
                 <span class="n">Energies</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_energies</span><span class="p">)])</span>
             <span class="p">)</span>
 
-        <span class="c1"># add a column with the visualisation</span>
-        <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">,</span> <span class="s2">&quot;Smiles&quot;</span><span class="p">,</span> <span class="s2">&quot;Molecule&quot;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
         <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;ID&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span></div>
 
     <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;ID&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
-                <span class="s2">&quot;Smiles&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)],</span>
-            <span class="p">}</span>
-        <span class="p">)</span>
+        <span class="c1"># return a dataframe with the rdkit visualisation</span>
 
-        <span class="c1"># add a column with the visualisation</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">()</span>
+
+        <span class="c1"># add a visualisation column</span>
         <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span>
             <span class="n">df</span><span class="p">,</span> <span class="s2">&quot;Smiles&quot;</span><span class="p">,</span> <span class="s2">&quot;Molecule&quot;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
@@ -805,7 +706,7 @@
 
 
 <span class="k">class</span> <span class="nc">RGroupGrid</span><span class="p">(</span><span class="n">mols2grid</span><span class="o">.</span><span class="n">MolGrid</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A wrapper around the mols to grid class to load and process the r group folders locally.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -817,7 +718,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_load_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the local r groups into rdkit molecules</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">molecules</span> <span class="o">=</span> <span class="p">[]</span>
@@ -850,7 +751,7 @@
 
 
 <span class="k">class</span> <span class="nc">RLinkerGrid</span><span class="p">(</span><span class="n">mols2grid</span><span class="o">.</span><span class="n">MolGrid</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A wrapper around the mols to grid class to load and process the linker folders locally.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -867,7 +768,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_load_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the local linkers into rdkit molecules</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">builtin_rlinkers</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;linkers&quot;</span> <span class="o">/</span> <span class="s2">&quot;library&quot;</span>
@@ -919,7 +820,7 @@
 
 
 <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="n">Rgroups</span><span class="p">,</span> <span class="n">Rlinkers</span><span class="p">,</span> <span class="n">One2One</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    :param Rgroups:</span>
 <span class="sd">    :param Rlinkers:</span>
@@ -953,7 +854,7 @@
 
 
 <div class="viewcode-block" id="RList"><a class="viewcode-back" href="../../../classes/RList/#fegrow.RList">[docs]</a><span class="k">class</span> <span class="nc">RList</span><span class="p">(</span><span class="n">RInterface</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Streamline working with RMol by presenting the same interface on the list,</span>
 <span class="sd">    and allowing to dispatch the functions to any single member.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -964,7 +865,13 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">toxicity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">toxicity</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+        <span class="n">df</span> <span class="o">=</span>  <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">toxicity</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+        <span class="c1"># add a column with the visualisation</span>
+        <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span> <span class="s2">&quot;Smiles&quot;</span><span class="p">,</span> <span class="s2">&quot;Molecule&quot;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span> <span class="nf">generate_conformers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">num_conf</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">minimum_conf_rms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="o">**</span><span class="n">kwargs</span>
@@ -982,7 +889,7 @@
             <span class="n">rmol</span><span class="o">.</span><span class="n">remove_clashing_confs</span><span class="p">(</span><span class="n">prot</span><span class="p">,</span> <span class="n">min_dst_allowed</span><span class="o">=</span><span class="n">min_dst_allowed</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RList.optimise_in_receptor"><a class="viewcode-back" href="../../../classes/RList/#fegrow.RList.optimise_in_receptor">[docs]</a>    <span class="k">def</span> <span class="nf">optimise_in_receptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replace the current molecule with the optimised one. Return lists of energies.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># return pandas.concat([m.toxicity() for m in self])</span>
@@ -1017,7 +924,7 @@
         <span class="k">return</span> <span class="n">df</span>
 
 <div class="viewcode-block" id="RList.discard_missing"><a class="viewcode-back" href="../../../classes/RList/#fegrow.RList.discard_missing">[docs]</a>    <span class="k">def</span> <span class="nf">discard_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove from this list the molecules that have no conformers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">removed</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1032,26 +939,35 @@
         <span class="k">return</span> <span class="n">removed</span></div>
 
     <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">rmol</span><span class="o">.</span><span class="n">df</span><span class="p">()</span> <span class="k">for</span> <span class="n">rmol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span></div>
+        <span class="c1"># return the dataframe with the visualisation column of the dataframe</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">rmol</span><span class="o">.</span><span class="n">df</span><span class="p">()</span> <span class="k">for</span> <span class="n">rmol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+        <span class="c1"># add a column with the visualisation</span>
+        <span class="n">PandasTools</span><span class="o">.</span><span class="n">AddMoleculeColumnToFrame</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span> <span class="s2">&quot;Smiles&quot;</span><span class="p">,</span> <span class="s2">&quot;Molecule&quot;</span><span class="p">,</span> <span class="n">includeFingerprints</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="build_molecules"><a class="viewcode-back" href="../../../classes/functions/#fegrow.build_molecules">[docs]</a><span class="k">def</span> <span class="nf">build_molecules</span><span class="p">(</span>
-    <span class="n">core_ligand</span><span class="p">:</span> <span class="n">RMol</span><span class="p">,</span>
-    <span class="n">r_groups</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">mols2grid</span><span class="o">.</span><span class="n">MolGrid</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">]],</span>
-    <span class="n">attachment_points</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="n">templates</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">]],</span>
+    <span class="n">r_groups</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">attachment_points</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For the given core molecule and list of attachment points</span>
 <span class="sd">     and r groups enumerate the possible molecules and</span>
 <span class="sd">     return a list of them.</span>
 
-<span class="sd">    :param core_ligand: The core scaffold molecule to attach the r groups to.</span>
-<span class="sd">    :param r_groups: The list of rdkit molecules which should be considered</span>
+<span class="sd">    :param template: The core scaffold molecule to attach the r groups to, or a list of them.</span>
+<span class="sd">    :param r_group: The list of rdkit molecules which should be considered</span>
 <span class="sd">      r groups or the RGroup Grid with highlighted molecules.</span>
 <span class="sd">    :param attachment_points: The list of atom index in the core ligand</span>
 <span class="sd">      that the r groups should be attached to. If it is empty, connecting points are sought out and matched.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="c1"># fixme - special case after changing the API: remove in the future</span>
     <span class="c1"># This is a temporary warning about the change in the interface.</span>
     <span class="c1"># This change is because there are situations where the attachment_points do not need to be passed to the function.</span>
     <span class="k">if</span> <span class="p">(</span>
@@ -1069,32 +985,36 @@
             <span class="s1">&#39; &quot;build_molecules(core_ligand, r_groups, attachment_points)&quot;. &#39;</span>
         <span class="p">)</span>
 
-    <span class="c1"># get a list of rdkit molecules</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r_groups</span><span class="p">,</span> <span class="n">mols2grid</span><span class="o">.</span><span class="n">MolGrid</span><span class="p">):</span>
-        <span class="n">selection</span> <span class="o">=</span> <span class="n">mols2grid</span><span class="o">.</span><span class="n">selection</span>
-        <span class="c1"># now get a list of the molecules</span>
-        <span class="n">r_mols</span> <span class="o">=</span> <span class="p">[</span><span class="n">r_groups</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;Mol&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">selection</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># it is a list</span>
-        <span class="c1"># just a list</span>
-        <span class="n">r_mols</span> <span class="o">=</span> <span class="n">r_groups</span>
+    <span class="c1"># ensure template and r_group are lists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">templates</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">List</span><span class="p">):</span>
+        <span class="n">templates</span> <span class="o">=</span> <span class="p">[</span><span class="n">templates</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">r_groups</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">List</span><span class="p">):</span>
+        <span class="n">r_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">r_groups</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_mols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="c1"># make a deep copy of r_groups/linkers to ensure we don&#39;t modify the library</span>
+    <span class="n">templates</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">templates</span><span class="p">]</span>
+    <span class="n">r_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">r_groups</span><span class="p">]</span>
+
+    <span class="c1"># get attachment points for each template</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">attachment_points</span><span class="p">:</span>
+        <span class="c1"># attempt to generate the attachment points by picking the joining molecule</span>
+        <span class="c1"># case: a list of templates previously joined with linkers requires iterating over them</span>
+        <span class="n">attachment_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">__getAttachmentVector</span><span class="p">(</span><span class="n">lig</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="k">for</span> <span class="n">lig</span> <span class="ow">in</span> <span class="n">templates</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">attachment_points</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not find attachement points. &quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">attachment_points</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">templates</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-            <span class="s1">&#39;Please provide at least one linker or R-group instead of an empty list for &quot;r_groups&quot;&#39;</span>
+            <span class="sa">f</span><span class="s2">&quot;There must be one attachment point for each template. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Provided attachement points = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">attachment_points</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;with templates number: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">templates</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="n">combined_mols</span> <span class="o">=</span> <span class="n">RList</span><span class="p">()</span>
     <span class="n">id_counter</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="c1"># loop over the attachment points and r_groups</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">attachment_points</span><span class="p">:</span>
-        <span class="c1"># attempt to generate the attachment points by picking the joining molecule</span>
-        <span class="n">atom</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">__getAttachmentVector</span><span class="p">(</span><span class="n">core_ligand</span><span class="p">)</span>
-        <span class="n">attachment_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()]</span>
-
-    <span class="k">for</span> <span class="n">atom_idx</span> <span class="ow">in</span> <span class="n">attachment_points</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">r_mol</span> <span class="ow">in</span> <span class="n">r_mols</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">atom_idx</span><span class="p">,</span> <span class="n">core_ligand</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">attachment_points</span><span class="p">,</span> <span class="n">templates</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">r_mol</span> <span class="ow">in</span> <span class="n">r_groups</span><span class="p">:</span>
             <span class="n">core_mol</span> <span class="o">=</span> <span class="n">RMol</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">core_ligand</span><span class="p">))</span>
             <span class="n">merged_mol</span> <span class="o">=</span> <span class="n">merge_R_group</span><span class="p">(</span>
                 <span class="n">mol</span><span class="o">=</span><span class="n">core_mol</span><span class="p">,</span> <span class="n">R_group</span><span class="o">=</span><span class="n">r_mol</span><span class="p">,</span> <span class="n">replaceIndex</span><span class="o">=</span><span class="n">atom_idx</span>
@@ -1108,46 +1028,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2022, Daniel J Cole.
-
-    </p>
+    <p>&#169; Copyright 2022, Daniel J Cole.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
