@@ -11,4 +11,4 @@ Bieniek, Mateusz K., Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum
 
 Please see [cole-group.github.io/fegrow](https://cole-group.github.io/FEgrow) for full installation instructions, documentation and acknowledgements.
 
-And see the [tutorial](https://github.com/cole-group/FEgrow/tree/master/notebooks) to get started.
+To get started see the [online tutorial](https://cole-group.github.io/FEgrow/tutorial/tutorial/) for which the IPython Notebook is available [here] (https://github.com/cole-group/FEgrow/tree/master/notebooks).
