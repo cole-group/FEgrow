@@ -8,7 +8,7 @@ Conda installation:
 
 .. code-block:: Bash
 
-    conda install fegrow -c conda-forge
+    mamba install fegrow -c conda-forge
 
 To use the latest git version, download the code and use the provided
 environment file *env.yml*. We recommend using Mambaforge (https://github.com/conda-forge/miniforge#mambaforge)
