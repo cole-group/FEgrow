@@ -21,4 +21,4 @@ We are grateful to many open source softwares available, including but not limit
  - OpenBabel (https://openbabel.org/)
  - torchani (https://aiqm.github.io/torchani/)
 
-Please cite accordingly the used packages. 
+Please cite the packages accordingly.
