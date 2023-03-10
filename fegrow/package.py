@@ -526,7 +526,8 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
         # obtain the absolute file to the receptor
         receptor = Path(receptor_file)
-        assert receptor.exists()
+        if not receptor.exists():
+            raise ValueError(f'Your receptor "{receptor_file}" does not seem to exist.')
 
         # make a temporary sdf file for gnina
         tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".sdf")
