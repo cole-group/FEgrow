@@ -873,12 +873,13 @@ class RList(RInterface, list):
                 removed.append(rmindex)
         return removed
 
+    @property
     def dataframe(self):
         return pandas.concat([rmol.df() for rmol in self] + [pandas.DataFrame()])
 
     def _repr_html_(self):
         # return the dataframe with the visualisation column of the dataframe
-        df = self.dataframe()
+        df = self.dataframe
         RList._append_jupyter_visualisation(df)
         return df._repr_html_()
 
