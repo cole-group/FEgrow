@@ -24,9 +24,11 @@ from rdkit.Chem import PandasTools
 import mols2grid
 import pandas
 
-
 from .conformers import generate_conformers
 from .toxicity import tox_props
+
+# default options
+pandas.set_option('display.precision', 3)
 
 
 def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:

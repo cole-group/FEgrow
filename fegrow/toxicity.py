@@ -15,10 +15,10 @@ def rule_of_five(mol):
     """
 
     # Ro5 descriptors
-    MW = round(Descriptors.MolWt(mol), 3)
+    MW = Descriptors.MolWt(mol)
     HBA = Descriptors.NumHAcceptors(mol)
     HBD = Descriptors.NumHDonors(mol)
-    LogP = round(Descriptors.MolLogP(mol), 3)
+    LogP = Descriptors.MolLogP(mol)
 
     # Ro5 conditions
     conditions = [MW <= 500, HBA <= 10, HBD <= 5, LogP <= 5]
@@ -87,7 +87,7 @@ def tox_props(data):
         nih = pd.DataFrame(
             [filter_mols(mol, catalog_nih, "has_prob_fgs") for mol in mols]
         )
-        sa_score = [round(calculateScore(mol), 3) for mol in mols]
+        sa_score = [calculateScore(mol) for mol in mols]
 
         data = pd.concat(
             [data, ro5, pains, unwanted_subs, nih], axis=1
