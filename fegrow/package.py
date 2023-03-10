@@ -790,13 +790,19 @@ class RList(RInterface, list):
             [mol.rep2D(rdkit_mol=True, **kwargs) for mol in self], subImgSize=subImgSize
         )
 
-    def toxicity(self):
-        df =  pandas.concat([m.toxicity() for m in self])
+    @staticmethod
+    def _append_jupyter_visualisation(df):
+        if "Smiles" not in df:
+            return
+
         # add a column with the visualisation
         PandasTools.AddMoleculeColumnToFrame(
             df, "Smiles", "Molecule", includeFingerprints=True
         )
 
+    def toxicity(self):
+        df = pandas.concat([m.toxicity() for m in self] + [pandas.DataFrame()])
+        RList._append_jupyter_visualisation(df)
         return df
 
     def generate_conformers(
@@ -865,17 +871,12 @@ class RList(RInterface, list):
         return removed
 
     def dataframe(self):
-        return pandas.concat([rmol.df() for rmol in self])
+        return pandas.concat([rmol.df() for rmol in self] + [pandas.DataFrame()])
 
     def _repr_html_(self):
         # return the dataframe with the visualisation column of the dataframe
-
         df = self.dataframe()
-
-        # add a column with the visualisation
-        PandasTools.AddMoleculeColumnToFrame(
-            df, "Smiles", "Molecule", includeFingerprints=True
-        )
+        RList._append_jupyter_visualisation(df)
         return df._repr_html_()
 
 
