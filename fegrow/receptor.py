@@ -117,7 +117,7 @@ def optimise_in_receptor(
     """
 
     ligand_force_fields = {
-        "openff": "openff_unconstrained-1.3.0.offxml",
+        "openff": "openff_unconstrained-2.0.0.offxml",
         "gaff": "gaff-2.11",
     }
 
