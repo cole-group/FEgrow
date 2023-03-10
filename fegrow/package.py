@@ -864,10 +864,13 @@ class RList(RInterface, list):
                 removed.append(rmindex)
         return removed
 
+    def dataframe(self):
+        return pandas.concat([rmol.df() for rmol in self])
+
     def _repr_html_(self):
         # return the dataframe with the visualisation column of the dataframe
 
-        df = pandas.concat([rmol.df() for rmol in self])
+        df = self.dataframe()
 
         # add a column with the visualisation
         PandasTools.AddMoleculeColumnToFrame(
