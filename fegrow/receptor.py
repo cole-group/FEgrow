@@ -117,7 +117,7 @@ def optimise_in_receptor(
     """
 
     ligand_force_fields = {
-        "openff": "openff_unconstrained-1.3.0.offxml",
+        "openff": "openff_unconstrained-2.0.0.offxml",
         "gaff": "gaff-2.11",
     }
 
@@ -154,7 +154,7 @@ def optimise_in_receptor(
     # build the complex system
     system = system_generator.create_system(complex_structure.topology)
 
-    # work out the index of the atoms in the ligand assuming the are the last chain?
+    # work out the index of the atoms in the ligand assuming they are the last residue?
     # is this always true if we add the ligand to the receptor?
     ligand_res = list(complex_structure.topology.residues())[-1]
     ligand_idx = [atom.index for atom in ligand_res.atoms()]
@@ -200,21 +200,17 @@ def optimise_in_receptor(
     for i, conformer in enumerate(
         tqdm(openff_mol.conformers, desc="Optimising conformer: ", ncols=80)
     ):
-        # now we need to make the ligand coords
+        # make the ligand coords
         lig_coords = conformer.value_in_unit(unit.angstrom)
         # make the vec3 list
         lig_vec = [openmm.Vec3(*i) for i in lig_coords] * unit.angstrom
         complex_coords = receptor_coords + lig_vec
-        # write out the starting positions
-        # with open(f"system_start_conformer_{i}.pdb", "w") as outfile:
-        #     app.PDBFile.writeFile(complex_structure.topology, complex_coords, outfile)
         # set the initial positions
-        # Mat: so here is the issue?
         simulation.context.setPositions(complex_coords)
         # now minimize the energy
         simulation.minimizeEnergy()
 
-        # now write out the final coords
+        # write out the final coords
         min_state = simulation.context.getState(getPositions=True, getEnergy=True)
         energies.append(
             min_state.getPotentialEnergy().value_in_unit(unit.kilocalories_per_mole)
@@ -225,9 +221,6 @@ def optimise_in_receptor(
             atom_position = Point3D(*coord)
             final_conformer.SetAtomPosition(j, atom_position)
         final_mol.AddConformer(final_conformer, assignId=True)
-
-        # with open(f"system_min_conformer_{i}.pdb", "w") as outfile:
-        #     app.PDBFile.writeFile(complex_structure.topology, min_state.getPositions().value_in_unit(unit.angstrom), outfile)
 
     return final_mol, energies
 

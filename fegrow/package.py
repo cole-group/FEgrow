@@ -24,9 +24,11 @@ from rdkit.Chem import PandasTools
 import mols2grid
 import pandas
 
-
 from .conformers import generate_conformers
 from .toxicity import tox_props
+
+# default options
+pandas.set_option('display.precision', 3)
 
 
 def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
@@ -526,7 +528,8 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
         # obtain the absolute file to the receptor
         receptor = Path(receptor_file)
-        assert receptor.exists()
+        if not receptor.exists():
+            raise ValueError(f'Your receptor "{receptor_file}" does not seem to exist.')
 
         # make a temporary sdf file for gnina
         tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".sdf")
@@ -790,13 +793,19 @@ class RList(RInterface, list):
             [mol.rep2D(rdkit_mol=True, **kwargs) for mol in self], subImgSize=subImgSize
         )
 
-    def toxicity(self):
-        df =  pandas.concat([m.toxicity() for m in self])
+    @staticmethod
+    def _append_jupyter_visualisation(df):
+        if "Smiles" not in df:
+            return
+
         # add a column with the visualisation
         PandasTools.AddMoleculeColumnToFrame(
             df, "Smiles", "Molecule", includeFingerprints=True
         )
 
+    def toxicity(self):
+        df = pandas.concat([m.toxicity() for m in self] + [pandas.DataFrame()])
+        RList._append_jupyter_visualisation(df)
         return df
 
     def generate_conformers(
@@ -864,15 +873,14 @@ class RList(RInterface, list):
                 removed.append(rmindex)
         return removed
 
+    @property
+    def dataframe(self):
+        return pandas.concat([rmol.df() for rmol in self] + [pandas.DataFrame()])
+
     def _repr_html_(self):
         # return the dataframe with the visualisation column of the dataframe
-
-        df = pandas.concat([rmol.df() for rmol in self])
-
-        # add a column with the visualisation
-        PandasTools.AddMoleculeColumnToFrame(
-            df, "Smiles", "Molecule", includeFingerprints=True
-        )
+        df = self.dataframe
+        RList._append_jupyter_visualisation(df)
         return df._repr_html_()
 
 
