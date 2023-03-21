@@ -853,10 +853,18 @@ class RList(RInterface, list):
         for i, rmol in enumerate(self):
             print(f"RMol index {i}")
             dfs.append(rmol.gnina(receptor_file))
-
+	
         df = pandas.concat(dfs)
         df.set_index(["ID", "Conformer"], inplace=True)
-        return df
+        
+        df_reset = df.reset_index()
+
+        # Add one to the 'Conformer' column
+        df_reset['Conformer'] = df_reset['Conformer'] + 1
+
+        # Set the index back to the original state
+        df_updated = df_reset.set_index(['ID', 'Conformer'])
+        return df_updated
 
     def discard_missing(self):
         """
