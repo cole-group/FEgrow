@@ -1,6 +1,7 @@
 from copy import deepcopy
 from typing import List, Tuple
 
+import numpy as np
 import parmed
 from openmmforcefields.generators import SystemGenerator
 from pdbfixer import PDBFixer
@@ -88,6 +89,7 @@ def optimise_in_receptor(
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
     platform_name: str = "CPU",
+    discard_bad_bonds: bool = True,
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -111,6 +113,9 @@ def optimise_in_receptor(
         platform_name:
             The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
             See the OpenMM documentation of Platform.
+        discard_bad_bonds:
+            ANI can create unphyiscal bond lengths, for which very low energies are reported.
+            We filter conformers with a bond longer than 2.5 A.
 
     Returns:
         A copy of the input molecule with the optimised positions.
@@ -212,18 +217,31 @@ def optimise_in_receptor(
 
         # write out the final coords
         min_state = simulation.context.getState(getPositions=True, getEnergy=True)
+        positions = min_state.getPositions(asNumpy=True).value_in_unit(unit.angstrom)
+        lig_positions = positions[ligand_idx[0] :]
+        if discard_bad_bonds and not _bonds_are_sane(openff_mol, lig_positions):
+            print('WARNING: Found a bond that is too long, discring the conformer. ')
+            continue
+
+        final_conformer = Chem.Conformer()
+        for j, coord in enumerate(lig_positions):
+            atom_position = Point3D(*coord)
+            final_conformer.SetAtomPosition(j, atom_position)
+
         energies.append(
             min_state.getPotentialEnergy().value_in_unit(unit.kilocalories_per_mole)
         )
-        positions = min_state.getPositions(asNumpy=True).value_in_unit(unit.angstrom)
-        final_conformer = Chem.Conformer()
-        for j, coord in enumerate(positions[ligand_idx[0] :]):
-            atom_position = Point3D(*coord)
-            final_conformer.SetAtomPosition(j, atom_position)
         final_mol.AddConformer(final_conformer, assignId=True)
 
     return final_mol, energies
 
+def _bonds_are_sane(offmol, positions, threshold=2.5):
+    for bond in offmol.bonds:
+        dst = np.sqrt(np.sum((positions[bond.atom1_index] - positions[bond.atom2_index])**2))
+        if dst > threshold:
+            return False
+
+    return True
 
 def sort_conformers(
     ligand: RMol, energies: List[float], energy_range: float = 5
