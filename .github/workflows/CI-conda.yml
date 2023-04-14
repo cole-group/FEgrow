@@ -1,0 +1,41 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install dependencies
+      run: conda env update --file env.yml --name base
+    - name: env summary
+      shell: bash -l {0}
+      run: conda list
+    - name: install fegrow
+      shell: bash -l {0}
+      run: pip install .
+    - name: install pytest
+      shell: bash -l {0}
+      run: mamba install pytest
+    - name: pytest
+      shell: bash -l {0}
+      run: pytest fegrow/testing
+    - name: Run tutorial.py
+      shell: bash -l {0}
+      run: |
+        cd notebooks
+        obabel sarscov2/lig.pdb -O sarscov2/coreh.sdf -p 7
+        wget -nc https://files.rcsb.org/download/7L10.pdb        
+        python .tutorial.py
