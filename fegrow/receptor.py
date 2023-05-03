@@ -44,7 +44,7 @@ def _can_use_ani2x(molecule: OFFMolecule) -> bool:
     """
     Check if ani2x can be used for this molecule by inspecting the elements.
     """
-    mol_elements = set([atom.element.symbol for atom in molecule.atoms])
+    mol_elements = set([atom.symbol for atom in molecule.atoms])
     ani2x_elements = {"H", "C", "N", "O", "S", "F", "Cl"}
     if mol_elements - ani2x_elements:
         # if there is any difference in the sets or a net charge ani2x can not be used.
@@ -142,7 +142,6 @@ def optimise_in_receptor(
         cache="db.json",
         molecules=openff_mol,
     )
-
     # now make a combined receptor and ligand topology
     parmed_receptor = parmed.openmm.load_topology(
         receptor.topology, xyz=receptor.positions
@@ -191,7 +190,7 @@ def optimise_in_receptor(
     )
 
     # save the receptor coords as they should be consistent
-    receptor_coords = parmed_receptor.positions
+    receptor_coords = unit.Quantity(parmed_receptor.coordinates.tolist(), unit=unit.angstrom)
 
     # loop over the conformers and energy minimise and store the final positions
     final_mol = RMol(deepcopy(ligand))
@@ -201,9 +200,8 @@ def optimise_in_receptor(
         tqdm(openff_mol.conformers, desc="Optimising conformer: ", ncols=80)
     ):
         # make the ligand coords
-        lig_coords = conformer.value_in_unit(unit.angstrom)
-        # make the vec3 list
-        lig_vec = [openmm.Vec3(*i) for i in lig_coords] * unit.angstrom
+        lig_vec = unit.Quantity([c.m.tolist() for c in conformer], unit=unit.angstrom)
+
         complex_coords = receptor_coords + lig_vec
         # set the initial positions
         simulation.context.setPositions(complex_coords)
