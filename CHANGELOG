@@ -3,6 +3,17 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
 
 ** [UNPUBLISHED] version 1.*.***
 
+**version 1.3.0**
+
+ - Compatibility with openff-toolkit >=0.11 (thanks to @jeeberhardt for #29 #30)
+
+
+**version 1.2.1**
+
+ - refined library coordinates (Ben)
+ - visualisations with pandas
+ - error handling
+
 
 **version 1.2.0**
 
