@@ -584,9 +584,16 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
             The file type is worked out from the name extension by splitting on `.`.
         """
         file_type = file_name.split(".")[-1]
+
+        # SDF has its own multi-frame writer
+        if file_type.lower() == 'sdf':
+            with Chem.SDWriter(file_name) as SD:
+                for conformer in self.GetConformers():
+                    SD.write(self, confId=conformer.GetId())
+            return
+
         write_functions = {
             "mol": Chem.MolToMolBlock,
-            "sdf": Chem.MolToMolBlock,
             "pdb": Chem.MolToPDBBlock,
             "xyz": Chem.MolToXYZBlock,
         }
@@ -787,6 +794,28 @@ class RList(RInterface, list):
     Streamline working with RMol by presenting the same interface on the list,
     and allowing to dispatch the functions to any single member.
     """
+
+    @staticmethod
+    def from_mols(mols):
+        # Generate a list of molecules from smiles
+        rlist = RList()
+        for mol in mols:
+            rlist.append(RMol(mol))
+
+        return rlist
+
+    def set_common_core(self, core_mol):
+        # set a common core across the molecules,
+        # this means most likely finding the subcomponent, knowing maybe even which atoms correspond to which?
+        # this will not be universal and will require RDKIT
+
+        for rmol in self:
+            # check if the core_mol is a substructure
+            if not rmol.HasSubstructMatch(core_mol):
+                raise Exception('The core molecule is not a substructure of one of the RMols in the RList, '
+                                'according to Mol.HasSubstructMatch')
+
+            rmol._save_template(core_mol)
 
     def rep2D(self, subImgSize=(400, 400), **kwargs):
         return Draw.MolsToGridImage(
