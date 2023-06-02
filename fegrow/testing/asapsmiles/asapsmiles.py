@@ -45,4 +45,5 @@ if rlist[mol_id].GetNumConformers() > 0:
     affinities = rlist[mol_id].gnina(receptor_file=protein_filename)
 
     with Chem.SDWriter(f'Rmol{mol_id}_best_conformers.sdf') as SDW:
-        SDW.write(rlist[mol_id])
+        for conformer in rlist[mol_id].GetConformers():
+            SDW.write(rlist[mol_id], confId=conformer.GetId())
