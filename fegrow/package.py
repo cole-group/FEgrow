@@ -584,9 +584,16 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
             The file type is worked out from the name extension by splitting on `.`.
         """
         file_type = file_name.split(".")[-1]
+
+        # SDF has its own multi-frame writer
+        if file_type.lower() == 'sdf':
+            with Chem.SDWriter(file_name) as SD:
+                for conformer in self.GetConformers():
+                    SD.write(self, confId=conformer.GetId())
+            return
+
         write_functions = {
             "mol": Chem.MolToMolBlock,
-            "sdf": Chem.MolToMolBlock,
             "pdb": Chem.MolToPDBBlock,
             "xyz": Chem.MolToXYZBlock,
         }
