@@ -3,9 +3,14 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  tests:
+    name: Test on ${{ matrix.os }}, 🐍=${{ matrix.python-version }}, Program=${{ matrix.conda-env }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-latest" ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11"]
       max-parallel: 5
 
     steps:
@@ -15,7 +20,7 @@ jobs:
       with:
         activate-environment: fegrow
         environment-file: env.yml
-        python-version: 3.8
+        python-version: ${{ matrix.python-version }}
         auto-update-conda: true
         auto-activate-base: false
         show-channel-urls: true
