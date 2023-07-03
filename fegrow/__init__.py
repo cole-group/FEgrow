@@ -11,11 +11,12 @@ from .package import (
     RLinkerGrid,
     link,
 )
-from .receptor import fix_receptor, optimise_in_receptor, sort_conformers
+from .receptor import (
+    fix_receptor,
+    optimise_in_receptor,
+    sort_conformers
+)
 from .toxicity import tox_props
-
-RGroups = RGroupGrid()
-RLinkers = RLinkerGrid()
 
 # get the version
 __version__ = open(Path(__file__).parent / "version.txt").read().strip()
@@ -28,8 +29,8 @@ __all__ = [
     optimise_in_receptor,
     tox_props,
     sort_conformers,
-    RGroups,
-    RLinkers,
+    RGroupGrid,
+    RLinkerGrid,
     link,
     build_molecules,
     ic50,
