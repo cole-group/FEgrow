@@ -2,6 +2,7 @@
 Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, Daniel J. Cole
 
 ** [UNPUBLISHED] version 1.*.***
+ - The user now has to import the libraries (RGroupGrid) and instantiate first.
 
 **version 1.3.0**
 
