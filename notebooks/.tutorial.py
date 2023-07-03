@@ -28,7 +28,10 @@ import prody
 from rdkit import Chem
 
 import fegrow
-from fegrow import RGroups, RLinkers
+from fegrow import RGroupGrid, RLinkerGrid
+
+RGroups = RGroupGrid()
+RLinkers = RLinkerGrid()
 
 
 # # Prepare the ligand template
