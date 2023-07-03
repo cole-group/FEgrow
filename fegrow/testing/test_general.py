@@ -2,7 +2,12 @@ import pathlib
 
 from rdkit import Chem
 import fegrow
-from fegrow import RGroups, RLinkers
+from fegrow import RGroupGrid, RLinkerGrid
+
+
+# instantiate the libraries
+RGroups = RGroupGrid()
+RLinkers = RLinkerGrid()
 
 root = pathlib.Path(__file__).parent
 
