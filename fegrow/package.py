@@ -647,13 +647,14 @@ class RGroupGrid(mols2grid.MolGrid):
     """
 
     def __init__(self):
-        dataframe = self._load_molecules()
+        dataframe = RGroupGrid._load_molecules()
 
         super(RGroupGrid, self).__init__(
             dataframe, removeHs=True, mol_col="Mol", use_coords=False, name="m2"
         )
 
-    def _load_molecules(self) -> pandas.DataFrame:
+    @staticmethod
+    def _load_molecules() -> pandas.DataFrame:
         """
         Load the local r groups into rdkit molecules
         """
