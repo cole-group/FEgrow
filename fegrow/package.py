@@ -661,16 +661,15 @@ class RGroupGrid(mols2grid.MolGrid):
         molecules = []
         names = []
 
-        builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library"
-        for molfile in glob.glob(str(builtin_rgroups / "*.mol")):
-            r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
-            molecules.append(r_mol)
-            names.append(Path(molfile).stem)
+        builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
+        for rgroup in Chem.SDMolSupplier(str(builtin_rgroups), removeHs=False):
+            molecules.append(rgroup)
+            names.append(rgroup.GetProp('SMILES'))
 
             # highlight the attachment atom
-            for atom in r_mol.GetAtoms():
+            for atom in rgroup.GetAtoms():
                 if atom.GetAtomicNum() == 0:
-                    setattr(r_mol, "__sssAtoms", [atom.GetIdx()])
+                    setattr(rgroup, "__sssAtoms", [atom.GetIdx()])
 
         return pandas.DataFrame({"Mol": molecules, "Name": names})
 
@@ -708,21 +707,21 @@ class RLinkerGrid(mols2grid.MolGrid):
         """
         Load the local linkers into rdkit molecules
         """
-        builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library"
-        linker_files = glob.glob(str(builtin_rlinkers / "*.sdf"))
+        builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
+        linker_mols = list(Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False))
+
         # sort the linkers so that [R1]C[R2] is next to [R2]C[R1] in the grid
-        linker_files = sorted(
-            linker_files,
-            key=lambda smiles: smiles.replace("[*:1]", "R").replace("[*:2]", "R"),
+        # fixme: preorder them in the .sdf and use that order instead
+        linker_mols = sorted(
+            linker_mols,
+            key=lambda l: l.GetProp('SMILES').replace("[*:1]", "R").replace("[*:2]", "R"),
         )
 
         linkers = []
-        for molfile in linker_files:
-            r_mol = list(Chem.SDMolSupplier(molfile, removeHs=False)).pop()
-
+        for mol in linker_mols:
             # generate a searchable name in the form of a simple SMILE without hydrogens
             name = (
-                Chem.MolToSmiles(Chem.RemoveHs(r_mol), canonical=False)
+                Chem.MolToSmiles(Chem.RemoveHs(mol), canonical=False)
                 .replace("[*:1]", "R1")
                 .replace("[*:2]", "R2")
             )
@@ -730,9 +729,9 @@ class RLinkerGrid(mols2grid.MolGrid):
             # simplify the names for the user
             linkers.append(
                 {
-                    "Mol": r_mol,
+                    "Mol": mol,
                     "Name": name,
-                    "Common": r_mol.GetIntProp(
+                    "Common": mol.GetIntProp(
                         "SmileIndex"
                     ),  # extract the index property from the original publication
                 }

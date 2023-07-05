@@ -3,6 +3,7 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
 
 ** [UNPUBLISHED] version 1.*.***
  - The user now has to import the libraries (RGroupGrid) and instantiate first.
+ - Libraries (linkers, rgroups) are now single .sdf files to avoid problems on clusters with many small files
 
 **version 1.3.0**
 
