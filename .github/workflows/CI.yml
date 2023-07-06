@@ -31,6 +31,9 @@ jobs:
     - name: env summary
       shell: bash -l {0}
       run: conda list
+    - name: dry install fegrow
+      shell: bash -l {0}
+      run: pip install --dry-run .
     - name: install fegrow
       shell: bash -l {0}
       run: pip install .
