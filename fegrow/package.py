@@ -662,6 +662,7 @@ class RGroupGrid(mols2grid.MolGrid):
         names = []
 
         builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
+        print(open(str(builtin_rgroups)).read())
         for rgroup in Chem.SDMolSupplier(str(builtin_rgroups.resolve()), removeHs=False):
             molecules.append(rgroup)
             names.append(rgroup.GetProp('SMILES'))
