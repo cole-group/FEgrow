@@ -3,7 +3,6 @@ import itertools
 import stat
 from typing import Optional, List, Union, Tuple
 import os
-import glob
 import tempfile
 import subprocess
 import re
@@ -662,6 +661,8 @@ class RGroupGrid(mols2grid.MolGrid):
         names = []
 
         builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
+        import glob
+        print(glob.glob(str(builtin_rgroups.parent) + '/*'))
         print(open(str(builtin_rgroups)).read())
         for rgroup in Chem.SDMolSupplier(str(builtin_rgroups.resolve()), removeHs=False):
             molecules.append(rgroup)
