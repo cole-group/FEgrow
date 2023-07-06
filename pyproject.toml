@@ -1,4 +1,3 @@
-[project]
-name = "fegrow"
-version = "1.3.0"
-include = ["fegrow/data/linkers/library.sdf", "fegrow/data/rgroups/library.sdf"]
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
