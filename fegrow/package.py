@@ -662,7 +662,10 @@ class RGroupGrid(mols2grid.MolGrid):
 
         builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
         import glob
-        print(glob.glob(str(builtin_rgroups.parent) + '/*'))
+        parent1 = str(builtin_rgroups.parent) + '/*'
+        print('parent1', parent1, glob.glob(parent1))
+        pp = str(builtin_rgroups.parent.parent) + '/*'
+        print('pp', pp, glob.glob(pp))
         print(open(str(builtin_rgroups)).read())
         for rgroup in Chem.SDMolSupplier(str(builtin_rgroups.resolve()), removeHs=False):
             molecules.append(rgroup)
