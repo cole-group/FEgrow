@@ -662,7 +662,7 @@ class RGroupGrid(mols2grid.MolGrid):
         names = []
 
         builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
-        for rgroup in Chem.SDMolSupplier(str(builtin_rgroups), removeHs=False):
+        for rgroup in Chem.SDMolSupplier(str(builtin_rgroups.resolve()), removeHs=False):
             molecules.append(rgroup)
             names.append(rgroup.GetProp('SMILES'))
 
@@ -708,7 +708,7 @@ class RLinkerGrid(mols2grid.MolGrid):
         Load the local linkers into rdkit molecules
         """
         builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
-        linker_mols = list(Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False))
+        linker_mols = list(Chem.SDMolSupplier(str(builtin_rlinkers.resolve()), removeHs=False))
 
         # sort the linkers so that [R1]C[R2] is next to [R2]C[R1] in the grid
         # fixme: preorder them in the .sdf and use that order instead
