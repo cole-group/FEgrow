@@ -537,22 +537,27 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
                 w.write(self, confId=conformer.GetId())
 
         # run the code on the sdf
-        process = subprocess.run(
-            [
-                "./gnina",
-                "--score_only",
-                "-l",
-                tmp.name,
-                "-r",
-                receptor.absolute(),
-                "--seed",
-                "0",
-                "--stripH",
-                "False",
-            ],
-            capture_output=True,
-            cwd=RMol.gnina_dir,
-        )
+        try:
+            process = subprocess.run(
+                [
+                    "./gnina",
+                    "--score_only",
+                    "-l",
+                    tmp.name,
+                    "-r",
+                    receptor.absolute(),
+                    "--seed",
+                    "0",
+                    "--stripH",
+                    "False",
+                ],
+                capture_output=True,
+                check=True,
+                cwd=RMol.gnina_dir,
+            )
+        except subprocess.CalledProcessError as E:
+            raise Exception('Gnina Failed', process.stderr, E)
+
         output = process.stdout.decode("utf-8")
         CNNaffinities_str = re.findall(r"CNNaffinity: (-?\d+.\d+)", output)
 
@@ -661,12 +666,6 @@ class RGroupGrid(mols2grid.MolGrid):
         names = []
 
         builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
-        import glob
-        parent1 = str(builtin_rgroups.parent) + '/*'
-        print('parent1', parent1, glob.glob(parent1))
-        pp = str(builtin_rgroups.parent.parent) + '/*'
-        print('pp', pp, glob.glob(pp))
-        print(open(str(builtin_rgroups)).read())
         for rgroup in Chem.SDMolSupplier(str(builtin_rgroups.resolve()), removeHs=False):
             molecules.append(rgroup)
             names.append(rgroup.GetProp('SMILES'))
