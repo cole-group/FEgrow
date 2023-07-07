@@ -696,7 +696,7 @@ class RLinkerGrid(mols2grid.MolGrid):
     """
 
     def __init__(self):
-        dataframe = self._load_molecules()
+        dataframe = RLinkerGrid._load_molecules()
 
         super(RLinkerGrid, self).__init__(
             dataframe,
@@ -707,44 +707,28 @@ class RLinkerGrid(mols2grid.MolGrid):
             prerender=False,
         )
 
-    def _load_molecules(self) -> pandas.DataFrame:
+    @staticmethod
+    def _load_molecules() -> pandas.DataFrame:
         """
         Load the local linkers into rdkit molecules
         """
-        builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
-        linker_mols = list(Chem.SDMolSupplier(str(builtin_rlinkers.resolve()), removeHs=False))
 
-        # sort the linkers so that [R1]C[R2] is next to [R2]C[R1] in the grid
-        # fixme: preorder them in the .sdf and use that order instead
-        linker_mols = sorted(
-            linker_mols,
-            key=lambda l: l.GetProp('SMILES').replace("[*:1]", "R").replace("[*:2]", "R"),
-        )
+        # note that the linkers are pre-sorted so that:
+        #  - [R1]C[R2] is next to [R2]C[R1]
+        #  - according to how common they are (See the original publication) as described with SmileIndex
+        builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
 
         linkers = []
-        for mol in linker_mols:
-            # generate a searchable name in the form of a simple SMILE without hydrogens
-            name = (
-                Chem.MolToSmiles(Chem.RemoveHs(mol), canonical=False)
-                .replace("[*:1]", "R1")
-                .replace("[*:2]", "R2")
-            )
+        for mol in Chem.SDMolSupplier(builtin_rlinkers, removeHs=False):
+            # use easier searchable SMILES, e.g. [*:1] was replaced with R1
+            display_name = mol.GetProp('display_smiles')
 
-            # simplify the names for the user
-            linkers.append(
-                {
-                    "Mol": mol,
-                    "Name": name,
-                    "Common": mol.GetIntProp(
-                        "SmileIndex"
-                    ),  # extract the index property from the original publication
-                }
-            )
+            # extract the index property from the original publication
+            smile_index = mol.GetIntProp("SmileIndex")
 
-        # presort using the original publication index
-        linkers = sorted(linkers, key=lambda i: i["Common"])
+            linkers.append([mol, display_name, smile_index])
 
-        return pandas.DataFrame(linkers)
+        return pandas.DataFrame(linkers, columns=['Mol', 'Name', 'Common'])
 
     def _ipython_display_(self):
         from IPython.display import display
