@@ -3,7 +3,6 @@ import itertools
 import stat
 from typing import Optional, List, Union, Tuple
 import os
-import glob
 import tempfile
 import subprocess
 import re
@@ -538,22 +537,27 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
                 w.write(self, confId=conformer.GetId())
 
         # run the code on the sdf
-        process = subprocess.run(
-            [
-                "./gnina",
-                "--score_only",
-                "-l",
-                tmp.name,
-                "-r",
-                receptor.absolute(),
-                "--seed",
-                "0",
-                "--stripH",
-                "False",
-            ],
-            capture_output=True,
-            cwd=RMol.gnina_dir,
-        )
+        try:
+            process = subprocess.run(
+                [
+                    "./gnina",
+                    "--score_only",
+                    "-l",
+                    tmp.name,
+                    "-r",
+                    receptor.absolute(),
+                    "--seed",
+                    "0",
+                    "--stripH",
+                    "False",
+                ],
+                capture_output=True,
+                check=True,
+                cwd=RMol.gnina_dir,
+            )
+        except subprocess.CalledProcessError as E:
+            raise Exception('Gnina Failed', process.stderr, E)
+
         output = process.stdout.decode("utf-8")
         CNNaffinities_str = re.findall(r"CNNaffinity: (-?\d+.\d+)", output)
 
@@ -661,16 +665,15 @@ class RGroupGrid(mols2grid.MolGrid):
         molecules = []
         names = []
 
-        builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library"
-        for molfile in glob.glob(str(builtin_rgroups / "*.mol")):
-            r_mol = Chem.MolFromMolFile(molfile, removeHs=False)
-            molecules.append(r_mol)
-            names.append(Path(molfile).stem)
+        builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
+        for rgroup in Chem.SDMolSupplier(str(builtin_rgroups), removeHs=False):
+            molecules.append(rgroup)
+            names.append(rgroup.GetProp('SMILES'))
 
             # highlight the attachment atom
-            for atom in r_mol.GetAtoms():
+            for atom in rgroup.GetAtoms():
                 if atom.GetAtomicNum() == 0:
-                    setattr(r_mol, "__sssAtoms", [atom.GetIdx()])
+                    setattr(rgroup, "__sssAtoms", [atom.GetIdx()])
 
         return pandas.DataFrame({"Mol": molecules, "Name": names})
 
@@ -693,7 +696,7 @@ class RLinkerGrid(mols2grid.MolGrid):
     """
 
     def __init__(self):
-        dataframe = self._load_molecules()
+        dataframe = RLinkerGrid._load_molecules()
 
         super(RLinkerGrid, self).__init__(
             dataframe,
@@ -704,44 +707,28 @@ class RLinkerGrid(mols2grid.MolGrid):
             prerender=False,
         )
 
-    def _load_molecules(self) -> pandas.DataFrame:
+    @staticmethod
+    def _load_molecules() -> pandas.DataFrame:
         """
         Load the local linkers into rdkit molecules
         """
-        builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library"
-        linker_files = glob.glob(str(builtin_rlinkers / "*.sdf"))
-        # sort the linkers so that [R1]C[R2] is next to [R2]C[R1] in the grid
-        linker_files = sorted(
-            linker_files,
-            key=lambda smiles: smiles.replace("[*:1]", "R").replace("[*:2]", "R"),
-        )
+
+        # note that the linkers are pre-sorted so that:
+        #  - [R1]C[R2] is next to [R2]C[R1]
+        #  - according to how common they are (See the original publication) as described with SmileIndex
+        builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
 
         linkers = []
-        for molfile in linker_files:
-            r_mol = list(Chem.SDMolSupplier(molfile, removeHs=False)).pop()
+        for mol in Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False):
+            # use easier searchable SMILES, e.g. [*:1] was replaced with R1
+            display_name = mol.GetProp('display_smiles')
 
-            # generate a searchable name in the form of a simple SMILE without hydrogens
-            name = (
-                Chem.MolToSmiles(Chem.RemoveHs(r_mol), canonical=False)
-                .replace("[*:1]", "R1")
-                .replace("[*:2]", "R2")
-            )
+            # extract the index property from the original publication
+            smile_index = mol.GetIntProp("SmileIndex")
 
-            # simplify the names for the user
-            linkers.append(
-                {
-                    "Mol": r_mol,
-                    "Name": name,
-                    "Common": r_mol.GetIntProp(
-                        "SmileIndex"
-                    ),  # extract the index property from the original publication
-                }
-            )
+            linkers.append([mol, display_name, smile_index])
 
-        # presort using the original publication index
-        linkers = sorted(linkers, key=lambda i: i["Common"])
-
-        return pandas.DataFrame(linkers)
+        return pandas.DataFrame(linkers, columns=['Mol', 'Name', 'Common'])
 
     def _ipython_display_(self):
         from IPython.display import display
