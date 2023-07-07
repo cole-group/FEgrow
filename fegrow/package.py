@@ -666,7 +666,7 @@ class RGroupGrid(mols2grid.MolGrid):
         names = []
 
         builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
-        for rgroup in Chem.SDMolSupplier(str(builtin_rgroups.resolve()), removeHs=False):
+        for rgroup in Chem.SDMolSupplier(str(builtin_rgroups), removeHs=False):
             molecules.append(rgroup)
             names.append(rgroup.GetProp('SMILES'))
 
@@ -719,7 +719,7 @@ class RLinkerGrid(mols2grid.MolGrid):
         builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
 
         linkers = []
-        for mol in Chem.SDMolSupplier(builtin_rlinkers, removeHs=False):
+        for mol in Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False):
             # use easier searchable SMILES, e.g. [*:1] was replaced with R1
             display_name = mol.GetProp('display_smiles')
 
