@@ -1,19 +1,15 @@
 import copy
-import itertools
 import stat
-from typing import Optional, List, Union, Tuple
+from typing import Optional, List, Union
 import os
 import tempfile
 import subprocess
 import re
 from pathlib import Path
 from urllib.request import urlretrieve
-from collections import OrderedDict
 
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.colors import to_hex
-from prody.proteins.functions import showProtein, view3D
+from prody.proteins.functions import view3D
 import py3Dmol
 import rdkit
 from rdkit import Chem
@@ -512,7 +508,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         os.chmod(gnina, mode | stat.S_IEXEC)
 
         # check if it works
-        subprocess.run(["./gnina", "--help"], capture_output=True, cwd=RMol.gnina_dir)
+        subprocess.run(["./gnina", "--help"], capture_output=True, check=True, cwd=RMol.gnina_dir)
 
     def gnina(self, receptor_file):
         """
@@ -537,26 +533,21 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
                 w.write(self, confId=conformer.GetId())
 
         # run the code on the sdf
-        try:
-            process = subprocess.run(
-                [
-                    "./gnina",
-                    "--score_only",
-                    "-l",
-                    tmp.name,
-                    "-r",
-                    receptor.absolute(),
-                    "--seed",
-                    "0",
-                    "--stripH",
-                    "False",
-                ],
-                capture_output=True,
-                check=True,
-                cwd=RMol.gnina_dir,
-            )
-        except subprocess.CalledProcessError as E:
-            raise Exception('Gnina Failed', process.stderr, E)
+        process = subprocess.run(
+            [
+                os.path.join(RMol.gnina_dir, "gnina"),
+                "--score_only",
+                "-l",
+                tmp.name,
+                "-r",
+                receptor,
+                "--seed",
+                "0",
+                "--stripH",
+                "False",
+            ],
+            capture_output=True,
+            check=True)
 
         output = process.stdout.decode("utf-8")
         CNNaffinities_str = re.findall(r"CNNaffinity: (-?\d+.\d+)", output)
