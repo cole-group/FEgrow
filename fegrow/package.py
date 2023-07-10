@@ -535,7 +535,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         # run the code on the sdf
         process = subprocess.run(
             [
-                RMol.gnina_dir / "gnina",
+                os.path.join(RMol.gnina_dir, "gnina"),
                 "--score_only",
                 "-l",
                 tmp.name,
