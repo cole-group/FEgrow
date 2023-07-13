@@ -117,9 +117,10 @@ def merge_R_group(mol, R_group, replaceIndex):
 
     # atom to be replaced in the molecule
     replace_atom = mol.GetAtomWithIdx(replaceIndex)
-    assert (
-        len(replace_atom.GetNeighbors()) == 1
-    ), "The atom being replaced on the molecule has more neighbour atoms than 1. Not supported."
+    if len(replace_atom.GetNeighbors()) != 1:
+        raise NotImplementedError(f"The atom being replaced (ID={replace_atom.GetIdx()}, Element={replace_atom.GetAtomicNum()}) "
+                        f"on the molecule has more neighbour atoms than 1. Not supported.")
+
     replace_atom_neighbour = replace_atom.GetNeighbors()[0]
 
     # align the Rgroup
