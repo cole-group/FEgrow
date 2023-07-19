@@ -6,17 +6,21 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdFMCS
 
 
+class WrongCoreForMolecule(Exception):
+    pass
+
 def duplicate_conformers(
     m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5
 ) -> bool:
-    rmslist = []
     for conf_idx in range(m.GetNumConformers()):
         if conf_idx == new_conf_idx:
             continue
+
         rms = AllChem.GetConformerRMS(m, new_conf_idx, conf_idx, prealigned=True)
-        rmslist.append(rms)
-    # True if it is too similar to any already generated conformers
-    return any(rms < rms_limit for rms in rmslist)
+        if rms < rms_limit:
+            return True
+
+    return False
 
 
 def generate_conformers(
@@ -46,7 +50,7 @@ def generate_conformers(
     # compute for each template atom to which atom it corresponds to
     match = rmol.GetSubstructMatch(template_mol)
     if not match:
-        raise ValueError("molecule doesn't match the core")
+        raise WrongCoreForMolecule("molecule doesn't match the core")
 
     # remember the coordinates
     coordMap = {}
@@ -81,6 +85,7 @@ def generate_conformers(
             if duplicate_conformers(rmol, conf_idx, rms_limit=minimum_conf_rms):
                 dup_count += 1
                 rmol.RemoveConformer(conf_idx)
+
     if dup_count:
         print(
             f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. "
