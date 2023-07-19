@@ -1,3 +1,4 @@
+import logging
 import copy
 import stat
 from typing import Optional, List, Union
@@ -24,6 +25,8 @@ from .toxicity import tox_props
 
 # default options
 pandas.set_option('display.precision', 3)
+
+logger = logging.getLogger(__name__)
 
 
 def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
@@ -425,7 +428,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         view.zoomTo({"model": -1})
         return view
 
-    def remove_clashing_confs(self, prot, min_dst_allowed=1.0):
+    def remove_clashing_confs(self, protein, min_dst_allowed=1.0):
         """
         Removing conformations that class with the protein.
         Note that the original conformer should be well docked into the protein,
@@ -433,29 +436,24 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         so that any growth on the template doesn't automatically cause
         clashes.
 
-        :param prot: The protein against which the conformers should be tested.
-        :type prot: Prody instance
+        :param protein: The protein against which the conformers should be tested.
+        :type protein: Prody instance
         :param min_dst_allowed: If any atom is within this distance in a conformer, the
          conformer will be deleted.
         :type min_dst_allowed: float in Angstroms
         """
-        prot_coords = prot.getCoords()
+        protein_coords = protein.getCoords()
 
-        counter = 0
-        for conf in list(self.GetConformers())[::-1]:
-            confid = conf.GetId()
-
+        for conf in list(self.GetConformers()):
             # for each atom check how far it is from the protein atoms
-            eacheach_shortest = []
-            for coord in conf.GetPositions():
-                shortest = np.min(np.sqrt(np.sum((coord - prot_coords) ** 2, axis=1)))
-                eacheach_shortest.append(shortest)
-
-            min_dst = np.min(eacheach_shortest)
+            min_dst = 999_999_999 # arbitrary large distance
+            for point in conf.GetPositions():
+                shortest = np.min(np.sqrt(np.sum((point - protein_coords) ** 2, axis=1)))
+                min_dst = min(min_dst, shortest)
 
             if min_dst < min_dst_allowed:
-                self.RemoveConformer(confid)
-                print(f"Clash with the protein. Removing conformer id: {confid}")
+                self.RemoveConformer(conf.GetId())
+                logger.debug(f"Clash with the protein. Removing conformer id: {conf.GetId()}")
 
     @staticmethod
     def set_gnina(loc):
