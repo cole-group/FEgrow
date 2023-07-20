@@ -210,14 +210,27 @@ def optimise_in_receptor(
 
         # write out the final coords
         min_state = simulation.context.getState(getPositions=True, getEnergy=True)
-        energies.append(
-            min_state.getPotentialEnergy().value_in_unit(unit.kilocalories_per_mole)
-        )
         positions = min_state.getPositions(asNumpy=True).value_in_unit(unit.angstrom)
         final_conformer = Chem.Conformer()
         for j, coord in enumerate(positions[ligand_idx[0] :]):
             atom_position = Point3D(*coord)
             final_conformer.SetAtomPosition(j, atom_position)
+
+        # ignore minimised conformers that have very long bonds
+        # this is a temporary fix to ANI generated
+        has_long_bonds = False
+        for bond in final_mol.GetBonds():
+            atom_from = final_conformer.GetAtomPosition(bond.GetBeginAtomIdx())
+            atom_to = final_conformer.GetAtomPosition(bond.GetEndAtomIdx())
+            if atom_from.Distance(atom_to) > 3:
+                has_long_bonds = True
+                break
+        if has_long_bonds:
+            continue
+
+        energies.append(
+            min_state.getPotentialEnergy().value_in_unit(unit.kilocalories_per_mole)
+        )
         final_mol.AddConformer(final_conformer, assignId=True)
 
     return final_mol, energies
