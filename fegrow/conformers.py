@@ -74,9 +74,6 @@ def generate_conformers(
             randomseed=randomseed + coreI,
         )
 
-        # correct the long bonds that are occasionally generated
-        Chem.SanitizeMol(temp_mol)
-
         conf_idx = rmol.AddConformer(temp_mol.GetConformer(-1), assignId=True)
         if minimum_conf_rms is not None:
             if duplicate_conformers(rmol, conf_idx, rms_limit=minimum_conf_rms):
