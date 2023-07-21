@@ -160,15 +160,9 @@ def merge_R_group(scaffold, RGroup, replace_index):
         merged.RemoveConformer(c.GetId())
 
     # bookkeeping about scaffolding
-    # if the molecule was previously merged
-    if hasattr(scaffold, "template") and scaffold.template is not None:
-        # mol already had a connected e.g. a linker, therefore we use the area without the linker
-        template = scaffold.template
-    else:
-        # prepare the template
-        etemp = Chem.EditableMol(scaffold)
-        etemp.RemoveAtom(atom_to_replace.GetIdx())
-        template = etemp.GetMol()
+    etemp = Chem.EditableMol(scaffold)
+    etemp.RemoveAtom(atom_to_replace.GetIdx())
+    template = etemp.GetMol()
 
     with_template = RMol(merged)
     with_template._save_template(template)
