@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from .conformers import generate_conformers
+from .conformers import generate_conformers, WrongCoreForMolecule
 from .package import (
     RList,
     RMol,
@@ -35,4 +35,5 @@ __all__ = [
     build_molecules,
     ic50,
     __version__,
+    WrongCoreForMolecule
 ]

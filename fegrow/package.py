@@ -1,3 +1,4 @@
+import logging
 import copy
 import stat
 from typing import Optional, List, Union
@@ -24,6 +25,8 @@ from .toxicity import tox_props
 
 # default options
 pandas.set_option('display.precision', 3)
+
+logger = logging.getLogger(__name__)
 
 
 def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
@@ -106,70 +109,76 @@ def __getAttachmentVector(R_group):
     return atom, neighbours[0]
 
 
-def merge_R_group(mol, R_group, replaceIndex):
+def merge_R_group(scaffold, RGroup, replace_index):
     """function originally copied from
     https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py
     """
 
     # the linking R atom on the R group
-    rgroup_R_atom, R_atom_neighbour = __getAttachmentVector(R_group)
-    print(f"Rgroup atom index {rgroup_R_atom} neighbouring {R_atom_neighbour}")
+    # fixme: attempt to do the same on the template if replace index is not provided
+    rgroup_R_atom, R_atom_neighbour = __getAttachmentVector(RGroup)
 
-    # atom to be replaced in the molecule
-    replace_atom = mol.GetAtomWithIdx(replaceIndex)
-    if len(replace_atom.GetNeighbors()) != 1:
-        raise NotImplementedError(f"The atom being replaced (ID={replace_atom.GetIdx()}, Element={replace_atom.GetAtomicNum()}) "
+    # atom to be replaced in the scaffold
+    atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
+    if len(atom_to_replace.GetNeighbors()) != 1:
+        raise NotImplementedError(f"The atom being replaced (ID={atom_to_replace.GetIdx()}, Element={atom_to_replace.GetAtomicNum()}) "
                         f"on the molecule has more neighbour atoms than 1. Not supported.")
 
-    replace_atom_neighbour = replace_atom.GetNeighbors()[0]
+    hook = atom_to_replace.GetNeighbors()[0]
 
     # align the Rgroup
     AlignMol(
-        R_group,
-        mol,
+        RGroup,
+        scaffold,
         atomMap=(
-            (R_atom_neighbour.GetIdx(), replace_atom.GetIdx()),
-            (rgroup_R_atom.GetIdx(), replace_atom_neighbour.GetIdx()),
+            (R_atom_neighbour.GetIdx(), atom_to_replace.GetIdx()),
+            (rgroup_R_atom.GetIdx(), hook.GetIdx()),
         ),
     )
 
-    # merge the two molecules
-    combined = Chem.CombineMols(mol, R_group)
+    # merge
+    combined = Chem.CombineMols(scaffold, RGroup)
     emol = Chem.EditableMol(combined)
 
     # connect
     bond_order = rgroup_R_atom.GetBonds()[0].GetBondType()
     emol.AddBond(
-        replace_atom_neighbour.GetIdx(),
-        R_atom_neighbour.GetIdx() + mol.GetNumAtoms(),
+        hook.GetIdx(),
+        R_atom_neighbour.GetIdx() + scaffold.GetNumAtoms(),
         order=bond_order,
     )
     # -1 accounts for the removed linking atom on the template
-    emol.RemoveAtom(rgroup_R_atom.GetIdx() + mol.GetNumAtoms())
+    emol.RemoveAtom(rgroup_R_atom.GetIdx() + scaffold.GetNumAtoms())
     # remove the linking atom on the template
-    emol.RemoveAtom(replace_atom.GetIdx())
+    emol.RemoveAtom(atom_to_replace.GetIdx())
 
     merged = emol.GetMol()
     Chem.SanitizeMol(merged)
 
+    # use only the best/first conformer
+    for c in list(merged.GetConformers())[1:]:
+        merged.RemoveConformer(c.GetId())
+
+    # bookkeeping about scaffolding
     # if the molecule was previously merged
-    if hasattr(mol, "template") and mol.template is not None:
+    if hasattr(scaffold, "template") and scaffold.template is not None:
         # mol already had a connected e.g. a linker, therefore we use the area without the linker
-        template = mol.template
+        template = scaffold.template
     else:
         # prepare the template
-        etemp = Chem.EditableMol(mol)
-        etemp.RemoveAtom(replace_atom.GetIdx())
+        etemp = Chem.EditableMol(scaffold)
+        etemp.RemoveAtom(atom_to_replace.GetIdx())
         template = etemp.GetMol()
 
     with_template = RMol(merged)
     with_template._save_template(template)
     # save the group
-    with_template._save_rgroup(R_group)
+    with_template._save_rgroup(RGroup)
 
-    if is_linker(R_group):
-        # the linker's label = 1 was used for the merging,
-        # rename label = 2 to 0 to turn it into a simple R-group
+    if is_linker(RGroup):
+        # update the linker so that there is an attachment point left for the future
+        # atom in the linker with a label=1 was used for the merging
+        # rename label=2 to 0 to turn it into a simple R-group
         for atom in with_template.GetAtoms():
             if atom.GetAtomMapNum() == 2:
                 atom.SetAtomMapNum(0)
@@ -300,7 +309,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
             print("Warning: no conformers so cannot optimise_in_receptor. Ignoring.")
             return
 
-        from .receptor import ForceField, optimise_in_receptor
+        from .receptor import optimise_in_receptor
 
         opt_mol, energies = optimise_in_receptor(self, *args, **kwargs)
         # replace the conformers with the optimised ones
@@ -425,7 +434,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         view.zoomTo({"model": -1})
         return view
 
-    def remove_clashing_confs(self, prot, min_dst_allowed=1.0):
+    def remove_clashing_confs(self, protein, min_dst_allowed=1.0):
         """
         Removing conformations that class with the protein.
         Note that the original conformer should be well docked into the protein,
@@ -433,29 +442,24 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         so that any growth on the template doesn't automatically cause
         clashes.
 
-        :param prot: The protein against which the conformers should be tested.
-        :type prot: Prody instance
+        :param protein: The protein against which the conformers should be tested.
+        :type protein: Prody instance
         :param min_dst_allowed: If any atom is within this distance in a conformer, the
          conformer will be deleted.
         :type min_dst_allowed: float in Angstroms
         """
-        prot_coords = prot.getCoords()
+        protein_coords = protein.getCoords()
 
-        counter = 0
-        for conf in list(self.GetConformers())[::-1]:
-            confid = conf.GetId()
-
+        for conf in list(self.GetConformers()):
             # for each atom check how far it is from the protein atoms
-            eacheach_shortest = []
-            for coord in conf.GetPositions():
-                shortest = np.min(np.sqrt(np.sum((coord - prot_coords) ** 2, axis=1)))
-                eacheach_shortest.append(shortest)
-
-            min_dst = np.min(eacheach_shortest)
+            min_dst = 999_999_999 # arbitrary large distance
+            for point in conf.GetPositions():
+                shortest = np.min(np.sqrt(np.sum((point - protein_coords) ** 2, axis=1)))
+                min_dst = min(min_dst, shortest)
 
             if min_dst < min_dst_allowed:
-                self.RemoveConformer(confid)
-                print(f"Clash with the protein. Removing conformer id: {confid}")
+                self.RemoveConformer(conf.GetId())
+                logger.debug(f"Clash with the protein. Removing conformer id: {conf.GetId()}")
 
     @staticmethod
     def set_gnina(loc):
@@ -938,7 +942,7 @@ def build_molecules(
         for r_mol in r_groups:
             core_mol = RMol(copy.deepcopy(core_ligand))
             merged_mol = merge_R_group(
-                mol=core_mol, R_group=r_mol, replaceIndex=atom_idx
+                scaffold=core_mol, RGroup=r_mol, replace_index=atom_idx
             )
             # assign the identifying index to the molecule
             merged_mol.id = id_counter

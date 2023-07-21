@@ -1,10 +1,12 @@
-import random
+import logging
 from copy import deepcopy
 from typing import List, Optional
 
 from rdkit import Chem
-from rdkit.Chem import AllChem, rdFMCS
+from rdkit.Chem import AllChem
 
+
+logger = logging.getLogger(__name__)
 
 class WrongCoreForMolecule(Exception):
     pass
@@ -33,28 +35,19 @@ def generate_conformers(
     flexible:
             The list of atomic indices on the @core_ligand that should not be constrained during the conformer generation
     """
-    # fixme - say something if the template has more than one conformer
-    template_mol = deepcopy(RMol.template)
-
-    # modify the template and remove the flexible atoms
-    # if flexible:
-    #     edit_mol = Chem.RWMol(template_mol)
-    #     # remove the flexible atoms
-    #     for idx in flexible:
-    #         edit_mol.RemoveAtom(idx)
-    #     template_mol = Chem.Mol(edit_mol)
+    scaffold_mol = deepcopy(RMol.template)
+    coreConf = scaffold_mol.GetConformer(0)
 
     # fixme - check if the conformer has H, it helps with conformer generation
     rmol = deepcopy(RMol)
 
-    # compute for each template atom to which atom it corresponds to
-    match = rmol.GetSubstructMatch(template_mol)
+    # map scaffold atoms to the new molecules
+    match = rmol.GetSubstructMatch(scaffold_mol)
     if not match:
-        raise WrongCoreForMolecule("molecule doesn't match the core")
+        raise WrongCoreForMolecule("molecule doesn't match the core", match)
 
-    # remember the coordinates
+    # remember the scaffold coordinates
     coordMap = {}
-    coreConf = template_mol.GetConformer(0)
     manmap = []
     for coreI, matchedMolI in enumerate(match):
         if matchedMolI in flexible:
@@ -73,13 +66,14 @@ def generate_conformers(
         # temp_mol = AllChem.ConstrainedEmbed(deepcopy(mol), template_mol, useTethers=False, randomseed=random.randint(1, 9e5))
         temp_mol = ConstrainedEmbedR2(
             deepcopy(rmol),
-            template_mol,
+            scaffold_mol,
             coordMap,
             match,
             manmap,
             flexible,
             randomseed=randomseed + coreI,
         )
+
         conf_idx = rmol.AddConformer(temp_mol.GetConformer(-1), assignId=True)
         if minimum_conf_rms is not None:
             if duplicate_conformers(rmol, conf_idx, rms_limit=minimum_conf_rms):
@@ -87,9 +81,8 @@ def generate_conformers(
                 rmol.RemoveConformer(conf_idx)
 
     if dup_count:
-        print(
-            f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. "
-        )
+        logger.debug(f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. ")
+
     return rmol
 
 
@@ -112,7 +105,6 @@ from rdkit.Chem.rdShapeHelpers import *
 from rdkit.Chem.rdqueries import *
 from rdkit.Chem.rdMolEnumerator import *
 from rdkit.Geometry import rdGeometry
-from rdkit.RDLogger import logger
 from rdkit.Chem.EnumerateStereoisomers import (
     StereoEnumerationOptions,
     EnumerateStereoisomers,
