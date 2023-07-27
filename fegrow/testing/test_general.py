@@ -25,7 +25,7 @@ def sars_core_scaffold():
 def test_adding_ethanol_1mol(sars_core_scaffold):
     # use a hydrogen bond N-H
     attachment_index = [7]
-    ethanol_rgroup = RGroups.loc[RGroups["Name"] == "*CCO"].Mol.values[0]
+    ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
     rmols = fegrow.build_molecules(sars_core_scaffold, [ethanol_rgroup], attachment_index)
 
     assert len(rmols) == 1, "Did not generate 1 molecule"
@@ -38,7 +38,7 @@ def test_growing_bond_oxygen(sars_core_scaffold):
     sars_core_scaffold_no_nh = emol.GetMol()
 
     attachment_index = [8]  # C-O
-    ethanol_rgroup = RGroups.loc[RGroups["Name"] == "*CCO"].Mol.values[0]
+    ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
 
     rmols = fegrow.build_molecules(sars_core_scaffold_no_nh, [ethanol_rgroup], attachment_index)
 
@@ -54,8 +54,7 @@ def test_adding_ethanol_number_of_atoms():
     attachment_index = [40]
 
     # get a group
-    groups = RGroups.dataframe
-    ethanol = groups.loc[groups["Name"] == "*CCO"]["Mol"].values[0]
+    ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
     ethanol_atoms_num = ethanol.GetNumAtoms()
 
     # merge
@@ -72,9 +71,8 @@ def test_growing_plural_groups():
     attachment_index = [40]
 
     # get r-group
-    groups = RGroups.dataframe
-    ethanol = groups.loc[groups["Name"] == "*CCO"]["Mol"].values[0]
-    cyclopropane = groups.loc[groups["Name"] == "*C1CC1"]["Mol"].values[0]
+    ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
+    cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.values[0]
 
     rmols = fegrow.build_molecules(
         template_mol, [ethanol, cyclopropane], attachment_index
@@ -91,8 +89,7 @@ def test_added_ethanol_conformer_generation():
     attachment_index = [40]
 
     # get r-group
-    groups = RGroups.dataframe
-    ethanol = groups.loc[groups["Name"] == "*CCO"]["Mol"].values[0]
+    ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
 
     rmols = fegrow.build_molecules(template_mol, [ethanol], attachment_index)
 
@@ -116,9 +113,8 @@ def test_add_a_linker_check_star():
         str(root / "data" / "sarscov2_coreh.sdf"), removeHs=False
     )[0]
     attachment_index = [40]
-    df = RLinkers.dataframe
     # Select a linker
-    linker = df.loc[df["mols2grid-id"] == 842]["Mol"].values[0]
+    linker = RLinkers[RLinkers.Name == 'R1NC(R2)=O'].Mol.values[0]
     template_with_linker = fegrow.build_molecules(
         template_mol, [linker], attachment_index
     )[0]
@@ -131,14 +127,12 @@ def test_two_linkers_two_rgroups():
     # Check combinatorial: ie 2 rgroups and 2 linkers create 4 molecles that contain both
 
     # get two R-groups
-    groups = RGroups.dataframe
-    R_group_ethanol = groups.loc[groups['Name'] == '*CCO']['Mol'].values[0]
-    R_group_cyclopropane = groups.loc[groups['Name'] == '*C1CC1']['Mol'].values[0]
+    R_group_ethanol = RGroups[RGroups.Name == '*CCO'].Mol.values[0]
+    R_group_cyclopropane = RGroups[RGroups.Name == '*C1CC1'].Mol.values[0]
 
     # get two linkers
-    df = RLinkers.dataframe
-    linker1 = df.loc[df['Name'] == 'R1CR2']['Mol'].values[0]
-    linker2 = df.loc[df['Name'] == 'R1CR2']['Mol'].values[0]
+    linker1 = RLinkers[RLinkers.Name == 'R1CR2'].Mol.values[0]
+    linker2 = RLinkers[RLinkers.Name == 'R1OR2'].Mol.values[0]
 
     built_molecules = fegrow.build_molecules([linker1, linker2], [R_group_ethanol, R_group_cyclopropane])
 
