@@ -1,25 +1,25 @@
-import logging
+import abc
 import copy
-import stat
-from typing import Optional, List, Union
+import logging
 import os
-import tempfile
-import subprocess
-import re
 from pathlib import Path
-from urllib.request import urlretrieve
+import re
+import stat
+import subprocess
+import tempfile
+from typing import List, Optional, Union
+import urllib
 
 import numpy as np
-from prody.proteins.functions import view3D
+import mols2grid
+import pandas
+import prody
 import py3Dmol
 import rdkit
 from rdkit import Chem
-from rdkit.Chem import AllChem, Draw
-from rdkit.Chem.rdMolAlign import AlignMol
-from rdkit.Chem import PandasTools
-import mols2grid
-import pandas
+from rdkit.Chem import AllChem, Draw, PandasTools
 
+from .builder import build_molecules_with_rdkit
 from .conformers import generate_conformers
 from .toxicity import tox_props
 
@@ -29,184 +29,33 @@ pandas.set_option('display.precision', 3)
 logger = logging.getLogger(__name__)
 
 
-def replace_atom(mol: Chem.Mol, target_idx: int, new_atom: int) -> Chem.Mol:
-    edit_mol = Chem.RWMol(mol)
-    for atom in edit_mol.GetAtoms():
-        if atom.GetIdx() == target_idx:
-            atom.SetAtomicNum(new_atom)
-    return Chem.Mol(edit_mol)
-
-
-def rep2D(mol, idx=-1, rdkit_mol=False, **kwargs):
-    numbered = copy.deepcopy(mol)
-    numbered.RemoveAllConformers()
-    if idx:
-        for atom in numbered.GetAtoms():
-            atom.SetAtomMapNum(atom.GetIdx())
-    AllChem.Compute2DCoords(numbered)
-
-    if rdkit_mol:
-        return numbered
-    else:
-        return Draw.MolToImage(numbered, **kwargs)
-
-
-def rep3D(mol):
-    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
-    for i in range(mol.GetNumConformers()):
-        mb = Chem.MolToMolBlock(mol, confId=i)
-        viewer.addModel(mb, "mol")
-    viewer.setStyle({"stick": {}})
-    viewer.zoomTo()
-    return viewer
-
-
-def is_linker(rmol):
-    """
-    Check if the molecule is a linker by checking if it has 2 R-group points
-    """
-    if len([atom for atom in rmol.GetAtoms() if atom.GetAtomMapNum() in (1, 2)]) == 2:
-        return True
-
-    return False
-
-
-def __getAttachmentVector(R_group):
-    """In the R-group or a linker, search for the position of the attachment point (R atom)
-    and extract the atom (currently only single bond supported). In case of the linker,
-    the R1 atom is selected.
-    rgroup: fragment passed as rdkit molecule
-    return: tuple (ratom, ratom_neighbour)
-    """
-
-    # find the R groups in the molecule
-    ratoms = [atom for atom in R_group.GetAtoms() if atom.GetAtomicNum() == 0]
-    if not len(ratoms):
-        raise Exception(
-            "The R-group does not have R-atoms (Atoms with index == 0, visualised with a '*' character)"
-        )
-
-    # if it is a linker, it will have more than 1 R group, pick the one with index 1
-    if len(ratoms) == 1:
-        atom = ratoms[0]
-    elif is_linker(R_group):
-        # find the attachable point
-        ratoms = [atom for atom in ratoms if atom.GetAtomMapNum() == 1]
-        atom = ratoms[0]
-    else:
-        raise Exception(
-            "Either missing R-atoms, or more than two R-atoms. "
-            '"Atom.GetAtomicNum" should be 0 for the R-atoms, and in the case of the linker,  '
-            '"Atom.GetAtomMapNum" has to specify the order (1,2) '
-        )
-
-    neighbours = atom.GetNeighbors()
-    if len(neighbours) > 1:
-        raise NotImplementedError(
-            "The linking R atom in the R group has two or more attachment points. "
-        )
-
-    return atom, neighbours[0]
-
-
-def merge_R_group(scaffold, RGroup, replace_index):
-    """function originally copied from
-    https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py
-    """
-
-    # the linking R atom on the R group
-    # fixme: attempt to do the same on the template if replace index is not provided
-    rgroup_R_atom, R_atom_neighbour = __getAttachmentVector(RGroup)
-
-    # atom to be replaced in the scaffold
-    atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
-    if len(atom_to_replace.GetNeighbors()) != 1:
-        raise NotImplementedError(f"The atom being replaced (ID={atom_to_replace.GetIdx()}, Element={atom_to_replace.GetAtomicNum()}) "
-                        f"on the molecule has more neighbour atoms than 1. Not supported.")
-
-    hook = atom_to_replace.GetNeighbors()[0]
-
-    # align the Rgroup
-    AlignMol(
-        RGroup,
-        scaffold,
-        atomMap=(
-            (R_atom_neighbour.GetIdx(), atom_to_replace.GetIdx()),
-            (rgroup_R_atom.GetIdx(), hook.GetIdx()),
-        ),
-    )
-
-    # merge
-    combined = Chem.CombineMols(scaffold, RGroup)
-    emol = Chem.EditableMol(combined)
-
-    # connect
-    bond_order = rgroup_R_atom.GetBonds()[0].GetBondType()
-    emol.AddBond(
-        hook.GetIdx(),
-        R_atom_neighbour.GetIdx() + scaffold.GetNumAtoms(),
-        order=bond_order,
-    )
-    # -1 accounts for the removed linking atom on the template
-    emol.RemoveAtom(rgroup_R_atom.GetIdx() + scaffold.GetNumAtoms())
-    # remove the linking atom on the template
-    emol.RemoveAtom(atom_to_replace.GetIdx())
-
-    merged = emol.GetMol()
-    Chem.SanitizeMol(merged)
-
-    # use only the best/first conformer
-    for c in list(merged.GetConformers())[1:]:
-        merged.RemoveConformer(c.GetId())
-
-    # bookkeeping about scaffolding
-    etemp = Chem.EditableMol(scaffold)
-    etemp.RemoveAtom(atom_to_replace.GetIdx())
-    template = etemp.GetMol()
-
-    with_template = RMol(merged)
-    with_template._save_template(template)
-    # save the group
-    with_template._save_rgroup(RGroup)
-
-    if is_linker(RGroup):
-        # update the linker so that there is an attachment point left for the future
-        # atom in the linker with a label=1 was used for the merging
-        # rename label=2 to 0 to turn it into a simple R-group
-        for atom in with_template.GetAtoms():
-            if atom.GetAtomMapNum() == 2:
-                atom.SetAtomMapNum(0)
-
-    return with_template
-
-
-def ic50(x):
-    return 10 ** (-x - -9)
-
-
-class RInterface:
+class RInterface():
     """
     This is a shared interface for a molecule and a list of molecules.
 
     The main purpose is to allow using the same functions on a single molecule and on a group of them.
     """
 
+    @abc.abstractmethod
     def rep2D(self, **kwargs):
-        pass
+        ...
 
+    @abc.abstractmethod
     def toxicity(self):
         pass
 
+    @abc.abstractmethod
     def generate_conformers(
         self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
     ):
         pass
 
+    @abc.abstractmethod
     def remove_clashing_confs(self, prot, min_dst_allowed=1):
         pass
 
 
-class RMol(rdkit.Chem.rdchem.Mol, RInterface):
+class RMol(RInterface, rdkit.Chem.rdchem.Mol):
     """
     RMol is essentially a wrapper around RDKit Mol with
     tailored functionalities for attaching R groups, etc.
@@ -237,9 +86,6 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
     def _save_template(self, mol):
         self.template = RMol(copy.deepcopy(mol))
-
-    def _save_rgroup(self, rgroup):
-        self.rgroup = rgroup
 
     def _save_opt_energies(self, energies):
         self.opt_energies = energies
@@ -381,7 +227,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         return rep2D(self, **kwargs)
 
     def rep3D(
-        self, view=None, prody=None, template=False, confIds: Optional[List[int]] = None
+        self, view=None, prody_protein=None, template=False, confIds: Optional[List[int]] = None
     ):
         """
         Use py3Dmol to obtain the 3D view of the molecule.
@@ -391,15 +237,15 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         :param view: a view to which add the visualisation. Useful if one wants to 3D view
             multiple conformers in one view.
         :type view: py3Dmol view instance (None)
-        :param prody: A prody protein around which a view 3D can be created
+        :param prody_protein: A prody protein around which a view 3D can be created
         :type prody: Prody instance (Default: None)
         :param template: Whether to visualise the original 3D template as well from which the molecule was made.
         :type template: bool (False)
         :param confIds: Select the conformations for display.
         :type confIds: List[int]
         """
-        if prody is not None:
-            view = view3D(prody)
+        if prody_protein is not None:
+            view = prody.proteins.functions.view3D(prody_protein)
 
         if view is None:
             view = py3Dmol.view(width=400, height=400, viewergrid=(1, 1))
@@ -498,7 +344,7 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         print(f"Gnina not found or set. Download gnina (~500MB) into {RMol.gnina_dir}")
         gnina = os.path.join(RMol.gnina_dir, "gnina")
         # fixme - currently download to the working directory (Home could be more applicable).
-        urlretrieve(
+        urllib.request.urlretrieve(
             "https://github.com/gnina/gnina/releases/download/v1.0.1/gnina",
             filename=gnina,
         )
@@ -553,6 +399,9 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
 
         # convert to floats
         CNNaffinities = list(map(float, CNNaffinities_str))
+
+        def ic50(x):
+            return 10 ** (-x - -9)
 
         # generate IC50 from the CNNaffinities
         ic50s = list(map(ic50, CNNaffinities))
@@ -635,138 +484,6 @@ class RMol(rdkit.Chem.rdchem.Mol, RInterface):
         return df._repr_html_()
 
 
-class RGroupGrid(mols2grid.MolGrid):
-    """
-    A wrapper around the mols to grid class to load and process the r group folders locally.
-    """
-
-    def __init__(self):
-        dataframe = RGroupGrid._load_molecules()
-
-        super(RGroupGrid, self).__init__(
-            dataframe, removeHs=True, mol_col="Mol", use_coords=False, name="m2"
-        )
-
-    @staticmethod
-    def _load_molecules() -> pandas.DataFrame:
-        """
-        Load the local r groups into rdkit molecules
-        """
-        molecules = []
-        names = []
-
-        builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
-        for rgroup in Chem.SDMolSupplier(str(builtin_rgroups), removeHs=False):
-            molecules.append(rgroup)
-            names.append(rgroup.GetProp('SMILES'))
-
-            # highlight the attachment atom
-            for atom in rgroup.GetAtoms():
-                if atom.GetAtomicNum() == 0:
-                    setattr(rgroup, "__sssAtoms", [atom.GetIdx()])
-
-        return pandas.DataFrame({"Mol": molecules, "Name": names})
-
-    def _ipython_display_(self):
-        from IPython.display import display, update_display, display_html
-
-        subset = ["img", "Name", "mols2grid-id"]
-        display_html(self.display(subset=subset, substruct_highlight=True))
-
-    def get_selected(self):
-        # use the new API
-        df = self.get_selection()
-        # now get a list of the molecules
-        return list(df["Mol"])
-
-
-class RLinkerGrid(mols2grid.MolGrid):
-    """
-    A wrapper around the mols to grid class to load and process the linker folders locally.
-    """
-
-    def __init__(self):
-        dataframe = RLinkerGrid._load_molecules()
-
-        super(RLinkerGrid, self).__init__(
-            dataframe,
-            removeHs=True,
-            mol_col="Mol",
-            use_coords=False,
-            name="m1",
-            prerender=False,
-        )
-
-    @staticmethod
-    def _load_molecules() -> pandas.DataFrame:
-        """
-        Load the local linkers into rdkit molecules
-        """
-
-        # note that the linkers are pre-sorted so that:
-        #  - [R1]C[R2] is next to [R2]C[R1]
-        #  - according to how common they are (See the original publication) as described with SmileIndex
-        builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
-
-        linkers = []
-        for mol in Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False):
-            # use easier searchable SMILES, e.g. [*:1] was replaced with R1
-            display_name = mol.GetProp('display_smiles')
-
-            # extract the index property from the original publication
-            smile_index = mol.GetIntProp("SmileIndex")
-
-            linkers.append([mol, display_name, smile_index])
-
-        return pandas.DataFrame(linkers, columns=['Mol', 'Name', 'Common'])
-
-    def _ipython_display_(self):
-        from IPython.display import display
-
-        subset = ["img", "Name", "mols2grid-id"]
-        return display(self.display(subset=subset, substruct_highlight=True))
-
-    def get_selected(self):
-        # use the new API
-        df = self.get_selection()
-        # now get a list of the molecules
-        return list(df["Mol"])
-
-
-def link(Rgroups, Rlinkers, One2One=False):
-    """
-
-    :param Rgroups:
-    :param Rlinkers:
-    :param One2One: If True, for each selected RGroup, a selected linker with the same index is added.
-        Alternatively, each linker is added to each RGroup resulting in n x m number of combinsions, with n being
-        the number of RGroups and m the number of linkers.
-    :return:
-    """
-
-    # convert rgroups/linkers to smiles
-    rgroup_smiles = [Chem.MolToSmiles(mol) for mol in Rgroups]
-    linker_smiles = [Chem.MolToSmiles(mol) for mol in Rlinkers]
-
-    # loop over and combine smiles
-    combined = []
-    if One2One:
-        for linker, rgroup in zip(linker_smiles, rgroup_smiles):
-            combined.append(rgroup.replace("*", "*" + linker))
-    else:
-        for linker in linker_smiles:
-            for rgroup in rgroup_smiles:
-                combined.append(rgroup.replace("*", "*" + linker))
-
-    # generate 3D conformers for each molecule
-    mols = []
-    for smile in combined:
-        mol = Chem.MolFromSmiles(smile)
-        AllChem.EmbedMultipleConfs(mol, numConfs=1, params=AllChem.ETKDGv3())
-        mols.append(mol)
-    return mols
-
-
 class RList(RInterface, list):
     """
     Streamline working with RMol by presenting the same interface on the list,
@@ -784,7 +501,7 @@ class RList(RInterface, list):
             return
 
         # add a column with the visualisation
-        PandasTools.AddMoleculeColumnToFrame(
+        Chem.PandasTools.AddMoleculeColumnToFrame(
             df, "Smiles", "Molecule", includeFingerprints=True
         )
 
@@ -869,78 +586,132 @@ class RList(RInterface, list):
         return df._repr_html_()
 
 
+class RGroupGrid(mols2grid.MolGrid):
+    """
+    A wrapper around the mols to grid class to load and process the r group folders locally.
+    """
+
+    def __init__(self):
+        dataframe = RGroupGrid._load_molecules()
+
+        super(RGroupGrid, self).__init__(
+            dataframe, removeHs=True, mol_col="Mol", use_coords=False, name="m2"
+        )
+
+    @staticmethod
+    def _load_molecules() -> pandas.DataFrame:
+        """
+        Load the library RGroups
+        """
+        molecules = []
+        names = []
+
+        builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
+        for rgroup in Chem.SDMolSupplier(str(builtin_rgroups), removeHs=False):
+            molecules.append(rgroup)
+            names.append(rgroup.GetProp('SMILES'))
+
+            # highlight the attachment atom
+            for atom in rgroup.GetAtoms():
+                if atom.GetAtomicNum() == 0:
+                    setattr(rgroup, "__sssAtoms", [atom.GetIdx()])
+
+        return pandas.DataFrame({"Mol": molecules, "Name": names})
+
+    def _ipython_display_(self):
+        from IPython.display import display_html
+        subset = ["img", "Name", "mols2grid-id"]
+        display_html(self.display(subset=subset, substruct_highlight=True))
+
+    def get_selected(self):
+        df = self.get_selection()
+        return list(df["Mol"])
+
+
+class RLinkerGrid(mols2grid.MolGrid):
+    """
+    A wrapper around the mols to grid class to load and process the linker folders locally.
+    """
+
+    def __init__(self):
+        dataframe = RLinkerGrid._load_molecules()
+
+        super(RLinkerGrid, self).__init__(
+            dataframe,
+            removeHs=True,
+            mol_col="Mol",
+            use_coords=False,
+            name="m1",
+            prerender=False,
+        )
+
+    @staticmethod
+    def _load_molecules() -> pandas.DataFrame:
+        """
+        Load the library linkers
+        """
+
+        # note that the linkers are pre-sorted so that:
+        #  - [R1]C[R2] is next to [R2]C[R1]
+        #  - according to how common they are (See the original publication) as described with SmileIndex
+        builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
+
+        linkers = []
+        for mol in Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False):
+            # use easier searchable SMILES, e.g. [*:1] was replaced with R1
+            display_name = mol.GetProp('display_smiles')
+
+            # extract the index property from the original publication
+            smile_index = mol.GetIntProp("SmileIndex")
+
+            linkers.append([mol, display_name, smile_index])
+
+        return pandas.DataFrame(linkers, columns=['Mol', 'Name', 'Common'])
+
+    def _ipython_display_(self):
+        from IPython.display import display
+        subset = ["img", "Name", "mols2grid-id"]
+        return display(self.display(subset=subset, substruct_highlight=True))
+
+    def get_selected(self):
+        df = self.get_selection()
+        return list(df["Mol"])
+
+
 def build_molecules(
-    templates: Union[Chem.Mol, List[Chem.Mol]],
-    r_groups: Union[Chem.Mol, List[Chem.Mol], int],
-    attachment_points: Optional[List[int]] = None,
+        templates: Union[Chem.Mol, List[Chem.Mol]],
+        r_groups: Union[Chem.Mol, List[Chem.Mol], int],
+        attachment_points: Optional[List[int]] = None,
 ):
-    """
-    For the given core molecule and list of attachment points
-     and r groups enumerate the possible molecules and
-     return a list of them.
+    built_mols = build_molecules_with_rdkit(templates, r_groups, attachment_points)
+    rlist = RList()
+    for mol, scaffold_no_attachement in built_mols:
+        rmol = RMol(mol)
+        rmol._save_template(scaffold_no_attachement)
+        rlist.append(rmol)
 
-    :param template: The core scaffold molecule to attach the r groups to, or a list of them.
-    :param r_group: The list of rdkit molecules which should be considered
-      r groups or the RGroup Grid with highlighted molecules.
-    :param attachment_points: The list of atom index in the core ligand
-      that the r groups should be attached to. If it is empty, connecting points are sought out and matched.
-    """
+    return rlist
 
-    # fixme - special case after changing the API: remove in the future
-    # This is a temporary warning about the change in the interface.
-    # This change is because there are situations where the attachment_points do not need to be passed to the function.
-    if (
-        isinstance(r_groups, list)
-        and len(r_groups) > 0
-        and isinstance(r_groups[0], int)
-    ):
-        print(
-            'Warning: second argument is detected to be an integer. It is now "r_groups" '
-            "whereas attachement_points are provided as the 3rd argument. "
-        )
-        raise Exception(
-            "Please note that after adding the linker to FEgrow (version 1.1), "
-            'the "build_molecules" function interface has changed to'
-            ' "build_molecules(core_ligand, r_groups, attachment_points)". '
-        )
 
-    # ensure template and r_group are lists
-    if not issubclass(templates.__class__, List):
-        templates = [templates]
-    if not issubclass(r_groups.__class__, List):
-        r_groups = [r_groups]
+def rep2D(mol, idx=-1, rdkit_mol=False, **kwargs):
+    numbered = copy.deepcopy(mol)
+    numbered.RemoveAllConformers()
+    if idx:
+        for atom in numbered.GetAtoms():
+            atom.SetAtomMapNum(atom.GetIdx())
+    AllChem.Compute2DCoords(numbered)
 
-    # make a deep copy of r_groups/linkers to ensure we don't modify the library
-    templates = [copy.deepcopy(mol) for mol in templates]
-    r_groups = [copy.deepcopy(mol) for mol in r_groups]
+    if rdkit_mol:
+        return numbered
+    else:
+        return Draw.MolToImage(numbered, **kwargs)
 
-    # get attachment points for each template
-    if not attachment_points:
-        # attempt to generate the attachment points by picking the joining molecule
-        # case: a list of templates previously joined with linkers requires iterating over them
-        attachment_points = [__getAttachmentVector(lig)[0].GetIdx() for lig in templates]
 
-    if not attachment_points:
-        raise Exception("Could not find attachement points. ")
-
-    if len(attachment_points) != len(templates):
-        raise Exception(
-            f"There must be one attachment point for each template. "
-            f"Provided attachement points = {len(attachment_points)} "
-            f"with templates number: {len(templates)}"
-        )
-
-    combined_mols = RList()
-    id_counter = 0
-    for atom_idx, core_ligand in zip(attachment_points, templates):
-        for r_mol in r_groups:
-            core_mol = RMol(copy.deepcopy(core_ligand))
-            merged_mol = merge_R_group(
-                scaffold=core_mol, RGroup=r_mol, replace_index=atom_idx
-            )
-            # assign the identifying index to the molecule
-            merged_mol.id = id_counter
-            combined_mols.append(merged_mol)
-            id_counter += 1
-
-    return combined_mols
+def rep3D(mol):
+    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
+    for i in range(mol.GetNumConformers()):
+        mb = Chem.MolToMolBlock(mol, confId=i)
+        viewer.addModel(mb, "mol")
+    viewer.setStyle({"stick": {}})
+    viewer.zoomTo()
+    return viewer

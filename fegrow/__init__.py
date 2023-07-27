@@ -6,10 +6,8 @@ from .package import (
     RMol,
     rep2D,
     build_molecules,
-    ic50,
     RGroupGrid,
     RLinkerGrid,
-    link,
 )
 from .receptor import (
     fix_receptor,
@@ -31,9 +29,7 @@ __all__ = [
     sort_conformers,
     RGroupGrid,
     RLinkerGrid,
-    link,
     build_molecules,
-    ic50,
     __version__,
     WrongCoreForMolecule
 ]
