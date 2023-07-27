@@ -1,30 +1,46 @@
 import pathlib
+import pytest
 
-from rdkit import Chem
 import fegrow
 from fegrow import RGroupGrid, RLinkerGrid
+from rdkit import Chem
 
 
 # instantiate the libraries
-RGroups = RGroupGrid()
-RLinkers = RLinkerGrid()
+RGroups = RGroupGrid._load_molecules()
+RLinkers = RLinkerGrid._load_molecules()
 
 root = pathlib.Path(__file__).parent
 
 
-def test_adding_ethanol_1mol():
-    # Check if adding one group to a molecule creates just one molecule.
-    template_mol = Chem.SDMolSupplier(
-        str(root / "data" / "sarscov2_coreh.sdf"), removeHs=False
-    )[0]
-    attachment_index = [40]
+@pytest.fixture
+def sars_core_scaffold():
+    params = Chem.SmilesParserParams()
+    params.removeHs = False  # keep the hydrogens
+    scaffold = Chem.MolFromSmiles('[H]c1c([H])c([H])n([H])c(=O)c1[H]', params=params)
+    Chem.AllChem.Compute2DCoords(scaffold)
+    return scaffold
 
-    # get a group
-    groups = RGroups.dataframe
-    ethanol = groups.loc[groups["Name"] == "*CCO"]["Mol"].values[0]
 
-    # merge
-    rmols = fegrow.build_molecules(template_mol, [ethanol], attachment_index)
+def test_adding_ethanol_1mol(sars_core_scaffold):
+    # use a hydrogen bond N-H
+    attachment_index = [7]
+    ethanol_rgroup = RGroups.loc[RGroups["Name"] == "*CCO"].Mol.values[0]
+    rmols = fegrow.build_molecules(sars_core_scaffold, [ethanol_rgroup], attachment_index)
+
+    assert len(rmols) == 1, "Did not generate 1 molecule"
+
+
+def test_growing_bond_oxygen(sars_core_scaffold):
+    # deprotonate N to enable kekulization of the molecule
+    emol = Chem.EditableMol(sars_core_scaffold)
+    emol.RemoveAtom(7)
+    sars_core_scaffold_no_nh = emol.GetMol()
+
+    attachment_index = [8]  # C-O
+    ethanol_rgroup = RGroups.loc[RGroups["Name"] == "*CCO"].Mol.values[0]
+
+    rmols = fegrow.build_molecules(sars_core_scaffold_no_nh, [ethanol_rgroup], attachment_index)
 
     assert len(rmols) == 1, "Did not generate 1 molecule"
 
@@ -55,12 +71,11 @@ def test_growing_plural_groups():
     )[0]
     attachment_index = [40]
 
-    # get a group
+    # get r-group
     groups = RGroups.dataframe
     ethanol = groups.loc[groups["Name"] == "*CCO"]["Mol"].values[0]
     cyclopropane = groups.loc[groups["Name"] == "*C1CC1"]["Mol"].values[0]
 
-    # merge
     rmols = fegrow.build_molecules(
         template_mol, [ethanol, cyclopropane], attachment_index
     )
@@ -75,17 +90,14 @@ def test_added_ethanol_conformer_generation():
     )[0]
     attachment_index = [40]
 
-    # get a group
+    # get r-group
     groups = RGroups.dataframe
     ethanol = groups.loc[groups["Name"] == "*CCO"]["Mol"].values[0]
 
-    # merge
     rmols = fegrow.build_molecules(template_mol, [ethanol], attachment_index)
 
-    # generate conformers
     rmols.generate_conformers(num_conf=20, minimum_conf_rms=0.1)
 
-    # there should be multiple conformers
     assert rmols[0].GetNumConformers() > 2
 
 

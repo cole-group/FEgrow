@@ -54,7 +54,7 @@ def build_molecules_with_rdkit(
     if not attachment_points:
         # attempt to generate the attachment points by picking the joining molecule
         # case: a list of templates previously joined with linkers requires iterating over them
-        attachment_points = [__getAttachmentVector(lig)[0].GetIdx() for lig in templates]
+        attachment_points = [get_attachment_vector(lig)[0].GetIdx() for lig in templates]
 
     if not attachment_points:
         raise Exception("Could not find attachement points. ")
@@ -89,7 +89,7 @@ def merge_R_group(scaffold, RGroup, replace_index):
 
     # the linking R atom on the R group
     # fixme: attempt to do the same on the template if replace index is not provided
-    rgroup_R_atom, R_atom_neighbour = __getAttachmentVector(RGroup)
+    rgroup_R_atom, R_atom_neighbour = get_attachment_vector(RGroup)
 
     # atom to be replaced in the scaffold
     atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
@@ -148,7 +148,7 @@ def merge_R_group(scaffold, RGroup, replace_index):
     return merged, scaffold_no_attachement
 
 
-def __getAttachmentVector(R_group):
+def get_attachment_vector(R_group):
     """In the R-group or a linker, search for the position of the attachment point (R atom)
     and extract the atom (currently only single bond supported). In case of the linker,
     the R1 atom is selected.

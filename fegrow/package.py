@@ -17,7 +17,7 @@ import prody
 import py3Dmol
 import rdkit
 from rdkit import Chem
-from rdkit.Chem import AllChem, Draw, PandasTools
+from rdkit.Chem import Draw, PandasTools
 
 from .builder import build_molecules_with_rdkit
 from .conformers import generate_conformers
@@ -699,7 +699,7 @@ def rep2D(mol, idx=-1, rdkit_mol=False, **kwargs):
     if idx:
         for atom in numbered.GetAtoms():
             atom.SetAtomMapNum(atom.GetIdx())
-    AllChem.Compute2DCoords(numbered)
+    Chem.AllChem.Compute2DCoords(numbered)
 
     if rdkit_mol:
         return numbered
