@@ -33,8 +33,8 @@ def test_adding_ethanol_1mol(sars_core_scaffold):
 
 def test_growing_keep_larger_component(sars_core_scaffold):
     """
-     When a growing vector is a random internal atom, the molecule is divided using that atom,
-     and the largest component becomes the scaffold.
+     When a growing vector is an internal atom that divides the molecule,
+     the largest component becomes the scaffold.
     """
     scaffold = Chem.MolFromSmiles('O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1')
     Chem.AddHs(scaffold)
@@ -46,6 +46,26 @@ def test_growing_keep_larger_component(sars_core_scaffold):
     rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index).pop()
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == 'O=c1c(CCO)cccn1-c1cccnc1'
+
+
+def test_growing_keep_cue_component(sars_core_scaffold):
+    """
+     When a growing vector is an atom that divides the molecule,
+     the user can specify which side to keep.
+
+     Keep the smaller chlorinated benzene ring for growing ethanol
+    """
+    scaffold = Chem.MolFromSmiles('O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1')
+    Chem.AddHs(scaffold)
+    Chem.AllChem.Compute2DCoords(scaffold)
+
+    # use C on the chlorinated benzene
+    attachment_index = [2]
+    keep_smaller_ring = [3]
+    ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
+    rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index, keep_smaller_ring).pop()
+
+    assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == 'OCCc1cccc(Cl)c1'
 
 
 def test_adding_ethanol_number_of_atoms():

@@ -1,4 +1,5 @@
 import copy
+import itertools
 import logging
 from typing import List, Optional, Union
 
@@ -13,6 +14,7 @@ def build_molecules_with_rdkit(
     templates: Union[Chem.Mol, List[Chem.Mol]],
     r_groups: Union[Chem.Mol, List[Chem.Mol], int],
     attachment_points: Optional[List[int]] = None,
+    keep_components: Optional[List[int]] = None,
 ):
     """
     For the given core molecule and list of attachment points
@@ -25,6 +27,9 @@ def build_molecules_with_rdkit(
     :param attachment_points: The list of atom index in the core ligand
       that the r groups should be attached to. If it is empty, connecting points are sought out and matched.
     """
+
+    if keep_components is None:
+        keep_components = []
 
     # fixme - special case after changing the API: remove in the future
     # This is a temporary warning about the change in the interface.
@@ -72,11 +77,12 @@ def build_molecules_with_rdkit(
 
     combined_mols = []
     id_counter = 0
-    for atom_idx, scaffold_ligand in zip(attachment_points, templates):
+    for atom_idx, scaffold_ligand, keep_submolecule_cue in \
+            itertools.zip_longest(attachment_points, templates, keep_components, fillvalue=None):
         for r_mol in r_groups:
             scaffold_mol = copy.deepcopy(scaffold_ligand)
             merged_mol, scaffold_no_attachement = merge_R_group(
-                scaffold=scaffold_mol, RGroup=r_mol, replace_index=atom_idx
+                scaffold=scaffold_mol, RGroup=r_mol, replace_index=atom_idx, keep_cue_idx=keep_submolecule_cue
             )
             # assign the identifying index to the molecule
             merged_mol.id = id_counter
@@ -122,10 +128,20 @@ def split(molecule, splitting_atom, keep_neighbour_idx=None):
     edit_scaffold = Chem.EditableMol(molecule)
     for idx in sorted(list(atom_ids_for_removal), reverse=True):
         edit_scaffold.RemoveAtom(idx)
-    return edit_scaffold.GetMol()
+    scaffold = edit_scaffold.GetMol()
+
+    kept_atoms = [a for a in molecule.GetAtoms() if a.GetIdx() not in atom_ids_for_removal]
+    scaffold_elements = [a for a in scaffold.GetAtoms()]
+
+    # removing atoms changes the IDs of the atoms that remain
+    if [a.GetAtomicNum() for a in kept_atoms] != [a.GetAtomicNum() for a in scaffold_elements]:
+        raise Exception('The assumption that the modified molecule will keep the atoms in the same order is false. '
+                        'Please get in touch with the FEgrow maintainers. ')
+    idx_map = dict(zip([a.GetIdx() for a in kept_atoms], [a.GetIdx() for a in scaffold_elements]))
+    return scaffold, idx_map
 
 
-def merge_R_group(scaffold, RGroup, replace_index, remain_cue_idx=None):
+def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
     """function originally copied from
     https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py
     """
@@ -139,7 +155,8 @@ def merge_R_group(scaffold, RGroup, replace_index, remain_cue_idx=None):
     if len(atom_to_replace.GetNeighbors()) == 1:
         hook = atom_to_replace.GetNeighbors()[0]
     elif len(atom_to_replace.GetNeighbors()) != 1:
-        scaffold = split(scaffold, atom_to_replace, remain_cue_idx)
+        scaffold, idx_map = split(scaffold, atom_to_replace, keep_cue_idx)
+        replace_index = idx_map[replace_index]
         atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
         hook = atom_to_replace.GetNeighbors()[0]
         # raise NotImplementedError(f"The atom being replaced (ID={atom_to_replace.GetIdx()}, Element={atom_to_replace.GetAtomicNum()}) "

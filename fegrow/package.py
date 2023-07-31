@@ -682,8 +682,18 @@ def build_molecules(
         templates: Union[Chem.Mol, List[Chem.Mol]],
         r_groups: Union[Chem.Mol, List[Chem.Mol], int],
         attachment_points: Optional[List[int]] = None,
+        keep_components: Optional[List[int]] = None,
 ):
-    built_mols = build_molecules_with_rdkit(templates, r_groups, attachment_points)
+    """
+
+    :param templates:
+    :param r_groups:
+    :param attachment_points:
+    :param keep_components: When the scaffold is grown from an internal atom that divides the molecules into separate
+        submolecules, keep the submolecule with this atom index.
+    :return:
+    """
+    built_mols = build_molecules_with_rdkit(templates, r_groups, attachment_points, keep_components)
     rlist = RList()
     for mol, scaffold_no_attachement in built_mols:
         rmol = RMol(mol)
