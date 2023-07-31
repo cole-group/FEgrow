@@ -1,9 +1,13 @@
 import copy
+import logging
 from typing import List, Optional, Union
 
+import networkx
 from rdkit import Chem
 from rdkit.Chem.rdMolAlign import AlignMol
 
+
+logger = logging.getLogger(__name__)
 
 def build_molecules_with_rdkit(
     templates: Union[Chem.Mol, List[Chem.Mol]],
@@ -82,7 +86,46 @@ def build_molecules_with_rdkit(
     return combined_mols
 
 
-def merge_R_group(scaffold, RGroup, replace_index):
+def split(molecule, splitting_atom, keep_neighbour_idx=None):
+    """
+    Return the smaller part of the molecule or one that that contains the prespecified atom.
+
+    :param molecule: RDKit Molecule
+    :param splitting_atom: RDKit Atom, the growing vector used to divide the molecule into submolecules.
+    :param splitting_atom: The index of the neighbouring atom on the side of the molecule that should be kept
+        as the scaffold.
+    :return:
+    """
+    G = networkx.from_numpy_array(Chem.GetAdjacencyMatrix(molecule, useBO=False))
+    G.remove_node(splitting_atom.GetIdx())
+
+    connected_components = list(networkx.connected_components(G))
+    if len(connected_components) != 2:
+        raise ValueError(f'The molecule is not divided into two separate components '
+                        f'with the Atom ID={splitting_atom.GetIdx()}, so we cannot decide which component to remove. ')
+
+    if keep_neighbour_idx in connected_components[1]:
+        atom_ids_for_removal = connected_components[0]
+    elif keep_neighbour_idx in connected_components[0]:
+        atom_ids_for_removal = connected_components[1]
+    else:
+        # keep the larger side of the molecule
+        if len(connected_components[0]) == len(connected_components[1]):
+            raise ValueError(f'The molecule has two equally sized separated components, '
+                             f'and it is not clear which one to keep, please use "keep_neighbour_idx" '
+                             f'to mark the size of the molecule that should be used as the scaffold.')
+
+        logger.info('User has not selected manually which side of the molecule to keep. Selecting the larger side. ')
+        atom_ids_for_removal, _ = sorted(connected_components, key=len)
+
+    # remove the unwanted component
+    edit_scaffold = Chem.EditableMol(molecule)
+    for idx in sorted(list(atom_ids_for_removal), reverse=True):
+        edit_scaffold.RemoveAtom(idx)
+    return edit_scaffold.GetMol()
+
+
+def merge_R_group(scaffold, RGroup, replace_index, remain_cue_idx=None):
     """function originally copied from
     https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py
     """
@@ -93,11 +136,14 @@ def merge_R_group(scaffold, RGroup, replace_index):
 
     # atom to be replaced in the scaffold
     atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
-    if len(atom_to_replace.GetNeighbors()) != 1:
-        raise NotImplementedError(f"The atom being replaced (ID={atom_to_replace.GetIdx()}, Element={atom_to_replace.GetAtomicNum()}) "
-                        f"on the molecule has more neighbour atoms than 1. Not supported.")
-
-    hook = atom_to_replace.GetNeighbors()[0]
+    if len(atom_to_replace.GetNeighbors()) == 1:
+        hook = atom_to_replace.GetNeighbors()[0]
+    elif len(atom_to_replace.GetNeighbors()) != 1:
+        scaffold = split(scaffold, atom_to_replace, remain_cue_idx)
+        atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
+        hook = atom_to_replace.GetNeighbors()[0]
+        # raise NotImplementedError(f"The atom being replaced (ID={atom_to_replace.GetIdx()}, Element={atom_to_replace.GetAtomicNum()}) "
+        #                 f"on the molecule has more neighbour atoms than 1. Not supported.")
 
     # align the Rgroup
     AlignMol(
@@ -133,9 +179,9 @@ def merge_R_group(scaffold, RGroup, replace_index):
         merged.RemoveConformer(c.GetId())
 
     # bookkeeping about scaffolding
-    etemp = Chem.EditableMol(scaffold)
-    etemp.RemoveAtom(atom_to_replace.GetIdx())
-    scaffold_no_attachement = etemp.GetMol()
+    edit_scaffold = Chem.EditableMol(scaffold)
+    edit_scaffold.RemoveAtom(atom_to_replace.GetIdx())
+    scaffold_no_attachement = edit_scaffold.GetMol()
 
     if is_linker(RGroup):
         # update the linker so that there is an attachment point left for the future

@@ -5,6 +5,7 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
  - ANI in some cases explodes. Remove the bad conformers with bonds that have lengths larger than 3A.
  - The user now has to import the libraries (RGroupGrid) and instantiate first.
  - Libraries (linkers, rgroups) are now single .sdf files to avoid problems on clusters with many small files
+ - A growing vector can now be any molecule-separating atom in the molecule.
 
 **version 1.3.0**
 

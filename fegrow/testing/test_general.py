@@ -31,18 +31,21 @@ def test_adding_ethanol_1mol(sars_core_scaffold):
     assert len(rmols) == 1, "Did not generate 1 molecule"
 
 
-def test_growing_bond_oxygen(sars_core_scaffold):
-    # deprotonate N to enable kekulization of the molecule
-    emol = Chem.EditableMol(sars_core_scaffold)
-    emol.RemoveAtom(7)
-    sars_core_scaffold_no_nh = emol.GetMol()
+def test_growing_keep_larger_component(sars_core_scaffold):
+    """
+     When a growing vector is a random internal atom, the molecule is divided using that atom,
+     and the largest component becomes the scaffold.
+    """
+    scaffold = Chem.MolFromSmiles('O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1')
+    Chem.AddHs(scaffold)
+    Chem.AllChem.Compute2DCoords(scaffold)
 
-    attachment_index = [8]  # C-O
+    # use C on the chlorinated benzene
+    attachment_index = [3]
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
+    rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index).pop()
 
-    rmols = fegrow.build_molecules(sars_core_scaffold_no_nh, [ethanol_rgroup], attachment_index)
-
-    assert len(rmols) == 1, "Did not generate 1 molecule"
+    assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == 'O=c1c(CCO)cccn1-c1cccnc1'
 
 
 def test_adding_ethanol_number_of_atoms():
