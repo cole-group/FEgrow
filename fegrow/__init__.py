@@ -9,11 +9,7 @@ from .package import (
     RGroupGrid,
     RLinkerGrid,
 )
-from .receptor import (
-    fix_receptor,
-    optimise_in_receptor,
-    sort_conformers
-)
+from .receptor import fix_receptor, optimise_in_receptor, sort_conformers
 from .toxicity import tox_props
 
 # get the version
@@ -31,5 +27,5 @@ __all__ = [
     RLinkerGrid,
     build_molecules,
     __version__,
-    WrongCoreForMolecule
+    WrongCoreForMolecule,
 ]
