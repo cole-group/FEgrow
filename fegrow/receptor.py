@@ -190,7 +190,9 @@ def optimise_in_receptor(
     )
 
     # save the receptor coords as they should be consistent
-    receptor_coords = unit.Quantity(parmed_receptor.coordinates.tolist(), unit=unit.angstrom)
+    receptor_coords = unit.Quantity(
+        parmed_receptor.coordinates.tolist(), unit=unit.angstrom
+    )
 
     # loop over the conformers and energy minimise and store the final positions
     final_mol = RMol(deepcopy(ligand))
