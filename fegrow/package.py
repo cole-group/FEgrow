@@ -24,12 +24,12 @@ from .conformers import generate_conformers
 from .toxicity import tox_props
 
 # default options
-pandas.set_option('display.precision', 3)
+pandas.set_option("display.precision", 3)
 
 logger = logging.getLogger(__name__)
 
 
-class RInterface():
+class RInterface:
     """
     This is a shared interface for a molecule and a list of molecules.
 
@@ -227,7 +227,11 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         return rep2D(self, **kwargs)
 
     def rep3D(
-        self, view=None, prody_protein=None, template=False, confIds: Optional[List[int]] = None
+        self,
+        view=None,
+        prody_protein=None,
+        template=False,
+        confIds: Optional[List[int]] = None,
     ):
         """
         Use py3Dmol to obtain the 3D view of the molecule.
@@ -292,14 +296,18 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
 
         for conf in list(self.GetConformers()):
             # for each atom check how far it is from the protein atoms
-            min_dst = 999_999_999 # arbitrary large distance
+            min_dst = 999_999_999  # arbitrary large distance
             for point in conf.GetPositions():
-                shortest = np.min(np.sqrt(np.sum((point - protein_coords) ** 2, axis=1)))
+                shortest = np.min(
+                    np.sqrt(np.sum((point - protein_coords) ** 2, axis=1))
+                )
                 min_dst = min(min_dst, shortest)
 
             if min_dst < min_dst_allowed:
                 self.RemoveConformer(conf.GetId())
-                logger.debug(f"Clash with the protein. Removing conformer id: {conf.GetId()}")
+                logger.debug(
+                    f"Clash with the protein. Removing conformer id: {conf.GetId()}"
+                )
 
     @staticmethod
     def set_gnina(loc):
@@ -353,7 +361,9 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         os.chmod(gnina, mode | stat.S_IEXEC)
 
         # check if it works
-        subprocess.run(["./gnina", "--help"], capture_output=True, check=True, cwd=RMol.gnina_dir)
+        subprocess.run(
+            ["./gnina", "--help"], capture_output=True, check=True, cwd=RMol.gnina_dir
+        )
 
     def gnina(self, receptor_file):
         """
@@ -392,7 +402,8 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                 "False",
             ],
             capture_output=True,
-            check=True)
+            check=True,
+        )
 
         output = process.stdout.decode("utf-8")
         CNNaffinities_str = re.findall(r"CNNaffinity: (-?\d+.\d+)", output)
@@ -429,7 +440,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         file_type = file_name.split(".")[-1]
 
         # SDF has its own multi-frame writer
-        if file_type.lower() == 'sdf':
+        if file_type.lower() == "sdf":
             with Chem.SDWriter(file_name) as SD:
                 for conformer in self.GetConformers():
                     SD.write(self, confId=conformer.GetId())
@@ -609,7 +620,7 @@ class RGroupGrid(mols2grid.MolGrid):
         builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
         for rgroup in Chem.SDMolSupplier(str(builtin_rgroups), removeHs=False):
             molecules.append(rgroup)
-            names.append(rgroup.GetProp('SMILES'))
+            names.append(rgroup.GetProp("SMILES"))
 
             # highlight the attachment atom
             for atom in rgroup.GetAtoms():
@@ -620,6 +631,7 @@ class RGroupGrid(mols2grid.MolGrid):
 
     def _ipython_display_(self):
         from IPython.display import display_html
+
         subset = ["img", "Name", "mols2grid-id"]
         display_html(self.display(subset=subset, substruct_highlight=True))
 
@@ -659,17 +671,18 @@ class RLinkerGrid(mols2grid.MolGrid):
         linkers = []
         for mol in Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False):
             # use easier searchable SMILES, e.g. [*:1] was replaced with R1
-            display_name = mol.GetProp('display_smiles')
+            display_name = mol.GetProp("display_smiles")
 
             # extract the index property from the original publication
             smile_index = mol.GetIntProp("SmileIndex")
 
             linkers.append([mol, display_name, smile_index])
 
-        return pandas.DataFrame(linkers, columns=['Mol', 'Name', 'Common'])
+        return pandas.DataFrame(linkers, columns=["Mol", "Name", "Common"])
 
     def _ipython_display_(self):
         from IPython.display import display
+
         subset = ["img", "Name", "mols2grid-id"]
         return display(self.display(subset=subset, substruct_highlight=True))
 
@@ -679,10 +692,10 @@ class RLinkerGrid(mols2grid.MolGrid):
 
 
 def build_molecules(
-        templates: Union[Chem.Mol, List[Chem.Mol]],
-        r_groups: Union[Chem.Mol, List[Chem.Mol], int],
-        attachment_points: Optional[List[int]] = None,
-        keep_components: Optional[List[int]] = None,
+    templates: Union[Chem.Mol, List[Chem.Mol]],
+    r_groups: Union[Chem.Mol, List[Chem.Mol], int],
+    attachment_points: Optional[List[int]] = None,
+    keep_components: Optional[List[int]] = None,
 ):
     """
 
@@ -693,7 +706,9 @@ def build_molecules(
         submolecules, keep the submolecule with this atom index.
     :return:
     """
-    built_mols = build_molecules_with_rdkit(templates, r_groups, attachment_points, keep_components)
+    built_mols = build_molecules_with_rdkit(
+        templates, r_groups, attachment_points, keep_components
+    )
     rlist = RList()
     for mol, scaffold_no_attachement in built_mols:
         rmol = RMol(mol)

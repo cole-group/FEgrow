@@ -17,7 +17,7 @@ root = pathlib.Path(__file__).parent
 def sars_core_scaffold():
     params = Chem.SmilesParserParams()
     params.removeHs = False  # keep the hydrogens
-    scaffold = Chem.MolFromSmiles('[H]c1c([H])c([H])n([H])c(=O)c1[H]', params=params)
+    scaffold = Chem.MolFromSmiles("[H]c1c([H])c([H])n([H])c(=O)c1[H]", params=params)
     Chem.AllChem.Compute2DCoords(scaffold)
     return scaffold
 
@@ -26,17 +26,19 @@ def test_adding_ethanol_1mol(sars_core_scaffold):
     # use a hydrogen bond N-H
     attachment_index = [7]
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmols = fegrow.build_molecules(sars_core_scaffold, [ethanol_rgroup], attachment_index)
+    rmols = fegrow.build_molecules(
+        sars_core_scaffold, [ethanol_rgroup], attachment_index
+    )
 
     assert len(rmols) == 1, "Did not generate 1 molecule"
 
 
 def test_growing_keep_larger_component(sars_core_scaffold):
     """
-     When a growing vector is an internal atom that divides the molecule,
-     the largest component becomes the scaffold.
+    When a growing vector is an internal atom that divides the molecule,
+    the largest component becomes the scaffold.
     """
-    scaffold = Chem.MolFromSmiles('O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1')
+    scaffold = Chem.MolFromSmiles("O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1")
     Chem.AddHs(scaffold)
     Chem.AllChem.Compute2DCoords(scaffold)
 
@@ -45,17 +47,17 @@ def test_growing_keep_larger_component(sars_core_scaffold):
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
     rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index).pop()
 
-    assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == 'O=c1c(CCO)cccn1-c1cccnc1'
+    assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "O=c1c(CCO)cccn1-c1cccnc1"
 
 
 def test_growing_keep_cue_component(sars_core_scaffold):
     """
-     When a growing vector is an atom that divides the molecule,
-     the user can specify which side to keep.
+    When a growing vector is an atom that divides the molecule,
+    the user can specify which side to keep.
 
-     Keep the smaller chlorinated benzene ring for growing ethanol
+    Keep the smaller chlorinated benzene ring for growing ethanol
     """
-    scaffold = Chem.MolFromSmiles('O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1')
+    scaffold = Chem.MolFromSmiles("O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1")
     Chem.AddHs(scaffold)
     Chem.AllChem.Compute2DCoords(scaffold)
 
@@ -63,9 +65,11 @@ def test_growing_keep_cue_component(sars_core_scaffold):
     attachment_index = [2]
     keep_smaller_ring = [3]
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index, keep_smaller_ring).pop()
+    rmol = fegrow.build_molecules(
+        scaffold, [ethanol_rgroup], attachment_index, keep_smaller_ring
+    ).pop()
 
-    assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == 'OCCc1cccc(Cl)c1'
+    assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "OCCc1cccc(Cl)c1"
 
 
 def test_adding_ethanol_number_of_atoms():
@@ -137,7 +141,7 @@ def test_add_a_linker_check_star():
     )[0]
     attachment_index = [40]
     # Select a linker
-    linker = RLinkers[RLinkers.Name == 'R1NC(R2)=O'].Mol.values[0]
+    linker = RLinkers[RLinkers.Name == "R1NC(R2)=O"].Mol.values[0]
     template_with_linker = fegrow.build_molecules(
         template_mol, [linker], attachment_index
     )[0]
@@ -150,13 +154,15 @@ def test_two_linkers_two_rgroups():
     # Check combinatorial: ie 2 rgroups and 2 linkers create 4 molecles that contain both
 
     # get two R-groups
-    R_group_ethanol = RGroups[RGroups.Name == '*CCO'].Mol.values[0]
-    R_group_cyclopropane = RGroups[RGroups.Name == '*C1CC1'].Mol.values[0]
+    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
+    R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.values[0]
 
     # get two linkers
-    linker1 = RLinkers[RLinkers.Name == 'R1CR2'].Mol.values[0]
-    linker2 = RLinkers[RLinkers.Name == 'R1OR2'].Mol.values[0]
+    linker1 = RLinkers[RLinkers.Name == "R1CR2"].Mol.values[0]
+    linker2 = RLinkers[RLinkers.Name == "R1OR2"].Mol.values[0]
 
-    built_molecules = fegrow.build_molecules([linker1, linker2], [R_group_ethanol, R_group_cyclopropane])
+    built_molecules = fegrow.build_molecules(
+        [linker1, linker2], [R_group_ethanol, R_group_cyclopropane]
+    )
 
     assert len(built_molecules) == 4

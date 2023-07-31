@@ -10,6 +10,7 @@ from rdkit.Chem.rdMolAlign import AlignMol
 
 logger = logging.getLogger(__name__)
 
+
 def build_molecules_with_rdkit(
     templates: Union[Chem.Mol, List[Chem.Mol]],
     r_groups: Union[Chem.Mol, List[Chem.Mol], int],
@@ -63,7 +64,9 @@ def build_molecules_with_rdkit(
     if not attachment_points:
         # attempt to generate the attachment points by picking the joining molecule
         # case: a list of templates previously joined with linkers requires iterating over them
-        attachment_points = [get_attachment_vector(lig)[0].GetIdx() for lig in templates]
+        attachment_points = [
+            get_attachment_vector(lig)[0].GetIdx() for lig in templates
+        ]
 
     if not attachment_points:
         raise Exception("Could not find attachement points. ")
@@ -77,12 +80,16 @@ def build_molecules_with_rdkit(
 
     combined_mols = []
     id_counter = 0
-    for atom_idx, scaffold_ligand, keep_submolecule_cue in \
-            itertools.zip_longest(attachment_points, templates, keep_components, fillvalue=None):
+    for atom_idx, scaffold_ligand, keep_submolecule_cue in itertools.zip_longest(
+        attachment_points, templates, keep_components, fillvalue=None
+    ):
         for r_mol in r_groups:
             scaffold_mol = copy.deepcopy(scaffold_ligand)
             merged_mol, scaffold_no_attachement = merge_R_group(
-                scaffold=scaffold_mol, RGroup=r_mol, replace_index=atom_idx, keep_cue_idx=keep_submolecule_cue
+                scaffold=scaffold_mol,
+                RGroup=r_mol,
+                replace_index=atom_idx,
+                keep_cue_idx=keep_submolecule_cue,
             )
             # assign the identifying index to the molecule
             merged_mol.id = id_counter
@@ -107,8 +114,10 @@ def split(molecule, splitting_atom, keep_neighbour_idx=None):
 
     connected_components = list(networkx.connected_components(G))
     if len(connected_components) != 2:
-        raise ValueError(f'The molecule is not divided into two separate components '
-                        f'with the Atom ID={splitting_atom.GetIdx()}, so we cannot decide which component to remove. ')
+        raise ValueError(
+            f"The molecule is not divided into two separate components "
+            f"with the Atom ID={splitting_atom.GetIdx()}, so we cannot decide which component to remove. "
+        )
 
     if keep_neighbour_idx in connected_components[1]:
         atom_ids_for_removal = connected_components[0]
@@ -117,11 +126,15 @@ def split(molecule, splitting_atom, keep_neighbour_idx=None):
     else:
         # keep the larger side of the molecule
         if len(connected_components[0]) == len(connected_components[1]):
-            raise ValueError(f'The molecule has two equally sized separated components, '
-                             f'and it is not clear which one to keep, please use "keep_neighbour_idx" '
-                             f'to mark the size of the molecule that should be used as the scaffold.')
+            raise ValueError(
+                f"The molecule has two equally sized separated components, "
+                f'and it is not clear which one to keep, please use "keep_neighbour_idx" '
+                f"to mark the size of the molecule that should be used as the scaffold."
+            )
 
-        logger.info('User has not selected manually which side of the molecule to keep. Selecting the larger side. ')
+        logger.info(
+            "User has not selected manually which side of the molecule to keep. Selecting the larger side. "
+        )
         atom_ids_for_removal, _ = sorted(connected_components, key=len)
 
     # remove the unwanted component
@@ -130,14 +143,22 @@ def split(molecule, splitting_atom, keep_neighbour_idx=None):
         edit_scaffold.RemoveAtom(idx)
     scaffold = edit_scaffold.GetMol()
 
-    kept_atoms = [a for a in molecule.GetAtoms() if a.GetIdx() not in atom_ids_for_removal]
+    kept_atoms = [
+        a for a in molecule.GetAtoms() if a.GetIdx() not in atom_ids_for_removal
+    ]
     scaffold_elements = [a for a in scaffold.GetAtoms()]
 
     # removing atoms changes the IDs of the atoms that remain
-    if [a.GetAtomicNum() for a in kept_atoms] != [a.GetAtomicNum() for a in scaffold_elements]:
-        raise Exception('The assumption that the modified molecule will keep the atoms in the same order is false. '
-                        'Please get in touch with the FEgrow maintainers. ')
-    idx_map = dict(zip([a.GetIdx() for a in kept_atoms], [a.GetIdx() for a in scaffold_elements]))
+    if [a.GetAtomicNum() for a in kept_atoms] != [
+        a.GetAtomicNum() for a in scaffold_elements
+    ]:
+        raise Exception(
+            "The assumption that the modified molecule will keep the atoms in the same order is false. "
+            "Please get in touch with the FEgrow maintainers. "
+        )
+    idx_map = dict(
+        zip([a.GetIdx() for a in kept_atoms], [a.GetIdx() for a in scaffold_elements])
+    )
     return scaffold, idx_map
 
 
@@ -247,7 +268,6 @@ def get_attachment_vector(R_group):
         )
 
     return atom, neighbours[0]
-
 
 
 def is_linker(rmol):
