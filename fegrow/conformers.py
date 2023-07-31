@@ -8,8 +8,10 @@ from rdkit.Chem import AllChem
 
 logger = logging.getLogger(__name__)
 
+
 class WrongCoreForMolecule(Exception):
     pass
+
 
 def duplicate_conformers(
     m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5
@@ -81,7 +83,9 @@ def generate_conformers(
                 rmol.RemoveConformer(conf_idx)
 
     if dup_count:
-        logger.debug(f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. ")
+        logger.debug(
+            f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. "
+        )
 
     return rmol
 

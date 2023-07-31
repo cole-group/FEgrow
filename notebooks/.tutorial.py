@@ -230,7 +230,7 @@ rec_final = prody.parsePDB("rec_final.pdb")
 # In[ ]:
 
 
-rmols[0].rep3D(prody=rec_final)
+rmols[0].rep3D(prody_protein=rec_final)
 
 
 # Any conformers that clash with the protein (any atom-atom distance less than 1 Angstrom), are removed.
@@ -244,7 +244,7 @@ rmols.remove_clashing_confs(rec_final)
 # In[ ]:
 
 
-rmols[0].rep3D(prody=rec_final)
+rmols[0].rep3D(prody_protein=rec_final)
 
 
 # ### Optimise conformers in context of protein

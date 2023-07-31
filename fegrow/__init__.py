@@ -6,16 +6,10 @@ from .package import (
     RMol,
     rep2D,
     build_molecules,
-    ic50,
     RGroupGrid,
     RLinkerGrid,
-    link,
 )
-from .receptor import (
-    fix_receptor,
-    optimise_in_receptor,
-    sort_conformers
-)
+from .receptor import fix_receptor, optimise_in_receptor, sort_conformers
 from .toxicity import tox_props
 
 # get the version
@@ -31,9 +25,7 @@ __all__ = [
     sort_conformers,
     RGroupGrid,
     RLinkerGrid,
-    link,
     build_molecules,
-    ic50,
     __version__,
-    WrongCoreForMolecule
+    WrongCoreForMolecule,
 ]
