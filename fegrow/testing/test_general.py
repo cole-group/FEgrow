@@ -39,7 +39,6 @@ def test_growing_keep_larger_component(sars_core_scaffold):
     the largest component becomes the scaffold.
     """
     scaffold = Chem.MolFromSmiles("O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1")
-    Chem.AddHs(scaffold)
     Chem.AllChem.Compute2DCoords(scaffold)
 
     # use C on the chlorinated benzene
@@ -58,7 +57,6 @@ def test_growing_keep_cue_component(sars_core_scaffold):
     Keep the smaller chlorinated benzene ring for growing ethanol
     """
     scaffold = Chem.MolFromSmiles("O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1")
-    Chem.AddHs(scaffold)
     Chem.AllChem.Compute2DCoords(scaffold)
 
     # use C on the chlorinated benzene
