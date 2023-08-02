@@ -91,8 +91,7 @@ def optimise_in_receptor(
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
-    platform_name: str = "CPU",
-    receptor_file=None
+    platform_name: str = "CPU"
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -116,16 +115,10 @@ def optimise_in_receptor(
         platform_name:
             The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
             See the OpenMM documentation of Platform.
-        receptor_file:
-            Deprecated, please see receptor
 
     Returns:
         A copy of the input molecule with the optimised positions.
     """
-
-    if receptor_file is not None:
-        warnings.warn("receptor_file is deprecated and will be removed, please use receptor instead. ", DeprecationWarning)
-        receptor = receptor_file
 
     ligand_force_fields = {
         "openff": "openff_unconstrained-2.0.0.offxml",
