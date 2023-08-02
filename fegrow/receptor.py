@@ -1,5 +1,7 @@
+import logging
 from copy import deepcopy
 from typing import List, Tuple, Union
+import warnings
 
 import parmed
 from openmmforcefields.generators import SystemGenerator
@@ -23,6 +25,8 @@ except (ImportError, ModuleNotFoundError):
 
 from openff.toolkit.topology import Molecule as OFFMolecule
 
+
+logger = logging.getLogger(__name__)
 
 def fix_receptor(input_file: str, output_file: str, pH: float = 7.0):
     """
@@ -88,6 +92,7 @@ def optimise_in_receptor(
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
     platform_name: str = "CPU",
+    receptor_file=None
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -111,10 +116,16 @@ def optimise_in_receptor(
         platform_name:
             The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
             See the OpenMM documentation of Platform.
+        receptor_file:
+            Deprecated, please see receptor
 
     Returns:
         A copy of the input molecule with the optimised positions.
     """
+
+    if receptor_file is not None:
+        warnings.warn("receptor_file is deprecated and will be removed, please use receptor instead. ", DeprecationWarning)
+        receptor = receptor_file
 
     ligand_force_fields = {
         "openff": "openff_unconstrained-2.0.0.offxml",
