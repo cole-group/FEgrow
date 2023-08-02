@@ -12,8 +12,10 @@ import urllib
 
 import numpy as np
 import mols2grid
+import openmm
+import openmm.app
 import pandas
-import prody
+import prody as prody_package
 import py3Dmol
 import rdkit
 from rdkit import Chem
@@ -229,7 +231,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
     def rep3D(
         self,
         view=None,
-        prody_protein=None,
+        prody=None,
         template=False,
         confIds: Optional[List[int]] = None,
     ):
@@ -241,15 +243,15 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         :param view: a view to which add the visualisation. Useful if one wants to 3D view
             multiple conformers in one view.
         :type view: py3Dmol view instance (None)
-        :param prody_protein: A prody protein around which a view 3D can be created
+        :param prody: A prody protein around which a view 3D can be created
         :type prody: Prody instance (Default: None)
         :param template: Whether to visualise the original 3D template as well from which the molecule was made.
         :type template: bool (False)
         :param confIds: Select the conformations for display.
         :type confIds: List[int]
         """
-        if prody_protein is not None:
-            view = prody.proteins.functions.view3D(prody_protein)
+        if prody is not None:
+            view = prody_package.proteins.functions.view3D(prody)
 
         if view is None:
             view = py3Dmol.view(width=400, height=400, viewergrid=(1, 1))
@@ -278,7 +280,8 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         view.zoomTo({"model": -1})
         return view
 
-    def remove_clashing_confs(self, protein, min_dst_allowed=1.0):
+    def remove_clashing_confs(self,
+                              protein: Union[str, openmm.app.PDBFile], min_dst_allowed=1.0):
         """
         Removing conformations that class with the protein.
         Note that the original conformer should be well docked into the protein,
@@ -287,12 +290,17 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         clashes.
 
         :param protein: The protein against which the conformers should be tested.
-        :type protein: Prody instance
+        :type protein: filename or the openmm PDBFile instance or prody instance
         :param min_dst_allowed: If any atom is within this distance in a conformer, the
          conformer will be deleted.
         :type min_dst_allowed: float in Angstroms
         """
-        protein_coords = protein.getCoords()
+        if type(protein) is str:
+            protein = openmm.app.PDBFile(protein)
+        if type(protein) is openmm.app.PDBFile:
+            protein_coords = protein.getPositions(asNumpy=True).in_units_of(openmm.unit.angstrom)._value
+        else:
+            protein_coords = protein.getCoords()
 
         for conf in list(self.GetConformers()):
             # for each atom check how far it is from the protein atoms

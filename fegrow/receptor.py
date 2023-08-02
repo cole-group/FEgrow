@@ -1,5 +1,7 @@
+import logging
 from copy import deepcopy
-from typing import List, Tuple
+from typing import List, Tuple, Union
+import warnings
 
 import parmed
 from openmmforcefields.generators import SystemGenerator
@@ -23,6 +25,8 @@ except (ImportError, ModuleNotFoundError):
 
 from openff.toolkit.topology import Molecule as OFFMolecule
 
+
+logger = logging.getLogger(__name__)
 
 def fix_receptor(input_file: str, output_file: str, pH: float = 7.0):
     """
@@ -81,13 +85,13 @@ ForceField = Literal["openff", "gaff"]
 
 def optimise_in_receptor(
     ligand: RMol,
-    receptor_file: str,
+    receptor: Union[str, app.PDBFile],
     ligand_force_field: ForceField,
     use_ani: bool = True,
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
-    platform_name: str = "CPU",
+    platform_name: str = "CPU"
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -95,7 +99,7 @@ def optimise_in_receptor(
     Args:
         ligand:
             The ligand with starting conformers already filtered for clashes with the receptor.
-        receptor_file:
+        receptor:
             The pdb file of the fixed and pronated receptor.
         ligand_force_field:
             The base ligand force field that should be used.
@@ -124,7 +128,8 @@ def optimise_in_receptor(
     platform = Platform.getPlatformByName(platform_name.upper())
 
     # assume the receptor has already been fixed and hydrogens have been added.
-    receptor = app.PDBFile(receptor_file)
+    if type(receptor) is str:
+        receptor = app.PDBFile(receptor)
     # receptor forcefield
     receptor_ff = "amber14/protein.ff14SB.xml"
 
