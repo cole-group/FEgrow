@@ -262,7 +262,7 @@ rmols[0].rep3D(prody_protein=rec_final)
 
 # opt_mol, energies
 energies = rmols.optimise_in_receptor(
-    receptor_file="rec_final.pdb", 
+    receptor="rec_final.pdb",
     ligand_force_field="openff", 
     use_ani=True,
     sigma_scale_factor=0.8,
