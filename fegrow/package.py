@@ -298,7 +298,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         if type(protein) is str:
             protein = openmm.app.PDBFile(protein)
         if type(protein) is openmm.app.PDBFile:
-            protein_coords = protein.getPositions(asNumpy=True).in_units_of(openmm.unit.angstrom)
+            protein_coords = protein.getPositions(asNumpy=True).in_units_of(openmm.unit.angstrom)._value
         else:
             protein_coords = protein.getCoords()
 
