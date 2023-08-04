@@ -85,7 +85,7 @@ ForceField = Literal["openff", "gaff"]
 
 def optimise_in_receptor(
     ligand: RMol,
-    receptor: Union[str, app.PDBFile],
+    receptor_file: Union[str, app.PDBFile],
     ligand_force_field: ForceField,
     use_ani: bool = True,
     sigma_scale_factor: float = 0.8,
@@ -99,7 +99,7 @@ def optimise_in_receptor(
     Args:
         ligand:
             The ligand with starting conformers already filtered for clashes with the receptor.
-        receptor:
+        receptor_file:
             The pdb file of the fixed and pronated receptor.
         ligand_force_field:
             The base ligand force field that should be used.
@@ -128,8 +128,8 @@ def optimise_in_receptor(
     platform = Platform.getPlatformByName(platform_name.upper())
 
     # assume the receptor has already been fixed and hydrogens have been added.
-    if type(receptor) is str:
-        receptor = app.PDBFile(receptor)
+    if type(receptor_file) is str:
+        receptor_file = app.PDBFile(receptor_file)
     # receptor forcefield
     receptor_ff = "amber14/protein.ff14SB.xml"
 
@@ -149,7 +149,7 @@ def optimise_in_receptor(
     )
     # now make a combined receptor and ligand topology
     parmed_receptor = parmed.openmm.load_topology(
-        receptor.topology, xyz=receptor.positions
+        receptor_file.topology, xyz=receptor_file.positions
     )
     parmed_ligand = parmed.openmm.load_topology(
         openff_mol.to_topology().to_openmm(), xyz=openff_mol.conformers[0]
