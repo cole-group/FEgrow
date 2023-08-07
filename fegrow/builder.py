@@ -113,29 +113,21 @@ def split(molecule, splitting_atom, keep_neighbour_idx=None):
     G.remove_node(splitting_atom.GetIdx())
 
     connected_components = list(networkx.connected_components(G))
-    if len(connected_components) != 2:
+    if len(connected_components) == 1:
         raise ValueError(
             f"The molecule is not divided into two separate components "
             f"with the Atom ID={splitting_atom.GetIdx()}, so we cannot decide which component to remove. "
         )
 
-    if keep_neighbour_idx in connected_components[1]:
-        atom_ids_for_removal = connected_components[0]
-    elif keep_neighbour_idx in connected_components[0]:
-        atom_ids_for_removal = connected_components[1]
+    if keep_neighbour_idx:
+        # select the user specifid component
+        component_to_keep = [c for c in connected_components if keep_neighbour_idx in c][0]
     else:
-        # keep the larger side of the molecule
-        if len(connected_components[0]) == len(connected_components[1]):
-            raise ValueError(
-                f"The molecule has two equally sized separated components, "
-                f'and it is not clear which one to keep, please use "keep_neighbour_idx" '
-                f"to mark the size of the molecule that should be used as the scaffold."
-            )
+        # keep the largest component
+        largest_component_size = max(map(len, connected_components))
+        component_to_keep = [c for c in connected_components if len(c) == largest_component_size][0]
 
-        logger.info(
-            "User has not selected manually which side of the molecule to keep. Selecting the larger side. "
-        )
-        atom_ids_for_removal, _ = sorted(connected_components, key=len)
+    atom_ids_for_removal = {item for sublist in connected_components for item in sublist} - component_to_keep
 
     # remove the unwanted component
     edit_scaffold = Chem.EditableMol(molecule)
@@ -180,8 +172,6 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
         replace_index = idx_map[replace_index]
         atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
         hook = atom_to_replace.GetNeighbors()[0]
-        # raise NotImplementedError(f"The atom being replaced (ID={atom_to_replace.GetIdx()}, Element={atom_to_replace.GetAtomicNum()}) "
-        #                 f"on the molecule has more neighbour atoms than 1. Not supported.")
 
     # align the Rgroup
     AlignMol(

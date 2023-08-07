@@ -33,7 +33,7 @@ def test_adding_ethanol_1mol(sars_core_scaffold):
     assert len(rmols) == 1, "Did not generate 1 molecule"
 
 
-def test_growing_keep_larger_component(sars_core_scaffold):
+def test_growing_keep_larger_component():
     """
     When a growing vector is an internal atom that divides the molecule,
     the largest component becomes the scaffold.
@@ -49,7 +49,7 @@ def test_growing_keep_larger_component(sars_core_scaffold):
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "O=c1c(CCO)cccn1-c1cccnc1"
 
 
-def test_growing_keep_cue_component(sars_core_scaffold):
+def test_growing_keep_cue_component():
     """
     When a growing vector is an atom that divides the molecule,
     the user can specify which side to keep.
@@ -69,6 +69,44 @@ def test_growing_keep_cue_component(sars_core_scaffold):
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "OCCc1cccc(Cl)c1"
 
+
+def test_replace_methyl(sars_core_scaffold):
+    """
+
+    """
+    params = Chem.SmilesParserParams()
+    params.removeHs = False  # keep the hydrogens
+    mol = Chem.MolFromSmiles('[H]c1nc(N([H])C(=O)C([H])([H])[H])c([H])c([H])c1[H]', params=params)
+    Chem.AllChem.Compute2DCoords(mol)
+
+    scaffold = fegrow.RMol(mol)
+
+    # replace the methyl group
+    attachment_index = [8]
+    ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
+    rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index).pop()
+
+    assert Chem.MolToSmiles(rmol) == "[H]OC([H])([H])C([H])([H])C(=O)N([H])c1nc([H])c([H])c([H])c1[H]"
+
+
+def test_replace_methyl_keep_h(sars_core_scaffold):
+    """
+
+    """
+    params = Chem.SmilesParserParams()
+    params.removeHs = False  # keep the hydrogens
+    mol = Chem.MolFromSmiles('[H]c1nc(N([H])C(=O)C([H])([H])[H])c([H])c([H])c1[H]', params=params)
+    Chem.AllChem.Compute2DCoords(mol)
+
+    scaffold = fegrow.RMol(mol)
+
+    # replace the methyl group
+    attachment_index = [8]
+    keep_only_h = [10]
+    ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
+    rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index, keep_only_h).pop()
+
+    assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "CCO"
 
 def test_adding_ethanol_number_of_atoms():
     # Check if merging ethanol with a molecule yields the right number of atoms.
