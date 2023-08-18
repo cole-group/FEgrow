@@ -1,5 +1,6 @@
 import abc
 import copy
+import functools
 import logging
 import os
 from pathlib import Path
@@ -312,11 +313,12 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                 )
                 min_dst = min(min_dst, shortest)
 
-            if min_dst < min_dst_allowed:
-                self.RemoveConformer(conf.GetId())
-                logger.debug(
-                    f"Clash with the protein. Removing conformer id: {conf.GetId()}"
-                )
+                if min_dst < min_dst_allowed:
+                    self.RemoveConformer(conf.GetId())
+                    logger.debug(
+                        f"Clash with the protein. Removing conformer id: {conf.GetId()}"
+                    )
+                    continue
 
     @staticmethod
     def set_gnina(loc):
@@ -439,37 +441,38 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
 
         return df
 
-    def to_file(self, file_name: str):
+    def to_file(self, filename: str):
         """
         Write the molecule and all conformers to file.
 
         Note:
             The file type is worked out from the name extension by splitting on `.`.
         """
-        file_type = file_name.split(".")[-1]
+        file_type = Path(filename).suffix.lower()
 
-        # SDF has its own multi-frame writer
-        if file_type.lower() == "sdf":
-            with Chem.SDWriter(file_name) as SD:
-                for conformer in self.GetConformers():
-                    SD.write(self, confId=conformer.GetId())
-            return
-
-        write_functions = {
-            "mol": Chem.MolToMolBlock,
-            "pdb": Chem.MolToPDBBlock,
-            "xyz": Chem.MolToXYZBlock,
+        writers = {
+            ".mol": Chem.MolToMolFile,
+            ".sdf": Chem.SDWriter,
+            ".pdb": functools.partial(Chem.PDBWriter, flavor=1),
+            ".xyz": Chem.MolToXYZFile,
         }
 
-        func = write_functions.get(file_type, None)
+        func = writers.get(file_type, None)
         if func is None:
             raise RuntimeError(
-                f"The file type {file_type} is not support please chose from {write_functions.keys()}"
+                f"The file type {file_type} is not support please chose from {writers.keys()}"
             )
 
-        with open(file_name, "w") as output:
-            for conformer in self.GetConformers():
-                output.write(func(self, confId=conformer.GetId()))
+        if file_type in ['.pdb', '.sdf']:
+            # multi-frame writers
+
+            with writers[file_type](filename) as WRITER:
+                for conformer in self.GetConformers():
+                    WRITER.write(self, confId=conformer.GetId())
+            return
+
+        writers[file_type](self, filename)
+
 
     def df(self):
         """
