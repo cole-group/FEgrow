@@ -32,6 +32,7 @@ def generate_conformers(
     num_conf: int,
     minimum_conf_rms: Optional[float] = None,
     flexible: Optional[List[int]] = [],
+    use_ties_mcs: bool = False,
 ) -> List[Chem.rdchem.Mol]:
     """
     flexible:
@@ -45,7 +46,7 @@ def generate_conformers(
 
     # map scaffold atoms to the new molecules
     match = rmol.GetSubstructMatch(scaffold_mol)
-    if match:
+    if match and not use_ties_mcs:
         # remember the scaffold coordinates
         coordMap = {}
         manmap = []
