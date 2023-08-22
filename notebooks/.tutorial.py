@@ -322,6 +322,6 @@ affinities
 
 # In[ ]:
 
-
+interactions = rmols.plip_interactions(receptor_file="rec_final.pdb")
 
 

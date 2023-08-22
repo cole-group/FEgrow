@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 from typing import List, Optional, Union
 import urllib
-
+import plip
 import numpy as np
 import mols2grid
 import openmm
@@ -21,10 +21,15 @@ import py3Dmol
 import rdkit
 from rdkit import Chem
 from rdkit.Chem import Draw, PandasTools
+from plip.structure.preparation import PDBComplex
+from plip.exchange.report import BindingSiteReport
+import MDAnalysis as mda
 
 from .builder import build_molecules_with_rdkit
 from .conformers import generate_conformers
 from .toxicity import tox_props
+import parmed as pmd
+import pandas as pd
 
 # default options
 pandas.set_option("display.precision", 3)
@@ -375,6 +380,29 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         subprocess.run(
             ["./gnina", "--help"], capture_output=True, check=True, cwd=RMol.gnina_dir
         )
+    def plip_interactions(self, receptor_file):
+        """Generates PLIP interactions by receptor residue."""
+        # obtain the absolute file to the receptor
+        receptor = Path(receptor_file)
+        if not receptor.exists():
+            raise ValueError(f'Your receptor "{receptor_file}" does not seem to exist.')
+
+        # Load PDB file using parmed
+
+        #receptor = '/home/cree/code/FEgrow/notebooks/rec_final.pdb'
+        prot = pmd.load_file(receptor_file)
+
+        # Convert RDKit molecule to a parmed structure
+        rdkit_mol = pmd.rdkit.load_rdkit(self)
+        complex = prot + rdkit_mol
+        # Add atoms from the converted RDKit molecule to the parmed structure
+        #tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".pdb")
+
+        complex.save('complex.pdb', overwrite=True)
+        interactions = analyse_traj(self, 'complex.pdb')
+        os.remove('complex.pdb')
+        # last argument determines which binding site is analysed
+        # this is the big list of dataframes with all the data in, if you want to explore
 
     def gnina(self, receptor_file):
         """
@@ -583,6 +611,17 @@ class RList(RInterface, list):
         df.set_index(["ID", "Conformer"], inplace=True)
         return df
 
+    def plip_interactions(self, receptor_file):
+        dfs = []
+        for i, rmol in enumerate(self):
+            print(f"RMol index {i}")
+            dfs.append(rmol.plip_interactions(receptor_file))
+
+        df = pandas.concat(dfs)
+        df.set_index(["ID", "Conformer"], inplace=True)
+        return df
+
+
     def discard_missing(self):
         """
         Remove from this list the molecules that have no conformers
@@ -607,6 +646,7 @@ class RList(RInterface, list):
         df = self.dataframe
         RList._append_jupyter_visualisation(df)
         return df._repr_html_()
+
 
 
 class RGroupGrid(mols2grid.MolGrid):
@@ -752,3 +792,150 @@ def rep3D(mol):
     viewer.setStyle({"stick": {}})
     viewer.zoomTo()
     return viewer
+
+
+def retrieve_plip_interactions(pdb_file):
+    """
+    Retrieves the interactions from PLIP.
+
+    Parameters
+    ----------
+    pdb_file :
+        The PDB file of the complex.
+
+    Returns
+    -------
+    dict :
+        A dictionary of the binding sites and the interactions.
+    """
+    protlig = PDBComplex()
+    protlig.load_pdb(pdb_file)  # load the pdb file
+    for ligand in protlig.ligands:
+        protlig.characterize_complex(ligand)  # find ligands and analyze interactions
+    sites = {}
+    # loop over binding sites
+    for key, site in sorted(protlig.interaction_sets.items()):
+        binding_site = BindingSiteReport(site)  # collect data about interactions
+        # tuples of *_features and *_info will be converted to pandas DataFrame
+        keys = (
+            "hydrophobic",
+            "hbond",
+            "waterbridge",
+            "saltbridge",
+            "pistacking",
+            "pication",
+            "halogen",
+            "metal",
+        )
+        # interactions is a dictionary which contains relevant information for each
+        # of the possible interactions: hydrophobic, hbond, etc. in the considered
+        # binding site. Each interaction contains a list with
+        # 1. the features of that interaction, e.g. for hydrophobic:
+        # ('RESNR', 'RESTYPE', ..., 'LIGCOO', 'PROTCOO')
+        # 2. information for each of these features, e.g. for hydrophobic
+        # (residue nb, residue type,..., ligand atom 3D coord., protein atom 3D coord.)
+        interactions = {
+            k: [getattr(binding_site, k + "_features")] + getattr(binding_site, k + "_info")
+            for k in keys
+        }
+        sites[key] = interactions
+    return sites
+
+
+# print(
+#     f"Number of binding sites detected in {pdb_id} : "
+#     f"{len(interactions_by_site)}\n"
+#     f"with {interactions_by_site.keys()}"
+# )
+
+def create_df_from_binding_site(selected_site_interactions, interaction_type="hbond"):
+    """
+    Creates a data frame from a binding site and interaction type.
+
+    Parameters
+    ----------
+    selected_site_interactions : dict
+        Precaluclated interactions from PLIP for the selected site
+    interaction_type : str
+        The interaction type of interest (default set to hydrogen bond).
+
+    Returns
+    -------
+    pd.DataFrame :
+        DataFrame with information retrieved from PLIP.
+    """
+
+    # check if interaction type is valid:
+    valid_types = [
+        "hydrophobic",
+        "hbond",
+        "waterbridge",
+        "saltbridge",
+        "pistacking",
+        "pication",
+        "halogen",
+        "metal",
+    ]
+
+    if interaction_type not in valid_types:
+        print("!!! Wrong interaction type specified. Hbond is chosen by default!!!\n")
+        interaction_type = "hbond"
+
+    df = pd.DataFrame.from_records(
+        # data is stored AFTER the column names
+        selected_site_interactions[interaction_type][1:],
+        # column names are always the first element
+        columns=selected_site_interactions[interaction_type][0],
+    )
+    return df
+
+
+def residue_interactions(pdb_id, site, x):
+    interactions_by_site = retrieve_plip_interactions(f"{pdb_id}")
+    index_of_selected_site = 0
+    selected_site = list(interactions_by_site.keys())[index_of_selected_site]
+    # print(selected_site)
+    dfs = []
+    valid_types = [
+        #            "hydrophobic",
+        "hbond",
+        "waterbridge",
+        "saltbridge",
+        "pistacking",
+        "pication",
+        "halogen",
+        "metal",
+    ]
+    for i in valid_types:
+        dfs.append(create_df_from_binding_site(interactions_by_site[site], interaction_type=i))
+
+    all_interactions = pd.concat(dfs, keys=valid_types)
+
+    # all_interactions = all_interactions.dropna(axis=1) #dont drop nan if want to keep hydrophobic interactions
+
+    all_interactions = all_interactions.reset_index()
+    all_interactions = all_interactions.rename(columns={"level_0": "type", "level_1": "id"})
+
+    # oh = pd.get_dummies(a.index)  #onehot encode at some point potentially??
+
+    #    res_interactions = all_interactions.groupby('RESNR')[['type','RESTYPE', 'DIST', 'ANGLE',]].agg(lambda x: list(x)).reset_index()
+    #    res_interactions['id'] = pdb_id[x]
+
+    return all_interactions
+
+def analyse_traj(self, pdb_id, site_id=0):
+
+    '''get ligand and protein in a complex
+        call residue_interactions
+            pdb_id DOES NOT HAVE FILE EXTENSION
+        '''
+    u = mda.Universe(self)
+    print(u)
+    index_of_selected_site = site_id
+    interactions_by_site = retrieve_plip_interactions(pdb_id) #+ '.pdb')
+    selected_site = list(interactions_by_site.keys())[index_of_selected_site]
+    print(selected_site)
+    itrns = residue_interactions(pdb_id, selected_site, site_id)
+    print(itrns)
+
+    return itrns
