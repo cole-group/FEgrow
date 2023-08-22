@@ -401,8 +401,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         complex.save('complex.pdb', overwrite=True)
         interactions = analyse_traj(self, 'complex.pdb')
         os.remove('complex.pdb')
-        # last argument determines which binding site is analysed
-        # this is the big list of dataframes with all the data in, if you want to explore
+        return interactions
 
     def gnina(self, receptor_file):
         """
@@ -618,7 +617,7 @@ class RList(RInterface, list):
             dfs.append(rmol.plip_interactions(receptor_file))
 
         df = pandas.concat(dfs)
-        df.set_index(["ID", "Conformer"], inplace=True)
+
         return df
 
 
