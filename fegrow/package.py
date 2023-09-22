@@ -398,9 +398,9 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         # Add atoms from the converted RDKit molecule to the parmed structure
         #tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".pdb")
 
-        complex.save('complex.pdb', overwrite=True)
-        interactions = analyse_traj(self, 'complex.pdb')
-        os.remove('complex.pdb')
+        complex.save(f'{self.id}_complex.pdb', overwrite=True)
+        interactions = analyse_traj(self, f'{self.id}_complex.pdb')
+        os.remove(f'{self.id}_complex.pdb')
         return interactions
 
     def gnina(self, receptor_file):
@@ -614,11 +614,15 @@ class RList(RInterface, list):
         dfs = []
         for i, rmol in enumerate(self):
             print(f"RMol index {i}")
-            dfs.append(rmol.plip_interactions(receptor_file))
+            interacts = rmol.plip_interactions(receptor_file)
+            interacts['rgroup'] = i
+            dfs.append(interacts)
 
-        df = pandas.concat(dfs)
+        for df in dfs:
+            df['interaction'] = df.apply(lambda row: f"{row['type']}_{row['RESTYPE']}_{str(row['RESNR'])}_{row['ACCEPTORTYPE']}", axis=1)
 
-        return df
+
+        return dfs
 
 
     def discard_missing(self):
@@ -913,8 +917,8 @@ def residue_interactions(pdb_id, site, x):
     # all_interactions = all_interactions.dropna(axis=1) #dont drop nan if want to keep hydrophobic interactions
 
     all_interactions = all_interactions.reset_index()
-    all_interactions = all_interactions.rename(columns={"level_0": "type", "level_1": "id"})
-
+    all_interactions = all_interactions.rename(columns={"level_0": "type", "level_1": f"id"})
+    print(all_interactions)
     # oh = pd.get_dummies(a.index)  #onehot encode at some point potentially??
 
     #    res_interactions = all_interactions.groupby('RESNR')[['type','RESTYPE', 'DIST', 'ANGLE',]].agg(lambda x: list(x)).reset_index()
