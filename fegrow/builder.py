@@ -93,7 +93,7 @@ def build_molecules_with_rdkit(
             )
             # assign the identifying index to the molecule
             merged_mol.id = id_counter
-            combined_mols.append((merged_mol, scaffold_no_attachement))
+            combined_mols.append((merged_mol, scaffold_ligand, scaffold_no_attachement))
             id_counter += 1
 
     return combined_mols
