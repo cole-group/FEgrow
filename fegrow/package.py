@@ -725,7 +725,7 @@ def build_molecules(
     for mol, scaffold, scaffold_no_attachement in built_mols:
         rmol = RMol(mol)
 
-        if isinstance(scaffold.template, rdkit.Chem.Mol):
+        if hasattr(scaffold, 'template') and isinstance(scaffold.template, rdkit.Chem.Mol):
             # save the original scaffold (e.g. before the linker was added)
             # this means that conformer generation will always have to regenerate the previously added R-groups/linkers
             rmol._save_template(scaffold.template)
