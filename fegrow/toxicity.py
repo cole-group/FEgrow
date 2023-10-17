@@ -1,5 +1,5 @@
 import pandas as pd
-from rdkit.Chem import Descriptors
+from rdkit.Chem import Descriptors, Lipinski
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
 
 from .sascorer import calculateScore
@@ -16,8 +16,8 @@ def rule_of_five(mol):
 
     # Ro5 descriptors
     MW = Descriptors.MolWt(mol)
-    HBA = Descriptors.NumHAcceptors(mol)
-    HBD = Descriptors.NumHDonors(mol)
+    HBA = Lipinski.NOCount(mol)
+    HBD = Lipinski.NHOHCount(mol)
     LogP = Descriptors.MolLogP(mol)
 
     # Ro5 conditions
