@@ -28,36 +28,69 @@ def duplicate_conformers(
 
 
 def generate_conformers(
-    RMol: Chem.rdchem.Mol,
+    rmol: Chem.rdchem.Mol,
     num_conf: int,
     minimum_conf_rms: Optional[float] = None,
     flexible: Optional[List[int]] = [],
+    use_ties_mcs: bool = False,
 ) -> List[Chem.rdchem.Mol]:
     """
     flexible:
             The list of atomic indices on the @core_ligand that should not be constrained during the conformer generation
     """
-    scaffold_mol = deepcopy(RMol.template)
+    scaffold_mol = deepcopy(rmol.template)
     coreConf = scaffold_mol.GetConformer(0)
 
     # fixme - check if the conformer has H, it helps with conformer generation
-    rmol = deepcopy(RMol)
+    rmol = deepcopy(rmol)
 
     # map scaffold atoms to the new molecules
     match = rmol.GetSubstructMatch(scaffold_mol)
-    if not match:
-        raise WrongCoreForMolecule("molecule doesn't match the core", match)
+    if match and not use_ties_mcs:
+        # remember the scaffold coordinates
+        coordMap = {}
+        manmap = []
+        for coreI, matchedMolI in enumerate(match):
+            if matchedMolI in flexible:
+                continue
 
-    # remember the scaffold coordinates
-    coordMap = {}
-    manmap = []
-    for coreI, matchedMolI in enumerate(match):
-        if matchedMolI in flexible:
-            continue
+            corePtI = coreConf.GetAtomPosition(coreI)
+            coordMap[matchedMolI] = corePtI
+            manmap.append((matchedMolI, coreI))
+    else:
+        try:
+            from ties.topology_superimposer import superimpose_topologies, Atom, get_starting_configurations
+        except ModuleNotFoundError as NoTies:
+            raise WrongCoreForMolecule("Molecule doesn't match the core. "
+                                       "This can be caused by the order of SMILES, for example. "
+                                       "You can install the python package 'ties' to use MCS instead. ", match) from NoTies
 
-        corePtI = coreConf.GetAtomPosition(coreI)
-        coordMap[matchedMolI] = corePtI
-        manmap.append((matchedMolI, coreI))
+        def to_ties_atoms(rdkit_mol):
+            ties_atoms = {}
+            for rdkit_atom in rdkit_mol.GetAtoms():
+                ties_atom = Atom(name=rdkit_atom.GetSymbol() + str(rdkit_atom.GetIdx()), atom_type=rdkit_atom.GetSymbol())
+                ties_atom.id = rdkit_atom.GetIdx()
+                ties_atoms[rdkit_atom.GetIdx()] = ties_atom
+
+            for bond in rdkit_mol.GetBonds():
+                ties_atoms[bond.GetBeginAtomIdx()].bind_to(ties_atoms[bond.GetEndAtomIdx()], str(bond.GetBondType()))
+            return list(ties_atoms.values())
+
+        rmol_ties = to_ties_atoms(rmol)
+        scaffold_ties = to_ties_atoms(scaffold_mol)
+        mapping = superimpose_topologies(scaffold_ties, rmol_ties, ignore_coords=True, ignore_charges_completely=True)
+
+        coordMap = {}
+        manmap = []
+        for coreI, matchedMolI in sorted(mapping.matched_pairs, key = lambda p: p[0].id):
+            if matchedMolI.id in flexible:
+                continue
+
+            corePtI = coreConf.GetAtomPosition(coreI.id)
+            coordMap[matchedMolI.id] = corePtI
+            manmap.append((matchedMolI.id, coreI.id))
+        #
+        print("Used the TIES (Bieniek et al) package to get the mapping")
 
     # use a reproducible random seed
     randomseed = 194715
@@ -139,7 +172,7 @@ def ConstrainedEmbedR2(
         useSmallRingTorsions=True,
     )
     if ci < 0:
-        raise ValueError("Could not embed molecule.")
+        raise ValueError("Could not embed molecule.", mol, coordMap)
 
     # rms = AlignMol(mol, core, atomMap=manmap)
     # mol.SetProp('EmbedRMS', str(rms))
