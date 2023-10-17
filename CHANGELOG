@@ -8,6 +8,8 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
  - The user now has to import the libraries (RGroupGrid) and instantiate first.
  - Libraries (linkers, rgroups) are now single .sdf files to avoid problems on clusters with many small files
  - A growing vector can now be any molecule-separating atom in the molecule.
+ - Lipinski now uses the initial definitions of HBD: "sum of Ns and Os" and HBA: "sum of OHs and NHs",
+    (thanks to @RPirie96)
 
 **version 1.3.0**
 
