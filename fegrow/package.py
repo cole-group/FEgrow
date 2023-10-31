@@ -318,7 +318,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                     logger.debug(
                         f"Clash with the protein. Removing conformer id: {conf.GetId()}"
                     )
-                    continue
+                    break
 
     @staticmethod
     def set_gnina(loc):
