@@ -304,9 +304,11 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         else:
             protein_coords = protein.getCoords()
 
-        for conf in list(self.GetConformers()):
+        rm_counter = 0
+        for conf in list(self.GetConformers())[::-1]:
             # for each atom check how far it is from the protein atoms
             min_dst = 999_999_999  # arbitrary large distance
+
             for point in conf.GetPositions():
                 shortest = np.min(
                     np.sqrt(np.sum((point - protein_coords) ** 2, axis=1))
@@ -318,7 +320,10 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                     logger.debug(
                         f"Clash with the protein. Removing conformer id: {conf.GetId()}"
                     )
+                    rm_counter += 1
                     break
+        print(f"Removed {rm_counter} conformers. ")
+
 
     @staticmethod
     def set_gnina(loc):
