@@ -305,7 +305,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
             protein_coords = protein.getCoords()
 
         rm_counter = 0
-        for conf in list(self.GetConformers())[::-1]:
+        for conf in list(self.GetConformers()):
             # for each atom check how far it is from the protein atoms
             min_dst = 999_999_999  # arbitrary large distance
 
