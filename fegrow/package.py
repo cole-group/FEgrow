@@ -723,6 +723,10 @@ def build_molecules(
         submolecules, keep the submolecule with this atom index.
     :return:
     """
+
+    if isinstance(r_groups, list) and len(r_groups) == 0:
+        raise ValueError("Empty list received. Please pass any R-groups or R-linkers. ")
+
     built_mols = build_molecules_with_rdkit(
         templates, r_groups, attachment_points, keep_components
     )
