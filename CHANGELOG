@@ -14,6 +14,7 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
     always be the original C
  - Lipinski now uses the initial definitions of HBD: "sum of Ns and Os" and HBA: "sum of OHs and NHs",
     (thanks to @RPirie96)
+ - R-group without coordinates are now using by default Chem.rdDistGeom.EmbedMolecule
 
 **version 1.3.0**
 

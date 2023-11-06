@@ -173,6 +173,10 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
         atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
         hook = atom_to_replace.GetNeighbors()[0]
 
+    if RGroup.GetNumConformers() == 0:
+        logger.warning("The R-Group lacks initial coordinates. Defaulting to Chem.rdDistGeom.EmbedMolecule.")
+        Chem.rdDistGeom.EmbedMolecule(RGroup)
+
     # align the Rgroup
     AlignMol(
         RGroup,
