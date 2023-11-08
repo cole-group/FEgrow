@@ -59,7 +59,6 @@ def generate_conformers(
             coordMap[matchedMolI] = corePtI
             manmap.append((matchedMolI, coreI))
     else:
-        raise Exception('no ties')
         try:
             from ties.topology_superimposer import superimpose_topologies, Atom, get_starting_configurations
         except ModuleNotFoundError as NoTies:
