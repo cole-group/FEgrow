@@ -16,11 +16,11 @@ class WrongCoreForMolecule(Exception):
 def duplicate_conformers(
     m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5
 ) -> bool:
-    for conf_idx in range(m.GetNumConformers()):
-        if conf_idx == new_conf_idx:
+    for conformer in m.GetConformers():
+        if conformer.GetId() == new_conf_idx:
             continue
 
-        rms = AllChem.GetConformerRMS(m, new_conf_idx, conf_idx, prealigned=True)
+        rms = AllChem.GetConformerRMS(m, new_conf_idx, conformer.GetId(), prealigned=True)
         if rms < rms_limit:
             return True
 
@@ -46,6 +46,7 @@ def generate_conformers(
 
     # map scaffold atoms to the new molecules
     match = rmol.GetSubstructMatch(scaffold_mol)
+    print('match', match)
     if match and not use_ties_mcs:
         # remember the scaffold coordinates
         coordMap = {}
@@ -58,6 +59,7 @@ def generate_conformers(
             coordMap[matchedMolI] = corePtI
             manmap.append((matchedMolI, coreI))
     else:
+        raise Exception('no ties')
         try:
             from ties.topology_superimposer import superimpose_topologies, Atom, get_starting_configurations
         except ModuleNotFoundError as NoTies:
