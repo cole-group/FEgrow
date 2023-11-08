@@ -2,6 +2,7 @@ import logging
 from copy import deepcopy
 from typing import List, Optional
 
+import numpy
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem.rdDistGeom import EmbedMolecule
@@ -15,14 +16,15 @@ class WrongCoreForMolecule(Exception):
     pass
 
 
-def duplicate_conformers(
-    m: Chem.rdchem.Mol, new_conf_idx: int, rms_limit: float = 0.5
+def conformer_exists(
+    mol: Chem.Mol, potential_conformer: Chem.Conformer, nonh_atom_indices, rms_limit: float = 0.5
 ) -> bool:
-    for conformer in m.GetConformers():
-        if conformer.GetId() == new_conf_idx:
-            continue
+    potential_nonh_pos = potential_conformer.GetPositions()[nonh_atom_indices]
+    for conformer in mol.GetConformers():
+        conformer_nonh_pos = conformer.GetPositions()[nonh_atom_indices]
 
-        rms = AllChem.GetConformerRMS(m, new_conf_idx, conformer.GetId(), prealigned=True)
+        dsts = numpy.sqrt(numpy.sum(numpy.square(potential_nonh_pos - conformer_nonh_pos), axis=1, keepdims=True))
+        rms = numpy.sqrt(numpy.mean(numpy.square(dsts)))
         if rms < rms_limit:
             return True
 
@@ -32,7 +34,7 @@ def duplicate_conformers(
 def generate_conformers(
     rmol: Chem.rdchem.Mol,
     num_conf: int,
-    minimum_conf_rms: Optional[float] = None,
+    minimum_conf_rms: float = 0.5,
     flexible: Optional[List[int]] = [],
     use_ties_mcs: bool = False,
 ) -> List[Chem.rdchem.Mol]:
@@ -41,25 +43,24 @@ def generate_conformers(
             The list of atomic indices on the @core_ligand that should not be constrained during the conformer generation
     """
     scaffold_mol = deepcopy(rmol.template)
-    coreConf = scaffold_mol.GetConformer(0)
+    scaffold_conformer = scaffold_mol.GetConformer(0)
 
     # fixme - check if the conformer has H, it helps with conformer generation
     rmol = deepcopy(rmol)
 
     # map scaffold atoms to the new molecules
     match = rmol.GetSubstructMatch(scaffold_mol)
-    print('match', match)
     if match and not use_ties_mcs:
         # remember the scaffold coordinates
-        coordMap = {}
+        coordinates_map = {}
         manmap = []
-        for coreI, matchedMolI in enumerate(match):
-            if matchedMolI in flexible:
+        for core_index, matched_index in enumerate(match):
+            if matched_index in flexible:
                 continue
 
-            corePtI = coreConf.GetAtomPosition(coreI)
-            coordMap[matchedMolI] = corePtI
-            manmap.append((matchedMolI, coreI))
+            core_atom_coordinate = scaffold_conformer.GetAtomPosition(core_index)
+            coordinates_map[matched_index] = core_atom_coordinate
+            manmap.append((matched_index, core_index))
     else:
         try:
             from ties.topology_superimposer import superimpose_topologies, Atom, get_starting_configurations
@@ -83,15 +84,15 @@ def generate_conformers(
         scaffold_ties = to_ties_atoms(scaffold_mol)
         mapping = superimpose_topologies(scaffold_ties, rmol_ties, ignore_coords=True, ignore_charges_completely=True)
 
-        coordMap = {}
+        coordinates_map = {}
         manmap = []
-        for coreI, matchedMolI in sorted(mapping.matched_pairs, key = lambda p: p[0].id):
-            if matchedMolI.id in flexible:
+        for core_index, matched_index in sorted(mapping.matched_pairs, key = lambda p: p[0].id):
+            if matched_index.id in flexible:
                 continue
 
-            corePtI = coreConf.GetAtomPosition(coreI.id)
-            coordMap[matchedMolI.id] = corePtI
-            manmap.append((matchedMolI.id, coreI.id))
+            core_atom_coordinate = scaffold_conformer.GetAtomPosition(core_index.id)
+            coordinates_map[matched_index.id] = core_atom_coordinate
+            manmap.append((matched_index.id, core_index.id))
         #
         print("Used the TIES (Bieniek et al) package to get the mapping")
 
@@ -99,28 +100,28 @@ def generate_conformers(
     randomseed = 194715
 
     # Generate conformers with constrained embed
+    mol_for_conformer_generation = deepcopy(rmol)
+    mol_nonh_indices = [a.GetIdx() for a in rmol.GetAtoms() if a.GetSymbol() != 'H']
     dup_count = 0
-    for coreI in range(num_conf):
-        # temp_mol = AllChem.ConstrainedEmbed(deepcopy(mol), template_mol, useTethers=False, randomseed=random.randint(1, 9e5))
+    for core_index in range(num_conf):
         temp_mol = ConstrainedEmbedR2(
-            deepcopy(rmol),
+            mol_for_conformer_generation,
             scaffold_mol,
-            coordMap,
+            coordinates_map,
             manmap,
-            randomseed=randomseed + coreI,
+            randomseed=randomseed + core_index,
         )
 
-        conf_idx = rmol.AddConformer(temp_mol.GetConformer(-1), assignId=True)
-        if minimum_conf_rms is not None:
-            if duplicate_conformers(rmol, conf_idx, rms_limit=minimum_conf_rms):
-                dup_count += 1
-                rmol.RemoveConformer(conf_idx)
+        assert temp_mol.GetNumConformers() == 1
+        if conformer_exists(rmol, temp_mol.GetConformer(), mol_nonh_indices, rms_limit=minimum_conf_rms):
+            dup_count += 1
+        else:
+            rmol.AddConformer(temp_mol.GetConformer(), assignId=True)
 
     if dup_count:
-        logger.debug(
-            f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. "
-        )
+        logger.info(f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. ")
 
+    print(f"Generated {rmol.GetNumConformers()} conformers. ")
     return rmol
 
 
