@@ -1,4 +1,5 @@
 import logging
+import tempfile
 from copy import deepcopy
 from typing import List, Tuple, Union
 import warnings
@@ -170,8 +171,12 @@ def optimise_in_receptor(
     if use_ani and _can_use_ani2x(openff_mol):
         print("using ani2x")
         potential = MLPotential("ani2x", platform_name=platform_name)
+
+        # save the torch model animodel.pt to a temporary file to ensure this is thread safe
+        _, tmpfile = tempfile.mkstemp()
+
         complex_system = potential.createMixedSystem(
-            complex_structure.topology, system, ligand_idx
+            complex_structure.topology, system, ligand_idx, filename=tmpfile
         )
     else:
         print("Using force field")

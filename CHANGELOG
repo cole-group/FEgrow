@@ -16,6 +16,7 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
     (thanks to @RPirie96)
  - R-group without coordinates are now using by default Chem.rdDistGeom.EmbedMolecule
  - Do not cache openff parameters into db.json which right now crashes when multiple threads are used (same filename)
+ - using a tempfile with the anipotential .pt model file for for thread safety
 
 **version 1.3.0**
 
