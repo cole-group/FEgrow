@@ -144,7 +144,7 @@ def optimise_in_receptor(
     system_generator = SystemGenerator(
         forcefields=forcefields,
         small_molecule_forcefield=ligand_force_fields[ligand_force_field],
-        cache="db.json",
+        cache=None,
         molecules=openff_mol,
     )
     # now make a combined receptor and ligand topology
