@@ -16,6 +16,7 @@ import mols2grid
 import openmm
 import openmm.app
 import pandas
+import pint_pandas
 import prody as prody_package
 import py3Dmol
 import rdkit
@@ -438,6 +439,9 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         # generate IC50 from the CNNaffinities
         ic50s = list(map(ic50, CNNaffinities))
 
+        # add nM units
+        ic50s_nM = pandas.Series(ic50s, dtype="pint[nM]")
+
         # create a dataframe
         conformer_ids = [c.GetId() for c in self.GetConformers()]
         df = pandas.DataFrame(
@@ -445,7 +449,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                 "ID": [self.id] * len(CNNaffinities),
                 "Conformer": conformer_ids,
                 "CNNaffinity": CNNaffinities,
-                "CNNaffinity->IC50s": ic50s,
+                "Kd": ic50s_nM,
             }
         )
 
