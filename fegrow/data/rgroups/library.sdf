@@ -37,6 +37,9 @@ M  END
 >  <SMILES>  (1) 
 *C(=O)Nc1ccncc1
 
+>  <rgroup_id>  (1) 
+0
+
 $$$$
 
      RDKit          3D
@@ -91,6 +94,9 @@ M  END
 >  <SMILES>  (2) 
 *CN1CCN(C)CC1
 
+>  <rgroup_id>  (2) 
+1
+
 $$$$
 
      RDKit          3D
@@ -117,6 +123,9 @@ V    1 *
 M  END
 >  <SMILES>  (3) 
 *NC(C)=O
+
+>  <rgroup_id>  (3) 
+2
 
 $$$$
 
@@ -154,6 +163,9 @@ M  END
 >  <SMILES>  (4) 
 *c1cccc(C#N)c1
 
+>  <rgroup_id>  (4) 
+3
+
 $$$$
 
      RDKit          3D
@@ -187,6 +199,9 @@ V    1 *
 M  END
 >  <SMILES>  (5) 
 *c1ccc(Cl)c(Cl)c1
+
+>  <rgroup_id>  (5) 
+4
 
 $$$$
 
@@ -224,6 +239,9 @@ M  END
 >  <SMILES>  (6) 
 *c1ccc(O)cc1
 
+>  <rgroup_id>  (6) 
+5
+
 $$$$
 
      RDKit          3D
@@ -252,6 +270,9 @@ V    1 *
 M  END
 >  <SMILES>  (7) 
 *CNC
+
+>  <rgroup_id>  (7) 
+6
 
 $$$$
 
@@ -290,6 +311,9 @@ M  END
 >  <SMILES>  (8) 
 *CNCCO
 
+>  <rgroup_id>  (8) 
+7
+
 $$$$
 
      RDKit          3D
@@ -317,6 +341,9 @@ V    1 *
 M  END
 >  <SMILES>  (9) 
 *c1cccs1
+
+>  <rgroup_id>  (9) 
+8
 
 $$$$
 
@@ -351,6 +378,9 @@ V    1 *
 M  END
 >  <SMILES>  (10) 
 *c1ccnc(N)n1
+
+>  <rgroup_id>  (10) 
+9
 
 $$$$
 
@@ -390,6 +420,9 @@ M  END
 >  <SMILES>  (11) 
 *c1ccnc(C)c1
 
+>  <rgroup_id>  (11) 
+10
+
 $$$$
 
      RDKit          3D
@@ -426,6 +459,9 @@ V    1 *
 M  END
 >  <SMILES>  (12) 
 *NCCCO
+
+>  <rgroup_id>  (12) 
+11
 
 $$$$
 
@@ -477,6 +513,9 @@ M  END
 >  <SMILES>  (13) 
 *CNCc1ccccc1
 
+>  <rgroup_id>  (13) 
+12
+
 $$$$
 
      RDKit          3D
@@ -520,6 +559,9 @@ M  END
 >  <SMILES>  (14) 
 *CCCCC
 
+>  <rgroup_id>  (14) 
+13
+
 $$$$
 
      RDKit          3D
@@ -542,6 +584,9 @@ V    1 *
 M  END
 >  <SMILES>  (15) 
 *NC
+
+>  <rgroup_id>  (15) 
+14
 
 $$$$
 
@@ -591,6 +636,9 @@ M  END
 >  <SMILES>  (16) 
 *CCOc1ccccc1
 
+>  <rgroup_id>  (16) 
+15
+
 $$$$
 
      RDKit          3D
@@ -632,6 +680,9 @@ V    1 *
 M  END
 >  <SMILES>  (17) 
 *C(=O)Nc1ccc(Cl)cc1
+
+>  <rgroup_id>  (17) 
+16
 
 $$$$
 
@@ -683,6 +734,9 @@ M  END
 >  <SMILES>  (18) 
 *NS(=O)(=O)c1ccc(C)cc1
 
+>  <rgroup_id>  (18) 
+17
+
 $$$$
 
      RDKit          3D
@@ -725,6 +779,9 @@ M  END
 >  <SMILES>  (19) 
 *c1cccc(C(N)=O)c1
 
+>  <rgroup_id>  (19) 
+18
+
 $$$$
 
      RDKit          3D
@@ -763,6 +820,9 @@ M  END
 >  <SMILES>  (20) 
 *C1CCCN1
 
+>  <rgroup_id>  (20) 
+19
+
 $$$$
 
      RDKit          3D
@@ -796,6 +856,9 @@ V    1 *
 M  END
 >  <SMILES>  (21) 
 *Cn1ccnc1
+
+>  <rgroup_id>  (21) 
+20
 
 $$$$
 
@@ -847,6 +910,9 @@ M  END
 >  <SMILES>  (22) 
 *c1cc(OC)cc(OC)c1
 
+>  <rgroup_id>  (22) 
+21
+
 $$$$
 
      RDKit          3D
@@ -885,6 +951,9 @@ V    1 *
 M  END
 >  <SMILES>  (23) 
 *C(C)(C)CO
+
+>  <rgroup_id>  (23) 
+22
 
 $$$$
 
@@ -932,6 +1001,9 @@ M  END
 >  <SMILES>  (24) 
 *c1ccc(CC)cc1
 
+>  <rgroup_id>  (24) 
+23
+
 $$$$
 
      RDKit          3D
@@ -958,6 +1030,9 @@ V    1 *
 M  END
 >  <SMILES>  (25) 
 *CC(N)=O
+
+>  <rgroup_id>  (25) 
+24
 
 $$$$
 
@@ -992,6 +1067,9 @@ V    1 *
 M  END
 >  <SMILES>  (26) 
 *c1cnc(N)cn1
+
+>  <rgroup_id>  (26) 
+25
 
 $$$$
 
@@ -1041,6 +1119,9 @@ M  END
 >  <SMILES>  (27) 
 *C(=O)NCc1ccccc1
 
+>  <rgroup_id>  (27) 
+26
+
 $$$$
 
      RDKit          3D
@@ -1076,6 +1157,9 @@ M  END
 >  <SMILES>  (28) 
 *NC(C)C
 
+>  <rgroup_id>  (28) 
+27
+
 $$$$
 
      RDKit          3D
@@ -1105,6 +1189,9 @@ V    1 *
 M  END
 >  <SMILES>  (29) 
 *N1C(=O)C=CC1=O
+
+>  <rgroup_id>  (29) 
+28
 
 $$$$
 
@@ -1152,6 +1239,9 @@ M  END
 >  <SMILES>  (30) 
 *CCc1ccccc1
 
+>  <rgroup_id>  (30) 
+29
+
 $$$$
 
      RDKit          3D
@@ -1198,6 +1288,9 @@ M  END
 >  <SMILES>  (31) 
 *c1ccc(C(=O)OC)cc1
 
+>  <rgroup_id>  (31) 
+30
+
 $$$$
 
      RDKit          3D
@@ -1232,6 +1325,9 @@ M  END
 >  <SMILES>  (32) 
 *c1ccn(C)n1
 
+>  <rgroup_id>  (32) 
+31
+
 $$$$
 
      RDKit          3D
@@ -1265,6 +1361,9 @@ M  END
 >  <SMILES>  (33) 
 *CCCO
 
+>  <rgroup_id>  (33) 
+32
+
 $$$$
 
      RDKit          3D
@@ -1289,6 +1388,9 @@ V    1 *
 M  END
 >  <SMILES>  (34) 
 *OCC#C
+
+>  <rgroup_id>  (34) 
+33
 
 $$$$
 
@@ -1333,6 +1435,9 @@ V    1 *
 M  END
 >  <SMILES>  (35) 
 *C1CCNCC1
+
+>  <rgroup_id>  (35) 
+34
 
 $$$$
 
@@ -1384,6 +1489,9 @@ M  END
 >  <SMILES>  (36) 
 *c1ccc(OC)c(OC)c1
 
+>  <rgroup_id>  (36) 
+35
+
 $$$$
 
      RDKit          3D
@@ -1425,6 +1533,9 @@ M  END
 >  <SMILES>  (37) 
 *c1cc2ccccc2o1
 
+>  <rgroup_id>  (37) 
+36
+
 $$$$
 
      RDKit          3D
@@ -1462,6 +1573,9 @@ V    1 *
 M  END
 >  <SMILES>  (38) 
 *N1CCCC1
+
+>  <rgroup_id>  (38) 
+37
 
 $$$$
 
@@ -1508,6 +1622,9 @@ M  END
 >  <SMILES>  (39) 
 *NCCN(C)C
 
+>  <rgroup_id>  (39) 
+38
+
 $$$$
 
      RDKit          3D
@@ -1549,6 +1666,9 @@ V    1 *
 M  END
 >  <SMILES>  (40) 
 *c1cccc(OC)c1
+
+>  <rgroup_id>  (40) 
+39
 
 $$$$
 
@@ -1605,6 +1725,9 @@ M  END
 >  <SMILES>  (41) 
 *c1ccc(-c2ccccc2)cc1
 
+>  <rgroup_id>  (41) 
+40
+
 $$$$
 
      RDKit          3D
@@ -1638,6 +1761,9 @@ M  END
 >  <SMILES>  (42) 
 *CCOC
 
+>  <rgroup_id>  (42) 
+41
+
 $$$$
 
      RDKit          3D
@@ -1666,6 +1792,9 @@ V    1 *
 M  END
 >  <SMILES>  (43) 
 *C(C)N
+
+>  <rgroup_id>  (43) 
+42
 
 $$$$
 
@@ -1714,6 +1843,9 @@ M  END
 >  <SMILES>  (44) 
 *c1ccc2c(c1)OCCO2
 
+>  <rgroup_id>  (44) 
+43
+
 $$$$
 
      RDKit          3D
@@ -1750,6 +1882,9 @@ M  END
 >  <SMILES>  (45) 
 *Nc1ccncc1
 
+>  <rgroup_id>  (45) 
+44
+
 $$$$
 
      RDKit          3D
@@ -1762,6 +1897,9 @@ V    1 *
 M  END
 >  <SMILES>  (46) 
 *F
+
+>  <rgroup_id>  (46) 
+45
 
 $$$$
 
@@ -1800,6 +1938,9 @@ V    1 *
 M  END
 >  <SMILES>  (47) 
 *c1cccc(C)n1
+
+>  <rgroup_id>  (47) 
+46
 
 $$$$
 
@@ -1851,6 +1992,9 @@ M  END
 >  <SMILES>  (48) 
 *N1CCC(C)CC1
 
+>  <rgroup_id>  (48) 
+47
+
 $$$$
 
      RDKit          3D
@@ -1885,6 +2029,9 @@ V    1 *
 M  END
 >  <SMILES>  (49) 
 *C(=O)NCCO
+
+>  <rgroup_id>  (49) 
+48
 
 $$$$
 
@@ -1930,6 +2077,9 @@ M  END
 >  <SMILES>  (50) 
 *NC1CCCC1
 
+>  <rgroup_id>  (50) 
+49
+
 $$$$
 c1cccccc1
      RDKit          3D
@@ -1963,6 +2113,9 @@ V    6 *
 M  END
 >  <SMILES>  (51) 
 *c1cccccc1
+
+>  <rgroup_id>  (51) 
+50
 
 $$$$
 
@@ -2016,6 +2169,9 @@ M  END
 >  <SMILES>  (52) 
 *OCCN1CCCC1
 
+>  <rgroup_id>  (52) 
+51
+
 $$$$
 
      RDKit          3D
@@ -2052,6 +2208,9 @@ M  END
 >  <SMILES>  (53) 
 *C1CCCO1
 
+>  <rgroup_id>  (53) 
+52
+
 $$$$
 
      RDKit          3D
@@ -2076,6 +2235,9 @@ V    1 *
 M  END
 >  <SMILES>  (54) 
 *CC
+
+>  <rgroup_id>  (54) 
+53
 
 $$$$
 
@@ -2119,6 +2281,9 @@ M  END
 >  <SMILES>  (55) 
 *C(=O)Nc1ccccc1
 
+>  <rgroup_id>  (55) 
+54
+
 $$$$
 
      RDKit          3D
@@ -2161,6 +2326,9 @@ M  END
 >  <SMILES>  (56) 
 *SCc1ccccc1
 
+>  <rgroup_id>  (56) 
+55
+
 $$$$
 
      RDKit          3D
@@ -2194,6 +2362,9 @@ M  END
 >  <SMILES>  (57) 
 *C(=O)N(C)C
 
+>  <rgroup_id>  (57) 
+56
+
 $$$$
 
      RDKit          3D
@@ -2214,6 +2385,9 @@ V    1 *
 M  END
 >  <SMILES>  (58) 
 *CO
+
+>  <rgroup_id>  (58) 
+57
 
 $$$$
 
@@ -2263,6 +2437,9 @@ M  END
 >  <SMILES>  (59) 
 *C(=O)N1CCCCC1
 
+>  <rgroup_id>  (59) 
+58
+
 $$$$
 
      RDKit          3D
@@ -2306,6 +2483,9 @@ V    1 *
 M  END
 >  <SMILES>  (60) 
 *Nc1ccc(C)cc1
+
+>  <rgroup_id>  (60) 
+59
 
 $$$$
 
@@ -2368,6 +2548,9 @@ M  END
 >  <SMILES>  (61) 
 *N1CCN(c2ccccn2)CC1
 
+>  <rgroup_id>  (61) 
+60
+
 $$$$
 
      RDKit          3D
@@ -2402,6 +2585,9 @@ M  END
 >  <SMILES>  (62) 
 *c1cccc(Cl)c1
 
+>  <rgroup_id>  (62) 
+61
+
 $$$$
 
      RDKit          3D
@@ -2430,6 +2616,9 @@ V    1 *
 M  END
 >  <SMILES>  (63) 
 *C(=O)CC
+
+>  <rgroup_id>  (63) 
+62
 
 $$$$
 
@@ -2479,6 +2668,9 @@ M  END
 >  <SMILES>  (64) 
 *Cc1ccccc1OC
 
+>  <rgroup_id>  (64) 
+63
+
 $$$$
 
      RDKit          3D
@@ -2520,6 +2712,9 @@ M  END
 >  <SMILES>  (65) 
 *c1ccc2c(c1)OCO2
 
+>  <rgroup_id>  (65) 
+64
+
 $$$$
 
      RDKit          3D
@@ -2559,6 +2754,9 @@ M  END
 >  <SMILES>  (66) 
 *OCCCC
 
+>  <rgroup_id>  (66) 
+65
+
 $$$$
 
      RDKit          3D
@@ -2585,6 +2783,9 @@ V    1 *
 M  END
 >  <SMILES>  (67) 
 *C(=O)NC
+
+>  <rgroup_id>  (67) 
+66
 
 $$$$
 
@@ -2630,6 +2831,9 @@ M  END
 >  <SMILES>  (68) 
 *N1CCCCC1
 
+>  <rgroup_id>  (68) 
+67
+
 $$$$
 
      RDKit          3D
@@ -2669,6 +2873,9 @@ M  END
 >  <SMILES>  (69) 
 *OCC(C)C
 
+>  <rgroup_id>  (69) 
+68
+
 $$$$
 
      RDKit          3D
@@ -2696,6 +2903,9 @@ V    1 *
 M  END
 >  <SMILES>  (70) 
 *C1CC1
+
+>  <rgroup_id>  (70) 
+69
 
 $$$$
 
@@ -2739,6 +2949,9 @@ M  END
 >  <SMILES>  (71) 
 *CC1CCCO1
 
+>  <rgroup_id>  (71) 
+70
+
 $$$$
 
      RDKit          3D
@@ -2776,6 +2989,9 @@ V    1 *
 M  END
 >  <SMILES>  (72) 
 *Cc1ccccn1
+
+>  <rgroup_id>  (72) 
+71
 
 $$$$
 
@@ -2815,6 +3031,9 @@ M  END
 >  <SMILES>  (73) 
 *c1ccc(C(F)(F)F)cn1
 
+>  <rgroup_id>  (73) 
+72
+
 $$$$
 
      RDKit          3D
@@ -2850,6 +3069,9 @@ V    1 *
 M  END
 >  <SMILES>  (74) 
 *C(=O)NC1CC1
+
+>  <rgroup_id>  (74) 
+73
 
 $$$$
 
@@ -2889,6 +3111,9 @@ V    1 *
 M  END
 >  <SMILES>  (75) 
 *CC(=O)N(C)C
+
+>  <rgroup_id>  (75) 
+74
 
 $$$$
 
@@ -2944,6 +3169,9 @@ M  END
 >  <SMILES>  (76) 
 *OCCN1CCOCC1
 
+>  <rgroup_id>  (76) 
+75
+
 $$$$
 
      RDKit          3D
@@ -2975,6 +3203,9 @@ V    1 *
 M  END
 >  <SMILES>  (77) 
 *C(=O)c1cccs1
+
+>  <rgroup_id>  (77) 
+76
 
 $$$$
 
@@ -3010,6 +3241,9 @@ M  END
 >  <SMILES>  (78) 
 *n1ccnc1C
 
+>  <rgroup_id>  (78) 
+77
+
 $$$$
 
      RDKit          3D
@@ -3039,6 +3273,9 @@ V    1 *
 M  END
 >  <SMILES>  (79) 
 *Nc1nccs1
+
+>  <rgroup_id>  (79) 
+78
 
 $$$$
 
@@ -3081,6 +3318,9 @@ M  END
 >  <SMILES>  (80) 
 *C(=O)NCCOC
 
+>  <rgroup_id>  (80) 
+79
+
 $$$$
 
      RDKit          3D
@@ -3108,6 +3348,9 @@ V    1 *
 M  END
 >  <SMILES>  (81) 
 *n1ccnc1
+
+>  <rgroup_id>  (81) 
+80
 
 $$$$
 
@@ -3150,6 +3393,9 @@ M  END
 >  <SMILES>  (82) 
 *CNC(C)C
 
+>  <rgroup_id>  (82) 
+81
+
 $$$$
 
      RDKit          3D
@@ -3191,6 +3437,9 @@ M  END
 >  <SMILES>  (83) 
 *c1nc2ccccc2[nH]1
 
+>  <rgroup_id>  (83) 
+82
+
 $$$$
 
      RDKit          3D
@@ -3228,6 +3477,9 @@ V    1 *
 M  END
 >  <SMILES>  (84) 
 *c1ccc(C)nc1
+
+>  <rgroup_id>  (84) 
+83
 
 $$$$
 
@@ -3270,6 +3522,9 @@ M  END
 >  <SMILES>  (85) 
 *NC(C)(C)C
 
+>  <rgroup_id>  (85) 
+84
+
 $$$$
 
      RDKit          3D
@@ -3282,6 +3537,9 @@ V    1 *
 M  END
 >  <SMILES>  (86) 
 *I
+
+>  <rgroup_id>  (86) 
+85
 
 $$$$
 
@@ -3305,6 +3563,9 @@ V    1 *
 M  END
 >  <SMILES>  (87) 
 *C(=N)N
+
+>  <rgroup_id>  (87) 
+86
 
 $$$$
 
@@ -3345,6 +3606,9 @@ M  END
 >  <SMILES>  (88) 
 *CCNC(C)=O
 
+>  <rgroup_id>  (88) 
+87
+
 $$$$
 
      RDKit          3D
@@ -3375,6 +3639,9 @@ V    1 *
 M  END
 >  <SMILES>  (89) 
 *OCCN
+
+>  <rgroup_id>  (89) 
+88
 
 $$$$
 
@@ -3430,6 +3697,9 @@ M  END
 >  <SMILES>  (90) 
 *C1CCN(C(C)=O)CC1
 
+>  <rgroup_id>  (90) 
+89
+
 $$$$
 
      RDKit          3D
@@ -3469,6 +3739,9 @@ V    1 *
 M  END
 >  <SMILES>  (91) 
 *c1ccc(C)cc1
+
+>  <rgroup_id>  (91) 
+90
 
 $$$$
 
@@ -3512,6 +3785,9 @@ M  END
 >  <SMILES>  (92) 
 *c1cccc(CO)c1
 
+>  <rgroup_id>  (92) 
+91
+
 $$$$
 
      RDKit          3D
@@ -3532,6 +3808,9 @@ V    1 *
 M  END
 >  <SMILES>  (93) 
 *OC(F)F
+
+>  <rgroup_id>  (93) 
+92
 
 $$$$
 
@@ -3571,6 +3850,9 @@ V    1 *
 M  END
 >  <SMILES>  (94) 
 *NC(=O)CCC
+
+>  <rgroup_id>  (94) 
+93
 
 $$$$
 
@@ -3617,6 +3899,9 @@ M  END
 >  <SMILES>  (95) 
 *C(=O)NC(C)(C)C
 
+>  <rgroup_id>  (95) 
+94
+
 $$$$
 
      RDKit          3D
@@ -3647,6 +3932,9 @@ V    1 *
 M  END
 >  <SMILES>  (96) 
 *C(C)C
+
+>  <rgroup_id>  (96) 
+95
 
 $$$$
 
@@ -3701,6 +3989,9 @@ M  END
 >  <SMILES>  (97) 
 *Cc1ccc2ccccc2c1
 
+>  <rgroup_id>  (97) 
+96
+
 $$$$
 
      RDKit          3D
@@ -3739,6 +4030,9 @@ V    1 *
 M  END
 >  <SMILES>  (98) 
 *C(=O)NCCC
+
+>  <rgroup_id>  (98) 
+97
 
 $$$$
 
@@ -3795,6 +4089,9 @@ M  END
 >  <SMILES>  (99) 
 *OCCN(CC)CC
 
+>  <rgroup_id>  (99) 
+98
+
 $$$$
 
      RDKit          3D
@@ -3830,6 +4127,9 @@ V    1 *
 M  END
 >  <SMILES>  (100) 
 *Oc1ccc(Cl)cc1
+
+>  <rgroup_id>  (100) 
+99
 
 $$$$
 
@@ -3875,6 +4175,9 @@ M  END
 >  <SMILES>  (101) 
 *NCc1ccccc1
 
+>  <rgroup_id>  (101) 
+100
+
 $$$$
 
      RDKit          3D
@@ -3909,6 +4212,9 @@ M  END
 >  <SMILES>  (102) 
 *Cc1cccs1
 
+>  <rgroup_id>  (102) 
+101
+
 $$$$
 
      RDKit          3D
@@ -3940,6 +4246,9 @@ V    1 *
 M  END
 >  <SMILES>  (103) 
 *N1CCC1
+
+>  <rgroup_id>  (103) 
+102
 
 $$$$
 
@@ -3982,6 +4291,9 @@ V    1 *
 M  END
 >  <SMILES>  (104) 
 *C(=O)N1CCCC1
+
+>  <rgroup_id>  (104) 
+103
 
 $$$$
 
@@ -4032,6 +4344,9 @@ M  END
 >  <SMILES>  (105) 
 *CCCCCC
 
+>  <rgroup_id>  (105) 
+104
+
 $$$$
 
      RDKit          3D
@@ -4068,6 +4383,9 @@ M  END
 >  <SMILES>  (106) 
 *Oc1ccccc1
 
+>  <rgroup_id>  (106) 
+105
+
 $$$$
 
      RDKit          3D
@@ -4096,6 +4414,9 @@ V    1 *
 M  END
 >  <SMILES>  (107) 
 *OCC=C
+
+>  <rgroup_id>  (107) 
+106
 
 $$$$
 
@@ -4136,6 +4457,9 @@ M  END
 >  <SMILES>  (108) 
 *c1nc2ccccc2s1
 
+>  <rgroup_id>  (108) 
+107
+
 $$$$
 
      RDKit          3D
@@ -4173,6 +4497,9 @@ V    1 *
 M  END
 >  <SMILES>  (109) 
 *c1cc(O)cc(O)c1
+
+>  <rgroup_id>  (109) 
+108
 
 $$$$
 
@@ -4232,6 +4559,9 @@ M  END
 >  <SMILES>  (110) 
 *OCCN1CCCCC1
 
+>  <rgroup_id>  (110) 
+109
+
 $$$$
 
      RDKit          3D
@@ -4261,6 +4591,9 @@ M  END
 >  <SMILES>  (111) 
 *NCC
 
+>  <rgroup_id>  (111) 
+110
+
 $$$$
 
      RDKit          3D
@@ -4288,6 +4621,9 @@ M  END
 >  <SMILES>  (112) 
 *OCC(F)(F)F
 
+>  <rgroup_id>  (112) 
+111
+
 $$$$
 
      RDKit          3D
@@ -4310,6 +4646,9 @@ V    1 *
 M  END
 >  <SMILES>  (113) 
 *C(C)=O
+
+>  <rgroup_id>  (113) 
+112
 
 $$$$
 
@@ -4351,6 +4690,9 @@ M  END
 >  <SMILES>  (114) 
 *Cc1ccc(F)cc1
 
+>  <rgroup_id>  (114) 
+113
+
 $$$$
 
      RDKit          3D
@@ -4390,6 +4732,9 @@ V    1 *
 M  END
 >  <SMILES>  (115) 
 *c1ccccc1C(F)(F)F
+
+>  <rgroup_id>  (115) 
+114
 
 $$$$
 
@@ -4433,6 +4778,9 @@ M  END
 >  <SMILES>  (116) 
 *Oc1cccc(C)c1
 
+>  <rgroup_id>  (116) 
+115
+
 $$$$
 
      RDKit          3D
@@ -4453,6 +4801,9 @@ V    1 *
 M  END
 >  <SMILES>  (117) 
 *B(O)O
+
+>  <rgroup_id>  (117) 
+116
 
 $$$$
 
@@ -4494,6 +4845,9 @@ M  END
 >  <SMILES>  (118) 
 *c1ccc(C(F)(F)F)cc1
 
+>  <rgroup_id>  (118) 
+117
+
 $$$$
 
      RDKit          3D
@@ -4529,6 +4883,9 @@ M  END
 >  <SMILES>  (119) 
 *CCCN
 
+>  <rgroup_id>  (119) 
+118
+
 $$$$
 
      RDKit          3D
@@ -4561,6 +4918,9 @@ M  END
 >  <SMILES>  (120) 
 *c1ccncc1
 
+>  <rgroup_id>  (120) 
+119
+
 $$$$
 
      RDKit          3D
@@ -4590,6 +4950,9 @@ V    1 *
 M  END
 >  <SMILES>  (121) 
 *c1ccc[nH]1
+
+>  <rgroup_id>  (121) 
+120
 
 $$$$
 
@@ -4632,6 +4995,9 @@ V    1 *
 M  END
 >  <SMILES>  (122) 
 *C(=O)Nc1ccc(F)cc1
+
+>  <rgroup_id>  (122) 
+121
 
 $$$$
 
@@ -4685,6 +5051,9 @@ M  END
 >  <SMILES>  (123) 
 *N1CCC(OC)CC1
 
+>  <rgroup_id>  (123) 
+122
+
 $$$$
 
      RDKit          3D
@@ -4709,6 +5078,9 @@ V    1 *
 M  END
 >  <SMILES>  (124) 
 *CC(=O)O
+
+>  <rgroup_id>  (124) 
+123
 
 $$$$
 
@@ -4747,6 +5119,9 @@ V    1 *
 M  END
 >  <SMILES>  (125) 
 *c1ccc(N)cc1
+
+>  <rgroup_id>  (125) 
+124
 
 $$$$
 
@@ -4808,6 +5183,9 @@ M  END
 >  <SMILES>  (126) 
 *N1CCC(N(C)C)CC1
 
+>  <rgroup_id>  (126) 
+125
+
 $$$$
 
      RDKit          3D
@@ -4846,6 +5224,9 @@ M  END
 >  <SMILES>  (127) 
 *Nc1ccccc1
 
+>  <rgroup_id>  (127) 
+126
+
 $$$$
 
      RDKit          3D
@@ -4878,6 +5259,9 @@ V    1 *
 M  END
 >  <SMILES>  (128) 
 *C(O)=CC(=O)C(=O)O
+
+>  <rgroup_id>  (128) 
+127
 
 $$$$
 
@@ -4921,6 +5305,9 @@ M  END
 >  <SMILES>  (129) 
 *c1ccc(OC(F)(F)F)cc1
 
+>  <rgroup_id>  (129) 
+128
+
 $$$$
 
      RDKit          3D
@@ -4947,6 +5334,9 @@ V    1 *
 M  END
 >  <SMILES>  (130) 
 *OCC
+
+>  <rgroup_id>  (130) 
+129
 
 $$$$
 
@@ -4984,6 +5374,9 @@ V    1 *
 M  END
 >  <SMILES>  (131) 
 *CCCC
+
+>  <rgroup_id>  (131) 
+130
 
 $$$$
 
@@ -5029,6 +5422,9 @@ M  END
 >  <SMILES>  (132) 
 *NS(=O)(=O)c1ccccc1
 
+>  <rgroup_id>  (132) 
+131
+
 $$$$
 
      RDKit          3D
@@ -5065,6 +5461,9 @@ V    1 *
 M  END
 >  <SMILES>  (133) 
 *CCCC(=O)O
+
+>  <rgroup_id>  (133) 
+132
 
 $$$$
 
@@ -5103,6 +5502,9 @@ V    1 *
 M  END
 >  <SMILES>  (134) 
 *c1ncccc1C(F)(F)F
+
+>  <rgroup_id>  (134) 
+133
 
 $$$$
 
@@ -5146,6 +5548,9 @@ M  END
 >  <SMILES>  (135) 
 *N1CCNCC1
 
+>  <rgroup_id>  (135) 
+134
+
 $$$$
 
      RDKit          3D
@@ -5186,6 +5591,9 @@ M  END
 >  <SMILES>  (136) 
 *Cc1ccccc1
 
+>  <rgroup_id>  (136) 
+135
+
 $$$$
 
      RDKit          3D
@@ -5221,6 +5629,9 @@ V    1 *
 M  END
 >  <SMILES>  (137) 
 *Oc1ccc(F)cc1
+
+>  <rgroup_id>  (137) 
+136
 
 $$$$
 
@@ -5262,6 +5673,9 @@ M  END
 >  <SMILES>  (138) 
 *c1cccc(C)c1
 
+>  <rgroup_id>  (138) 
+137
+
 $$$$
 
      RDKit          3D
@@ -5283,6 +5697,9 @@ M  END
 >  <SMILES>  (139) 
 *CC#N
 
+>  <rgroup_id>  (139) 
+138
+
 $$$$
 
      RDKit          3D
@@ -5303,6 +5720,9 @@ V    1 *
 M  END
 >  <SMILES>  (140) 
 *OC
+
+>  <rgroup_id>  (140) 
+139
 
 $$$$
 
@@ -5346,6 +5766,9 @@ M  END
 >  <SMILES>  (141) 
 *c1cccc(OC(F)(F)F)c1
 
+>  <rgroup_id>  (141) 
+140
+
 $$$$
 
      RDKit          3D
@@ -5387,6 +5810,9 @@ V    1 *
 M  END
 >  <SMILES>  (142) 
 *NCc1ccncc1
+
+>  <rgroup_id>  (142) 
+141
 
 $$$$
 
@@ -5432,6 +5858,9 @@ V    1 *
 M  END
 >  <SMILES>  (143) 
 *c1cnc2ccccc2c1
+
+>  <rgroup_id>  (143) 
+142
 
 $$$$
 
@@ -5485,6 +5914,9 @@ M  END
 >  <SMILES>  (144) 
 *NCc1ccc(OC)cc1
 
+>  <rgroup_id>  (144) 
+143
+
 $$$$
 
      RDKit          3D
@@ -5499,6 +5931,9 @@ V    1 *
 M  END
 >  <SMILES>  (145) 
 *S
+
+>  <rgroup_id>  (145) 
+144
 
 $$$$
 
@@ -5551,6 +5986,9 @@ V    1 *
 M  END
 >  <SMILES>  (146) 
 *N1CCC(CO)CC1
+
+>  <rgroup_id>  (146) 
+145
 
 $$$$
 
@@ -5608,6 +6046,9 @@ M  END
 >  <SMILES>  (147) 
 *CCN1CCCCC1
 
+>  <rgroup_id>  (147) 
+146
+
 $$$$
 
      RDKit          3D
@@ -5649,6 +6090,9 @@ M  END
 >  <SMILES>  (148) 
 *N(CC)CC
 
+>  <rgroup_id>  (148) 
+147
+
 $$$$
 
      RDKit          3D
@@ -5689,6 +6133,9 @@ M  END
 >  <SMILES>  (149) 
 *c1cccc(OC)n1
 
+>  <rgroup_id>  (149) 
+148
+
 $$$$
 
      RDKit          3D
@@ -5721,6 +6168,9 @@ V    1 *
 M  END
 >  <SMILES>  (150) 
 *C(=O)NCC
+
+>  <rgroup_id>  (150) 
+149
 
 $$$$
 
@@ -5772,6 +6222,9 @@ M  END
 >  <SMILES>  (151) 
 *CN1CCCCC1
 
+>  <rgroup_id>  (151) 
+150
+
 $$$$
 
      RDKit          3D
@@ -5786,6 +6239,9 @@ V    1 *
 M  END
 >  <SMILES>  (152) 
 *O
+
+>  <rgroup_id>  (152) 
+151
 
 $$$$
 
@@ -5833,6 +6289,9 @@ M  END
 >  <SMILES>  (153) 
 *c1cccc(S(C)(=O)=O)c1
 
+>  <rgroup_id>  (153) 
+152
+
 $$$$
 
      RDKit          3D
@@ -5873,6 +6332,9 @@ M  END
 >  <SMILES>  (154) 
 *N1CCOCC1
 
+>  <rgroup_id>  (154) 
+153
+
 $$$$
 
      RDKit          3D
@@ -5891,6 +6353,9 @@ V    1 *
 M  END
 >  <SMILES>  (155) 
 *C(F)(F)F
+
+>  <rgroup_id>  (155) 
+154
 
 $$$$
 
@@ -5921,6 +6386,9 @@ M  END
 >  <SMILES>  (156) 
 *CCN
 
+>  <rgroup_id>  (156) 
+155
+
 $$$$
 
      RDKit          3D
@@ -5945,6 +6413,9 @@ V    1 *
 M  END
 >  <SMILES>  (157) 
 *NC(N)=O
+
+>  <rgroup_id>  (157) 
+156
 
 $$$$
 
@@ -5983,6 +6454,9 @@ M  END
 >  <SMILES>  (158) 
 *CC(C)C
 
+>  <rgroup_id>  (158) 
+157
+
 $$$$
 
      RDKit          3D
@@ -6017,6 +6491,9 @@ V    1 *
 M  END
 >  <SMILES>  (159) 
 *CCC(=O)NO
+
+>  <rgroup_id>  (159) 
+158
 
 $$$$
 
@@ -6067,6 +6544,9 @@ M  END
 >  <SMILES>  (160) 
 *C1CC1c1ccccc1
 
+>  <rgroup_id>  (160) 
+159
+
 $$$$
 
      RDKit          3D
@@ -6112,6 +6592,9 @@ M  END
 >  <SMILES>  (161) 
 *c1ccc2ccccc2n1
 
+>  <rgroup_id>  (161) 
+160
+
 $$$$
 
      RDKit          3D
@@ -6141,6 +6624,9 @@ M  END
 >  <SMILES>  (162) 
 *CP(=O)(O)O
 
+>  <rgroup_id>  (162) 
+161
+
 $$$$
 
      RDKit          3D
@@ -6167,6 +6653,9 @@ V    1 *
 M  END
 >  <SMILES>  (163) 
 *C=CC(=O)O
+
+>  <rgroup_id>  (163) 
+162
 
 $$$$
 
@@ -6208,6 +6697,9 @@ M  END
 >  <SMILES>  (164) 
 *OCc1cccnc1
 
+>  <rgroup_id>  (164) 
+163
+
 $$$$
 
      RDKit          3D
@@ -6247,6 +6739,9 @@ M  END
 >  <SMILES>  (165) 
 *c1nc2ccccc2o1
 
+>  <rgroup_id>  (165) 
+164
+
 $$$$
 
      RDKit          3D
@@ -6282,6 +6777,9 @@ V    1 *
 M  END
 >  <SMILES>  (166) 
 *Nc1cccnc1
+
+>  <rgroup_id>  (166) 
+165
 
 $$$$
 
@@ -6335,6 +6833,9 @@ M  END
 >  <SMILES>  (167) 
 *CC1CCCCC1
 
+>  <rgroup_id>  (167) 
+166
+
 $$$$
 
      RDKit          3D
@@ -6375,6 +6876,9 @@ M  END
 >  <SMILES>  (168) 
 *Cn1nc(OC)oc1=O
 
+>  <rgroup_id>  (168) 
+167
+
 $$$$
 
      RDKit          3D
@@ -6404,6 +6908,9 @@ V    1 *
 M  END
 >  <SMILES>  (169) 
 *n1cccc1
+
+>  <rgroup_id>  (169) 
+168
 
 $$$$
 
@@ -6460,6 +6967,9 @@ M  END
 >  <SMILES>  (170) 
 *c1cccc(-c2ccccc2)c1
 
+>  <rgroup_id>  (170) 
+169
+
 $$$$
 
      RDKit          3D
@@ -6500,6 +7010,9 @@ M  END
 >  <SMILES>  (171) 
 *OCc1ccccn1
 
+>  <rgroup_id>  (171) 
+170
+
 $$$$
 
      RDKit          3D
@@ -6533,6 +7046,9 @@ V    1 *
 M  END
 >  <SMILES>  (172) 
 *c1cnc(N)nc1
+
+>  <rgroup_id>  (172) 
+171
 
 $$$$
 
@@ -6574,6 +7090,9 @@ M  END
 >  <SMILES>  (173) 
 *NC(=O)c1ccccn1
 
+>  <rgroup_id>  (173) 
+172
+
 $$$$
 
      RDKit          3D
@@ -6607,6 +7126,9 @@ V    1 *
 M  END
 >  <SMILES>  (174) 
 *C1COC(N)=N1
+
+>  <rgroup_id>  (174) 
+173
 
 $$$$
 
@@ -6645,6 +7167,9 @@ V    1 *
 M  END
 >  <SMILES>  (175) 
 *c1ccc(C(F)(F)F)nc1
+
+>  <rgroup_id>  (175) 
+174
 
 $$$$
 
@@ -6691,6 +7216,9 @@ V    1 *
 M  END
 >  <SMILES>  (176) 
 *C(=O)OCc1ccccc1
+
+>  <rgroup_id>  (176) 
+175
 
 $$$$
 
@@ -6740,6 +7268,9 @@ M  END
 >  <SMILES>  (177) 
 *COCc1ccccc1
 
+>  <rgroup_id>  (177) 
+176
+
 $$$$
 
      RDKit          3D
@@ -6776,6 +7307,9 @@ M  END
 >  <SMILES>  (178) 
 *NC(=O)c1cccs1
 
+>  <rgroup_id>  (178) 
+177
+
 $$$$
 
      RDKit          3D
@@ -6808,6 +7342,9 @@ V    1 *
 M  END
 >  <SMILES>  (179) 
 *NCCN
+
+>  <rgroup_id>  (179) 
+178
 
 $$$$
 
@@ -6843,6 +7380,9 @@ M  END
 >  <SMILES>  (180) 
 *Oc1cccnc1
 
+>  <rgroup_id>  (180) 
+179
+
 $$$$
 
      RDKit          3D
@@ -6874,6 +7414,9 @@ M  END
 >  <SMILES>  (181) 
 *CC(=O)OC
 
+>  <rgroup_id>  (181) 
+180
+
 $$$$
 
      RDKit          3D
@@ -6894,6 +7437,9 @@ V    1 *
 M  END
 >  <SMILES>  (182) 
 *C=C
+
+>  <rgroup_id>  (182) 
+181
 
 $$$$
 
@@ -6932,6 +7478,9 @@ V    1 *
 M  END
 >  <SMILES>  (183) 
 *NCC1CC1
+
+>  <rgroup_id>  (183) 
+182
 
 $$$$
 
@@ -6973,6 +7522,9 @@ V    1 *
 M  END
 >  <SMILES>  (184) 
 *c1csc2ccccc12
+
+>  <rgroup_id>  (184) 
+183
 
 $$$$
 
@@ -7018,6 +7570,9 @@ M  END
 >  <SMILES>  (185) 
 *N(C)c1ccccc1
 
+>  <rgroup_id>  (185) 
+184
+
 $$$$
 
      RDKit          3D
@@ -7050,6 +7605,9 @@ V    1 *
 M  END
 >  <SMILES>  (186) 
 *NC(=O)CC
+
+>  <rgroup_id>  (186) 
+185
 
 $$$$
 
@@ -7091,6 +7649,9 @@ M  END
 >  <SMILES>  (187) 
 *C(=O)Nc1cccnc1
 
+>  <rgroup_id>  (187) 
+186
+
 $$$$
 
      RDKit          3D
@@ -7131,6 +7692,9 @@ M  END
 >  <SMILES>  (188) 
 *Cc1ccc(Cl)cc1
 
+>  <rgroup_id>  (188) 
+187
+
 $$$$
 
      RDKit          3D
@@ -7161,6 +7725,9 @@ M  END
 >  <SMILES>  (189) 
 *c1ccnnc1
 
+>  <rgroup_id>  (189) 
+188
+
 $$$$
 
      RDKit          3D
@@ -7181,6 +7748,9 @@ V    1 *
 M  END
 >  <SMILES>  (190) 
 *NN
+
+>  <rgroup_id>  (190) 
+189
 
 $$$$
 
@@ -7215,6 +7785,9 @@ V    1 *
 M  END
 >  <SMILES>  (191) 
 *CC1CC1
+
+>  <rgroup_id>  (191) 
+190
 
 $$$$
 
@@ -7276,6 +7849,9 @@ M  END
 >  <SMILES>  (192) 
 *OCCCN1CCOCC1
 
+>  <rgroup_id>  (192) 
+191
+
 $$$$
 
      RDKit          3D
@@ -7318,6 +7894,9 @@ M  END
 >  <SMILES>  (193) 
 *c1ccc(OC)c(F)c1
 
+>  <rgroup_id>  (193) 
+192
+
 $$$$
 
      RDKit          3D
@@ -7349,6 +7928,9 @@ V    1 *
 M  END
 >  <SMILES>  (194) 
 *C(=O)c1ccco1
+
+>  <rgroup_id>  (194) 
+193
 
 $$$$
 
@@ -7419,6 +8001,9 @@ M  END
 >  <SMILES>  (195) 
 *N1CCC(N2CCCC2)CC1
 
+>  <rgroup_id>  (195) 
+194
+
 $$$$
 
      RDKit          3D
@@ -7464,6 +8049,9 @@ M  END
 >  <SMILES>  (196) 
 *c1cccc2ncccc12
 
+>  <rgroup_id>  (196) 
+195
+
 $$$$
 
      RDKit          3D
@@ -7499,6 +8087,9 @@ M  END
 >  <SMILES>  (197) 
 *CN(C)C
 
+>  <rgroup_id>  (197) 
+196
+
 $$$$
 
      RDKit          3D
@@ -7525,6 +8116,9 @@ V    1 *
 M  END
 >  <SMILES>  (198) 
 *OCCF
+
+>  <rgroup_id>  (198) 
+197
 
 $$$$
 
@@ -7574,6 +8168,9 @@ V    1 *
 M  END
 >  <SMILES>  (199) 
 *OCCCN(C)C
+
+>  <rgroup_id>  (199) 
+198
 
 $$$$
 
@@ -7636,6 +8233,9 @@ M  END
 >  <SMILES>  (200) 
 *c1ccc(N2CCOCC2)cc1
 
+>  <rgroup_id>  (200) 
+199
+
 $$$$
 
      RDKit          3D
@@ -7679,6 +8279,9 @@ V    1 *
 M  END
 >  <SMILES>  (201) 
 *C(=O)N1CCOCC1
+
+>  <rgroup_id>  (201) 
+200
 
 $$$$
 
@@ -7730,6 +8333,9 @@ M  END
 >  <SMILES>  (202) 
 *NC1CCCCC1
 
+>  <rgroup_id>  (202) 
+201
+
 $$$$
 
      RDKit          3D
@@ -7763,6 +8369,9 @@ M  END
 >  <SMILES>  (203) 
 *CC(=O)NC
 
+>  <rgroup_id>  (203) 
+202
+
 $$$$
 
      RDKit          3D
@@ -7793,6 +8402,9 @@ V    1 *
 M  END
 >  <SMILES>  (204) 
 *S(=O)(=O)CC
+
+>  <rgroup_id>  (204) 
+203
 
 $$$$
 
@@ -7827,6 +8439,9 @@ V    1 *
 M  END
 >  <SMILES>  (205) 
 *c1cnn(C)c1
+
+>  <rgroup_id>  (205) 
+204
 
 $$$$
 
@@ -7872,6 +8487,9 @@ M  END
 >  <SMILES>  (206) 
 *Oc1ccc(OC)cc1
 
+>  <rgroup_id>  (206) 
+205
+
 $$$$
 
      RDKit          3D
@@ -7914,6 +8532,9 @@ M  END
 >  <SMILES>  (207) 
 *NC(=O)c1ccccc1
 
+>  <rgroup_id>  (207) 
+206
+
 $$$$
 
      RDKit          3D
@@ -7952,6 +8573,9 @@ M  END
 >  <SMILES>  (208) 
 *Cc1cccnc1
 
+>  <rgroup_id>  (208) 
+207
+
 $$$$
 
      RDKit          3D
@@ -7979,6 +8603,9 @@ V    1 *
 M  END
 >  <SMILES>  (209) 
 *c1ccco1
+
+>  <rgroup_id>  (209) 
+208
 
 $$$$
 
@@ -8025,6 +8652,9 @@ V    1 *
 M  END
 >  <SMILES>  (210) 
 *Nc1ccc(OC)cc1
+
+>  <rgroup_id>  (210) 
+209
 
 $$$$
 
@@ -8073,6 +8703,9 @@ V    1 *
 M  END
 >  <SMILES>  (211) 
 *c1ccc(NC(C)=O)cc1
+
+>  <rgroup_id>  (211) 
+210
 
 $$$$
 
@@ -8128,6 +8761,9 @@ M  END
 >  <SMILES>  (212) 
 *c1ccc(OC(C)C)cc1
 
+>  <rgroup_id>  (212) 
+211
+
 $$$$
 
      RDKit          3D
@@ -8157,6 +8793,9 @@ M  END
 >  <SMILES>  (213) 
 *NS(C)(=O)=O
 
+>  <rgroup_id>  (213) 
+212
+
 $$$$
 
      RDKit          3D
@@ -8181,6 +8820,9 @@ V    1 *
 M  END
 >  <SMILES>  (214) 
 *CC(F)(F)F
+
+>  <rgroup_id>  (214) 
+213
 
 $$$$
 
@@ -8222,6 +8864,9 @@ M  END
 >  <SMILES>  (215) 
 *C1=CCNCC1
 
+>  <rgroup_id>  (215) 
+214
+
 $$$$
 
      RDKit          3D
@@ -8260,6 +8905,9 @@ M  END
 >  <SMILES>  (216) 
 *Nc1ccc(Cl)cc1
 
+>  <rgroup_id>  (216) 
+215
+
 $$$$
 
      RDKit          3D
@@ -8293,6 +8941,9 @@ V    1 *
 M  END
 >  <SMILES>  (217) 
 *c1ccccc1Cl
+
+>  <rgroup_id>  (217) 
+216
 
 $$$$
 
@@ -8332,6 +8983,9 @@ V    1 *
 M  END
 >  <SMILES>  (218) 
 *C(=O)NC(C)C
+
+>  <rgroup_id>  (218) 
+217
 
 $$$$
 
@@ -8383,6 +9037,9 @@ M  END
 >  <SMILES>  (219) 
 *CNC1CCCC1
 
+>  <rgroup_id>  (219) 
+218
+
 $$$$
 
      RDKit          3D
@@ -8422,6 +9079,9 @@ V    1 *
 M  END
 >  <SMILES>  (220) 
 *C1CCCC1
+
+>  <rgroup_id>  (220) 
+219
 
 $$$$
 
@@ -8468,6 +9128,9 @@ M  END
 >  <SMILES>  (221) 
 *C(=O)NCCCC
 
+>  <rgroup_id>  (221) 
+220
+
 $$$$
 
      RDKit          3D
@@ -8500,6 +9163,9 @@ M  END
 >  <SMILES>  (222) 
 *c1cccnc1
 
+>  <rgroup_id>  (222) 
+221
+
 $$$$
 
      RDKit          3D
@@ -8522,6 +9188,9 @@ V    1 *
 M  END
 >  <SMILES>  (223) 
 *S(N)(=O)=O
+
+>  <rgroup_id>  (223) 
+222
 
 $$$$
 
@@ -8556,6 +9225,9 @@ V    1 *
 M  END
 >  <SMILES>  (224) 
 *c1ccc(Cl)cc1Cl
+
+>  <rgroup_id>  (224) 
+223
 
 $$$$
 
@@ -8599,6 +9271,9 @@ M  END
 >  <SMILES>  (225) 
 *OC1CCCC1
 
+>  <rgroup_id>  (225) 
+224
+
 $$$$
 
      RDKit          3D
@@ -8629,6 +9304,9 @@ V    1 *
 M  END
 >  <SMILES>  (226) 
 *CS(C)(=O)=O
+
+>  <rgroup_id>  (226) 
+225
 
 $$$$
 
@@ -8676,6 +9354,9 @@ M  END
 >  <SMILES>  (227) 
 *N1CCCC(O)C1
 
+>  <rgroup_id>  (227) 
+226
+
 $$$$
 
      RDKit          3D
@@ -8696,6 +9377,9 @@ V    1 *
 M  END
 >  <SMILES>  (228) 
 *C(N)=O
+
+>  <rgroup_id>  (228) 
+227
 
 $$$$
 
@@ -8745,6 +9429,9 @@ M  END
 >  <SMILES>  (229) 
 *N1CCN(C)CC1
 
+>  <rgroup_id>  (229) 
+228
+
 $$$$
 
      RDKit          3D
@@ -8776,6 +9463,9 @@ V    1 *
 M  END
 >  <SMILES>  (230) 
 *C1=NCCN1
+
+>  <rgroup_id>  (230) 
+229
 
 $$$$
 
@@ -8811,6 +9501,9 @@ M  END
 >  <SMILES>  (231) 
 *Cc1c[nH]cn1
 
+>  <rgroup_id>  (231) 
+230
+
 $$$$
 
      RDKit          3D
@@ -8844,6 +9537,9 @@ V    1 *
 M  END
 >  <SMILES>  (232) 
 *C1CCC1
+
+>  <rgroup_id>  (232) 
+231
 
 $$$$
 
@@ -8882,6 +9578,9 @@ V    1 *
 M  END
 >  <SMILES>  (233) 
 *NCc1cccs1
+
+>  <rgroup_id>  (233) 
+232
 
 $$$$
 
@@ -8933,6 +9632,9 @@ M  END
 >  <SMILES>  (234) 
 *CCN1CCCC1
 
+>  <rgroup_id>  (234) 
+233
+
 $$$$
 
      RDKit          3D
@@ -8966,6 +9668,9 @@ V    1 *
 M  END
 >  <SMILES>  (235) 
 *c1ccc(F)c(F)c1
+
+>  <rgroup_id>  (235) 
+234
 
 $$$$
 
@@ -9004,6 +9709,9 @@ M  END
 >  <SMILES>  (236) 
 *C(C)=NNC(N)=S
 
+>  <rgroup_id>  (236) 
+235
+
 $$$$
 
      RDKit          3D
@@ -9038,6 +9746,9 @@ V    1 *
 M  END
 >  <SMILES>  (237) 
 *NCCC
+
+>  <rgroup_id>  (237) 
+236
 
 $$$$
 
@@ -9093,6 +9804,9 @@ M  END
 >  <SMILES>  (238) 
 *C(=O)NCCc1ccccc1
 
+>  <rgroup_id>  (238) 
+237
+
 $$$$
 
      RDKit          3D
@@ -9105,6 +9819,9 @@ V    1 *
 M  END
 >  <SMILES>  (239) 
 *Br
+
+>  <rgroup_id>  (239) 
+238
 
 $$$$
 
@@ -9152,6 +9869,9 @@ M  END
 >  <SMILES>  (240) 
 *CN1CCOCC1
 
+>  <rgroup_id>  (240) 
+239
+
 $$$$
 
      RDKit          3D
@@ -9196,6 +9916,9 @@ M  END
 >  <SMILES>  (241) 
 *N1CCS(=O)(=O)CC1
 
+>  <rgroup_id>  (241) 
+240
+
 $$$$
 
      RDKit          3D
@@ -9221,6 +9944,9 @@ V    1 *
 M  END
 >  <SMILES>  (242) 
 *c1nccs1
+
+>  <rgroup_id>  (242) 
+241
 
 $$$$
 
@@ -9274,6 +10000,9 @@ M  END
 >  <SMILES>  (243) 
 *CCN1CCOCC1
 
+>  <rgroup_id>  (243) 
+242
+
 $$$$
 
      RDKit          3D
@@ -9312,6 +10041,9 @@ M  END
 >  <SMILES>  (244) 
 *Oc1ccc(Cl)cc1O
 
+>  <rgroup_id>  (244) 
+243
+
 $$$$
 
      RDKit          3D
@@ -9343,6 +10075,9 @@ V    1 *
 M  END
 >  <SMILES>  (245) 
 *C=C1SC(=O)NC1=O
+
+>  <rgroup_id>  (245) 
+244
 
 $$$$
 
@@ -9383,6 +10118,9 @@ V    1 *
 M  END
 >  <SMILES>  (246) 
 *c1ccccc1C
+
+>  <rgroup_id>  (246) 
+245
 
 $$$$
 
@@ -9432,6 +10170,9 @@ M  END
 >  <SMILES>  (247) 
 *NC(=O)Cc1ccccc1
 
+>  <rgroup_id>  (247) 
+246
+
 $$$$
 
      RDKit          3D
@@ -9459,6 +10200,9 @@ V    1 *
 M  END
 >  <SMILES>  (248) 
 *c1ccsc1
+
+>  <rgroup_id>  (248) 
+247
 
 $$$$
 
@@ -9505,6 +10249,9 @@ V    1 *
 M  END
 >  <SMILES>  (249) 
 *NC(=O)Nc1ccc(Cl)cc1
+
+>  <rgroup_id>  (249) 
+248
 
 $$$$
 
@@ -9559,6 +10306,9 @@ V    1 *
 M  END
 >  <SMILES>  (250) 
 *N1CCN(CC)CC1
+
+>  <rgroup_id>  (250) 
+249
 
 $$$$
 
@@ -9616,6 +10366,9 @@ M  END
 >  <SMILES>  (251) 
 *NCCN1CCOCC1
 
+>  <rgroup_id>  (251) 
+250
+
 $$$$
 
      RDKit          3D
@@ -9657,6 +10410,9 @@ V    1 *
 M  END
 >  <SMILES>  (252) 
 *c1ccc(OC)cc1
+
+>  <rgroup_id>  (252) 
+251
 
 $$$$
 
@@ -9706,6 +10462,9 @@ M  END
 >  <SMILES>  (253) 
 *c1ccc(OCC)cc1
 
+>  <rgroup_id>  (253) 
+252
+
 $$$$
 
      RDKit          3D
@@ -9736,6 +10495,9 @@ V    1 *
 M  END
 >  <SMILES>  (254) 
 *CCC
+
+>  <rgroup_id>  (254) 
+253
 
 $$$$
 
@@ -9791,6 +10553,9 @@ M  END
 >  <SMILES>  (255) 
 *N1CCCN(C)CC1
 
+>  <rgroup_id>  (255) 
+254
+
 $$$$
 
      RDKit          3D
@@ -9825,6 +10590,9 @@ V    1 *
 M  END
 >  <SMILES>  (256) 
 *NC(=O)OCC
+
+>  <rgroup_id>  (256) 
+255
 
 $$$$
 
@@ -9879,6 +10647,9 @@ M  END
 >  <SMILES>  (257) 
 *CCN(CC)CC
 
+>  <rgroup_id>  (257) 
+256
+
 $$$$
 
      RDKit          3D
@@ -9909,6 +10680,9 @@ M  END
 >  <SMILES>  (258) 
 *c1nnc(C)o1
 
+>  <rgroup_id>  (258) 
+257
+
 $$$$
 
      RDKit          3D
@@ -9938,6 +10712,9 @@ M  END
 >  <SMILES>  (259) 
 *N(C)C
 
+>  <rgroup_id>  (259) 
+258
+
 $$$$
 
      RDKit          3D
@@ -9963,6 +10740,9 @@ V    1 *
 M  END
 >  <SMILES>  (260) 
 *c1cnco1
+
+>  <rgroup_id>  (260) 
+259
 
 $$$$
 
@@ -10010,6 +10790,9 @@ M  END
 >  <SMILES>  (261) 
 *c1ccc(C)c(C)c1
 
+>  <rgroup_id>  (261) 
+260
+
 $$$$
 
      RDKit          3D
@@ -10051,6 +10834,9 @@ V    1 *
 M  END
 >  <SMILES>  (262) 
 *c1ccc(CO)cc1
+
+>  <rgroup_id>  (262) 
+261
 
 $$$$
 
@@ -10102,6 +10888,9 @@ M  END
 >  <SMILES>  (263) 
 *NCCc1ccccc1
 
+>  <rgroup_id>  (263) 
+262
+
 $$$$
 
      RDKit          3D
@@ -10129,6 +10918,9 @@ V    1 *
 M  END
 >  <SMILES>  (264) 
 *c1cc[nH]n1
+
+>  <rgroup_id>  (264) 
+263
 
 $$$$
 
@@ -10158,6 +10950,9 @@ V    1 *
 M  END
 >  <SMILES>  (265) 
 *CC(=O)NO
+
+>  <rgroup_id>  (265) 
+264
 
 $$$$
 
@@ -10190,6 +10985,9 @@ V    1 *
 M  END
 >  <SMILES>  (266) 
 *NC1CC1
+
+>  <rgroup_id>  (266) 
+265
 
 $$$$
 
@@ -10225,6 +11023,9 @@ M  END
 >  <SMILES>  (267) 
 *c1ccc(F)cc1F
 
+>  <rgroup_id>  (267) 
+266
+
 $$$$
 
      RDKit          3D
@@ -10251,6 +11052,9 @@ V    1 *
 M  END
 >  <SMILES>  (268) 
 *OCC(=O)O
+
+>  <rgroup_id>  (268) 
+267
 
 $$$$
 
@@ -10279,6 +11083,9 @@ V    1 *
 M  END
 >  <SMILES>  (269) 
 *c1cn[nH]c1
+
+>  <rgroup_id>  (269) 
+268
 
 $$$$
 
@@ -10326,6 +11133,9 @@ M  END
 >  <SMILES>  (270) 
 *NC(=S)Nc1ccccc1
 
+>  <rgroup_id>  (270) 
+269
+
 $$$$
 
      RDKit          3D
@@ -10372,6 +11182,9 @@ M  END
 >  <SMILES>  (271) 
 *Cc1ccc(C)cc1
 
+>  <rgroup_id>  (271) 
+270
+
 $$$$
 
      RDKit          3D
@@ -10400,6 +11213,9 @@ V    1 *
 M  END
 >  <SMILES>  (272) 
 *NC(=O)C=C
+
+>  <rgroup_id>  (272) 
+271
 
 $$$$
 
@@ -10432,6 +11248,9 @@ V    1 *
 M  END
 >  <SMILES>  (273) 
 *Cn1cncn1
+
+>  <rgroup_id>  (273) 
+272
 
 $$$$
 
@@ -10477,6 +11296,9 @@ M  END
 >  <SMILES>  (274) 
 *c1cccc(C(C)=O)c1
 
+>  <rgroup_id>  (274) 
+273
+
 $$$$
 
      RDKit          3D
@@ -10512,6 +11334,9 @@ V    1 *
 M  END
 >  <SMILES>  (275) 
 *C#Cc1ccccn1
+
+>  <rgroup_id>  (275) 
+274
 
 $$$$
 
@@ -10551,6 +11376,9 @@ V    1 *
 M  END
 >  <SMILES>  (276) 
 *c1cccc([N+](=O)[O-])c1
+
+>  <rgroup_id>  (276) 
+275
 
 $$$$
 
@@ -10616,6 +11444,9 @@ M  END
 >  <SMILES>  (277) 
 *C12CC3CC(CC(C3)C1)C2
 
+>  <rgroup_id>  (277) 
+276
+
 $$$$
 
      RDKit          3D
@@ -10662,6 +11493,9 @@ M  END
 >  <SMILES>  (278) 
 *NC(=O)Nc1ccccc1
 
+>  <rgroup_id>  (278) 
+277
+
 $$$$
 
      RDKit          3D
@@ -10697,6 +11531,9 @@ V    1 *
 M  END
 >  <SMILES>  (279) 
 *NC(=O)C1CC1
+
+>  <rgroup_id>  (279) 
+278
 
 $$$$
 
@@ -10738,6 +11575,9 @@ M  END
 >  <SMILES>  (280) 
 *c1ccc(OC)nc1
 
+>  <rgroup_id>  (280) 
+279
+
 $$$$
 
      RDKit          3D
@@ -10760,6 +11600,9 @@ V    1 *
 M  END
 >  <SMILES>  (281) 
 *P(=O)(O)O
+
+>  <rgroup_id>  (281) 
+280
 
 $$$$
 
@@ -10789,6 +11632,9 @@ V    1 *
 M  END
 >  <SMILES>  (282) 
 *OCCO
+
+>  <rgroup_id>  (282) 
+281
 
 $$$$
 
@@ -10826,6 +11672,9 @@ M  END
 >  <SMILES>  (283) 
 *Nc1ccccn1
 
+>  <rgroup_id>  (283) 
+282
+
 $$$$
 
      RDKit          3D
@@ -10857,6 +11706,9 @@ V    1 *
 M  END
 >  <SMILES>  (284) 
 *c1csc(C)n1
+
+>  <rgroup_id>  (284) 
+283
 
 $$$$
 
@@ -10904,6 +11756,9 @@ M  END
 >  <SMILES>  (285) 
 *Cc1c(C)n[nH]c1C(=O)O
 
+>  <rgroup_id>  (285) 
+284
+
 $$$$
 
      RDKit          3D
@@ -10924,6 +11779,9 @@ V    1 *
 M  END
 >  <SMILES>  (286) 
 *CS
+
+>  <rgroup_id>  (286) 
+285
 
 $$$$
 
@@ -10970,6 +11828,9 @@ V    1 *
 M  END
 >  <SMILES>  (287) 
 *Nc1ccccc1C(N)=O
+
+>  <rgroup_id>  (287) 
+286
 
 $$$$
 
@@ -11027,6 +11888,9 @@ M  END
 >  <SMILES>  (288) 
 *CCN1CCCC1C
 
+>  <rgroup_id>  (288) 
+287
+
 $$$$
 
      RDKit          3D
@@ -11074,6 +11938,9 @@ M  END
 >  <SMILES>  (289) 
 *c1ccc2ccccc2c1
 
+>  <rgroup_id>  (289) 
+288
+
 $$$$
 
      RDKit          3D
@@ -11092,6 +11959,9 @@ V    1 *
 M  END
 >  <SMILES>  (290) 
 *C(F)F
+
+>  <rgroup_id>  (290) 
+289
 
 $$$$
 
@@ -11130,6 +12000,9 @@ V    1 *
 M  END
 >  <SMILES>  (291) 
 *c1c(C)noc1C
+
+>  <rgroup_id>  (291) 
+290
 
 $$$$
 
@@ -11178,6 +12051,9 @@ V    1 *
 M  END
 >  <SMILES>  (292) 
 *CN1CCNCC1
+
+>  <rgroup_id>  (292) 
+291
 
 $$$$
 
@@ -11229,6 +12105,9 @@ M  END
 >  <SMILES>  (293) 
 *c1ccc(OC)cc1OC
 
+>  <rgroup_id>  (293) 
+292
+
 $$$$
 
      RDKit          3D
@@ -11271,6 +12150,9 @@ M  END
 >  <SMILES>  (294) 
 *OCc1ccccc1
 
+>  <rgroup_id>  (294) 
+293
+
 $$$$
 
      RDKit          3D
@@ -11309,6 +12191,9 @@ M  END
 >  <SMILES>  (295) 
 *c1ncccc1C
 
+>  <rgroup_id>  (295) 
+294
+
 $$$$
 
      RDKit          3D
@@ -11332,6 +12217,9 @@ V    1 *
 M  END
 >  <SMILES>  (296) 
 *c1nnn[nH]1
+
+>  <rgroup_id>  (296) 
+295
 
 $$$$
 
@@ -11384,6 +12272,9 @@ V    1 *
 M  END
 >  <SMILES>  (297) 
 *N1CCN(C(C)=O)CC1
+
+>  <rgroup_id>  (297) 
+296
 
 $$$$
 
@@ -11443,6 +12334,9 @@ M  END
 >  <SMILES>  (298) 
 *NC(=O)NC1CCCCC1
 
+>  <rgroup_id>  (298) 
+297
+
 $$$$
 
      RDKit          3D
@@ -11500,6 +12394,9 @@ M  END
 >  <SMILES>  (299) 
 *N1CCC2CN(C)CC21
 
+>  <rgroup_id>  (299) 
+298
+
 $$$$
 
      RDKit          3D
@@ -11535,6 +12432,9 @@ V    1 *
 M  END
 >  <SMILES>  (300) 
 *c1ccccc1C#N
+
+>  <rgroup_id>  (300) 
+299
 
 $$$$
 
@@ -11573,6 +12473,9 @@ M  END
 >  <SMILES>  (301) 
 *C(C)CC
 
+>  <rgroup_id>  (301) 
+300
+
 $$$$
 
      RDKit          3D
@@ -11608,6 +12511,9 @@ V    1 *
 M  END
 >  <SMILES>  (302) 
 *N1CCCC1=O
+
+>  <rgroup_id>  (302) 
+301
 
 $$$$
 
@@ -11656,6 +12562,9 @@ V    1 *
 M  END
 >  <SMILES>  (303) 
 *c1cccc(NC(C)=O)c1
+
+>  <rgroup_id>  (303) 
+302
 
 $$$$
 
@@ -11709,6 +12618,9 @@ M  END
 >  <SMILES>  (304) 
 *CCCc1ccccc1
 
+>  <rgroup_id>  (304) 
+303
+
 $$$$
 
      RDKit          3D
@@ -11759,6 +12671,9 @@ M  END
 >  <SMILES>  (305) 
 *N(C)Cc1ccccc1
 
+>  <rgroup_id>  (305) 
+304
+
 $$$$
 
      RDKit          3D
@@ -11775,6 +12690,9 @@ V    1 *
 M  END
 >  <SMILES>  (306) 
 *C#C
+
+>  <rgroup_id>  (306) 
+305
 
 $$$$
 
@@ -11813,6 +12731,9 @@ V    1 *
 M  END
 >  <SMILES>  (307) 
 *Cc1ccncc1
+
+>  <rgroup_id>  (307) 
+306
 
 $$$$
 
@@ -11860,6 +12781,9 @@ M  END
 >  <SMILES>  (308) 
 *OC1CCNCC1
 
+>  <rgroup_id>  (308) 
+307
+
 $$$$
 
      RDKit          3D
@@ -11904,6 +12828,9 @@ M  END
 >  <SMILES>  (309) 
 *CNc1ccccc1
 
+>  <rgroup_id>  (309) 
+308
+
 $$$$
 
      RDKit          3D
@@ -11933,6 +12860,9 @@ V    1 *
 M  END
 >  <SMILES>  (310) 
 *c1cnccn1
+
+>  <rgroup_id>  (310) 
+309
 
 $$$$
 
@@ -11997,6 +12927,9 @@ M  END
 >  <SMILES>  (311) 
 *N1CCN(c2ccccc2)CC1
 
+>  <rgroup_id>  (311) 
+310
+
 $$$$
 
      RDKit          3D
@@ -12035,6 +12968,9 @@ M  END
 >  <SMILES>  (312) 
 *Oc1ccc(O)cc1
 
+>  <rgroup_id>  (312) 
+311
+
 $$$$
 
      RDKit          3D
@@ -12067,6 +13003,9 @@ V    1 *
 M  END
 >  <SMILES>  (313) 
 *OCCC
+
+>  <rgroup_id>  (313) 
+312
 
 $$$$
 
@@ -12106,6 +13045,9 @@ M  END
 >  <SMILES>  (314) 
 *C(=O)c1ccc(F)cc1
 
+>  <rgroup_id>  (314) 
+313
+
 $$$$
 
      RDKit          3D
@@ -12141,6 +13083,9 @@ V    1 *
 M  END
 >  <SMILES>  (315) 
 *c1cccc(O)c1
+
+>  <rgroup_id>  (315) 
+314
 
 $$$$
 
@@ -12180,6 +13125,9 @@ M  END
 >  <SMILES>  (316) 
 *C1CCNC1
 
+>  <rgroup_id>  (316) 
+315
+
 $$$$
 
      RDKit          3D
@@ -12216,6 +13164,9 @@ M  END
 >  <SMILES>  (317) 
 *Sc1ccccc1
 
+>  <rgroup_id>  (317) 
+316
+
 $$$$
 
      RDKit          3D
@@ -12236,6 +13187,9 @@ V    1 *
 M  END
 >  <SMILES>  (318) 
 *SC
+
+>  <rgroup_id>  (318) 
+317
 
 $$$$
 
@@ -12274,6 +13228,9 @@ V    1 *
 M  END
 >  <SMILES>  (319) 
 *c1cccc(N)c1
+
+>  <rgroup_id>  (319) 
+318
 
 $$$$
 
@@ -12318,6 +13275,9 @@ M  END
 >  <SMILES>  (320) 
 *c1cccc2[nH]ccc12
 
+>  <rgroup_id>  (320) 
+319
+
 $$$$
 
      RDKit          3D
@@ -12352,6 +13312,9 @@ M  END
 >  <SMILES>  (321) 
 *c1cccc(F)c1
 
+>  <rgroup_id>  (321) 
+320
+
 $$$$
 
      RDKit          3D
@@ -12374,6 +13337,9 @@ V    1 *
 M  END
 >  <SMILES>  (322) 
 *C(=O)C(F)(F)F
+
+>  <rgroup_id>  (322) 
+321
 
 $$$$
 
@@ -12417,6 +13383,9 @@ M  END
 >  <SMILES>  (323) 
 *C1CCOCC1
 
+>  <rgroup_id>  (323) 
+322
+
 $$$$
 
      RDKit          3D
@@ -12446,6 +13415,9 @@ V    1 *
 M  END
 >  <SMILES>  (324) 
 *c1cncnc1
+
+>  <rgroup_id>  (324) 
+323
 
 $$$$
 
@@ -12487,6 +13459,9 @@ M  END
 >  <SMILES>  (325) 
 *NC(=O)c1ccncc1
 
+>  <rgroup_id>  (325) 
+324
+
 $$$$
 
      RDKit          3D
@@ -12520,6 +13495,9 @@ M  END
 >  <SMILES>  (326) 
 *OC(C)C
 
+>  <rgroup_id>  (326) 
+325
+
 $$$$
 
      RDKit          3D
@@ -12547,6 +13525,9 @@ V    1 *
 M  END
 >  <SMILES>  (327) 
 *c1ccc(Cl)s1
+
+>  <rgroup_id>  (327) 
+326
 
 $$$$
 
@@ -12581,6 +13562,9 @@ V    1 *
 M  END
 >  <SMILES>  (328) 
 *c1ccc(Br)cc1
+
+>  <rgroup_id>  (328) 
+327
 
 $$$$
 
@@ -12628,6 +13612,9 @@ M  END
 >  <SMILES>  (329) 
 *C(C)c1ccccc1
 
+>  <rgroup_id>  (329) 
+328
+
 $$$$
 
      RDKit          3D
@@ -12654,6 +13641,9 @@ V    1 *
 M  END
 >  <SMILES>  (330) 
 *NS(N)(=O)=O
+
+>  <rgroup_id>  (330) 
+329
 
 $$$$
 
@@ -12698,6 +13688,9 @@ M  END
 >  <SMILES>  (331) 
 *c1ccc2cc[nH]c2c1
 
+>  <rgroup_id>  (331) 
+330
+
 $$$$
 
      RDKit          3D
@@ -12729,6 +13722,9 @@ V    1 *
 M  END
 >  <SMILES>  (332) 
 *C1CC1N
+
+>  <rgroup_id>  (332) 
+331
 
 $$$$
 
@@ -12766,6 +13762,9 @@ M  END
 >  <SMILES>  (333) 
 *c1nccc(C(F)(F)F)n1
 
+>  <rgroup_id>  (333) 
+332
+
 $$$$
 
      RDKit          3D
@@ -12799,6 +13798,9 @@ V    1 *
 M  END
 >  <SMILES>  (334) 
 *c1ccccc1F
+
+>  <rgroup_id>  (334) 
+333
 
 $$$$
 
@@ -12840,6 +13842,9 @@ M  END
 >  <SMILES>  (335) 
 *c1ccc(C(=O)O)cc1
 
+>  <rgroup_id>  (335) 
+334
+
 $$$$
 
      RDKit          3D
@@ -12876,6 +13881,9 @@ V    1 *
 M  END
 >  <SMILES>  (336) 
 *NCCOC
+
+>  <rgroup_id>  (336) 
+335
 
 $$$$
 
@@ -12918,6 +13926,9 @@ V    1 *
 M  END
 >  <SMILES>  (337) 
 *C=Cc1ccccc1
+
+>  <rgroup_id>  (337) 
+336
 
 $$$$
 
@@ -12969,6 +13980,9 @@ M  END
 >  <SMILES>  (338) 
 *C1CCN(C)CC1
 
+>  <rgroup_id>  (338) 
+337
+
 $$$$
 
      RDKit          3D
@@ -12983,6 +13997,9 @@ V    1 *
 M  END
 >  <SMILES>  (339) 
 *C#N
+
+>  <rgroup_id>  (339) 
+338
 
 $$$$
 
@@ -13026,6 +14043,9 @@ M  END
 >  <SMILES>  (340) 
 *c1ccccc1OC
 
+>  <rgroup_id>  (340) 
+339
+
 $$$$
 
      RDKit          3D
@@ -13064,6 +14084,9 @@ V    1 *
 M  END
 >  <SMILES>  (341) 
 *c1ccc([N+](=O)[O-])cc1
+
+>  <rgroup_id>  (341) 
+340
 
 $$$$
 
@@ -13109,6 +14132,9 @@ M  END
 >  <SMILES>  (342) 
 *OCC1CCCO1
 
+>  <rgroup_id>  (342) 
+341
+
 $$$$
 
      RDKit          3D
@@ -13135,6 +14161,9 @@ V    1 *
 M  END
 >  <SMILES>  (343) 
 *SCC
+
+>  <rgroup_id>  (343) 
+342
 
 $$$$
 
@@ -13192,6 +14221,9 @@ M  END
 >  <SMILES>  (344) 
 *CN(C)Cc1ccccc1
 
+>  <rgroup_id>  (344) 
+343
+
 $$$$
 
      RDKit          3D
@@ -13232,6 +14264,9 @@ M  END
 >  <SMILES>  (345) 
 *c1ccnc(OC)c1
 
+>  <rgroup_id>  (345) 
+344
+
 $$$$
 
      RDKit          3D
@@ -13270,6 +14305,9 @@ V    1 *
 M  END
 >  <SMILES>  (346) 
 *OC(C)(C)C
+
+>  <rgroup_id>  (346) 
+345
 
 $$$$
 
@@ -13319,6 +14357,9 @@ M  END
 >  <SMILES>  (347) 
 *C(=O)NC1CCCC1
 
+>  <rgroup_id>  (347) 
+346
+
 $$$$
 
      RDKit          3D
@@ -13355,6 +14396,9 @@ V    1 *
 M  END
 >  <SMILES>  (348) 
 *C(C)(C)C
+
+>  <rgroup_id>  (348) 
+347
 
 $$$$
 
@@ -13395,6 +14439,9 @@ V    1 *
 M  END
 >  <SMILES>  (349) 
 *c1cccc(C(F)(F)F)c1
+
+>  <rgroup_id>  (349) 
+348
 
 $$$$
 
@@ -13437,6 +14484,9 @@ V    1 *
 M  END
 >  <SMILES>  (350) 
 *COc1ccccc1
+
+>  <rgroup_id>  (350) 
+349
 
 $$$$
 
@@ -13490,6 +14540,9 @@ M  END
 >  <SMILES>  (351) 
 *OC1CCN(C)CC1
 
+>  <rgroup_id>  (351) 
+350
+
 $$$$
 
      RDKit          3D
@@ -13510,6 +14563,9 @@ V    1 *
 M  END
 >  <SMILES>  (352) 
 *SC(F)(F)F
+
+>  <rgroup_id>  (352) 
+351
 
 $$$$
 
@@ -13569,6 +14625,9 @@ M  END
 >  <SMILES>  (353) 
 *OCCCN1CCCC1
 
+>  <rgroup_id>  (353) 
+352
+
 $$$$
 
      RDKit          3D
@@ -13612,6 +14671,9 @@ M  END
 >  <SMILES>  (354) 
 *c1cc2ccccc2[nH]1
 
+>  <rgroup_id>  (354) 
+353
+
 $$$$
 
      RDKit          3D
@@ -13654,6 +14716,9 @@ V    1 *
 M  END
 >  <SMILES>  (355) 
 *CCC(C)C
+
+>  <rgroup_id>  (355) 
+354
 
 $$$$
 
@@ -13704,6 +14769,9 @@ M  END
 >  <SMILES>  (356) 
 *c1nc2cc(C(N)=O)ccc2[nH]1
 
+>  <rgroup_id>  (356) 
+355
+
 $$$$
 
      RDKit          3D
@@ -13742,6 +14810,9 @@ M  END
 >  <SMILES>  (357) 
 *C(=O)c1ccc(Cl)cc1
 
+>  <rgroup_id>  (357) 
+356
+
 $$$$
 
      RDKit          3D
@@ -13778,6 +14849,9 @@ M  END
 >  <SMILES>  (358) 
 *C(=O)c1ccncc1
 
+>  <rgroup_id>  (358) 
+357
+
 $$$$
 
      RDKit          3D
@@ -13806,6 +14880,9 @@ V    1 *
 M  END
 >  <SMILES>  (359) 
 *C(F)(F)P(=O)(O)O
+
+>  <rgroup_id>  (359) 
+358
 
 $$$$
 
@@ -13845,6 +14922,9 @@ M  END
 >  <SMILES>  (360) 
 *c1cccc(C(F)(F)F)n1
 
+>  <rgroup_id>  (360) 
+359
+
 $$$$
 
      RDKit          3D
@@ -13864,6 +14944,9 @@ V    1 *
 M  END
 >  <SMILES>  (361) 
 *N=[N+]=N
+
+>  <rgroup_id>  (361) 
+360
 
 $$$$
 
@@ -13898,6 +14981,9 @@ V    1 *
 M  END
 >  <SMILES>  (362) 
 *c1cccc(Cl)c1Cl
+
+>  <rgroup_id>  (362) 
+361
 
 $$$$
 
@@ -13945,6 +15031,9 @@ V    1 *
 M  END
 >  <SMILES>  (363) 
 *CCCCC(=O)NO
+
+>  <rgroup_id>  (363) 
+362
 
 $$$$
 
@@ -14010,6 +15099,9 @@ M  END
 >  <SMILES>  (364) 
 *OCCCN1CCCCC1
 
+>  <rgroup_id>  (364) 
+363
+
 $$$$
 
      RDKit          3D
@@ -14053,6 +15145,9 @@ M  END
 >  <SMILES>  (365) 
 *OCCN(C)C
 
+>  <rgroup_id>  (365) 
+364
+
 $$$$
 
      RDKit          3D
@@ -14080,6 +15175,9 @@ V    1 *
 M  END
 >  <SMILES>  (366) 
 *c1ccoc1
+
+>  <rgroup_id>  (366) 
+365
 
 $$$$
 
@@ -14121,6 +15219,9 @@ M  END
 >  <SMILES>  (367) 
 *S(=O)(=O)c1ccccc1
 
+>  <rgroup_id>  (367) 
+366
+
 $$$$
 
      RDKit          3D
@@ -14154,6 +15255,9 @@ V    1 *
 M  END
 >  <SMILES>  (368) 
 *c1cccc(Br)c1
+
+>  <rgroup_id>  (368) 
+367
 
 $$$$
 
@@ -14193,6 +15297,9 @@ M  END
 >  <SMILES>  (369) 
 *C#Cc1ccccc1
 
+>  <rgroup_id>  (369) 
+368
+
 $$$$
 
      RDKit          3D
@@ -14229,6 +15336,9 @@ M  END
 >  <SMILES>  (370) 
 *C#Cc1cccnc1
 
+>  <rgroup_id>  (370) 
+369
+
 $$$$
 
      RDKit          3D
@@ -14255,6 +15365,9 @@ V    1 *
 M  END
 >  <SMILES>  (371) 
 *C(C)O
+
+>  <rgroup_id>  (371) 
+370
 
 $$$$
 
@@ -14295,6 +15408,9 @@ V    1 *
 M  END
 >  <SMILES>  (372) 
 *NC(=O)c1cccnc1
+
+>  <rgroup_id>  (372) 
+371
 
 $$$$
 
@@ -14341,6 +15457,9 @@ M  END
 >  <SMILES>  (373) 
 *c1cncc2ccccc12
 
+>  <rgroup_id>  (373) 
+372
+
 $$$$
 
      RDKit          3D
@@ -14365,6 +15484,9 @@ V    1 *
 M  END
 >  <SMILES>  (374) 
 *OC(C)=O
+
+>  <rgroup_id>  (374) 
+373
 
 $$$$
 
@@ -14408,6 +15530,9 @@ M  END
 >  <SMILES>  (375) 
 *c1ccc(C(N)=O)cc1
 
+>  <rgroup_id>  (375) 
+374
+
 $$$$
 
      RDKit          3D
@@ -14447,6 +15572,9 @@ V    1 *
 M  END
 >  <SMILES>  (376) 
 *c1cncc(OC)c1
+
+>  <rgroup_id>  (376) 
+375
 
 $$$$
 
@@ -14507,6 +15635,9 @@ M  END
 >  <SMILES>  (377) 
 *CNC1CC1c1ccccc1
 
+>  <rgroup_id>  (377) 
+376
+
 $$$$
 
      RDKit          3D
@@ -14553,6 +15684,9 @@ M  END
 >  <SMILES>  (378) 
 *C(=O)c1ccc(OC)cc1
 
+>  <rgroup_id>  (378) 
+377
+
 $$$$
 
      RDKit          3D
@@ -14588,6 +15722,9 @@ M  END
 >  <SMILES>  (379) 
 *CC(N)C(=O)O
 
+>  <rgroup_id>  (379) 
+378
+
 $$$$
 
      RDKit          3D
@@ -14606,6 +15743,9 @@ V    1 *
 M  END
 >  <SMILES>  (380) 
 *C(=O)O
+
+>  <rgroup_id>  (380) 
+379
 
 $$$$
 
@@ -14631,6 +15771,9 @@ V    1 *
 M  END
 >  <SMILES>  (381) 
 *OS(N)(=O)=O
+
+>  <rgroup_id>  (381) 
+380
 
 $$$$
 
@@ -14672,6 +15815,9 @@ M  END
 >  <SMILES>  (382) 
 *N1CCC(O)C1
 
+>  <rgroup_id>  (382) 
+381
+
 $$$$
 
      RDKit          3D
@@ -14711,6 +15857,9 @@ V    1 *
 M  END
 >  <SMILES>  (383) 
 *c1cccc(C(=O)O)c1
+
+>  <rgroup_id>  (383) 
+382
 
 $$$$
 
@@ -14758,6 +15907,9 @@ M  END
 >  <SMILES>  (384) 
 *S(=O)(=O)N1CCOCC1
 
+>  <rgroup_id>  (384) 
+383
+
 $$$$
 
      RDKit          3D
@@ -14794,6 +15946,9 @@ M  END
 >  <SMILES>  (385) 
 *NC(=O)c1ccco1
 
+>  <rgroup_id>  (385) 
+384
+
 $$$$
 
      RDKit          3D
@@ -14824,6 +15979,9 @@ M  END
 >  <SMILES>  (386) 
 *c1ccncn1
 
+>  <rgroup_id>  (386) 
+385
+
 $$$$
 
      RDKit          3D
@@ -14851,6 +16009,9 @@ V    1 *
 M  END
 >  <SMILES>  (387) 
 *n1cccn1
+
+>  <rgroup_id>  (387) 
+386
 
 $$$$
 
@@ -14896,6 +16057,9 @@ M  END
 >  <SMILES>  (388) 
 *c1ccc(C(C)=O)cc1
 
+>  <rgroup_id>  (388) 
+387
+
 $$$$
 
      RDKit          3D
@@ -14928,6 +16092,9 @@ V    1 *
 M  END
 >  <SMILES>  (389) 
 *COCC
+
+>  <rgroup_id>  (389) 
+388
 
 $$$$
 
@@ -14972,6 +16139,9 @@ V    1 *
 M  END
 >  <SMILES>  (390) 
 *c1ccc(S(N)(=O)=O)cc1
+
+>  <rgroup_id>  (390) 
+389
 
 $$$$
 
@@ -15020,6 +16190,9 @@ M  END
 >  <SMILES>  (391) 
 *NC(=O)OC(C)(C)C
 
+>  <rgroup_id>  (391) 
+390
+
 $$$$
 
      RDKit          3D
@@ -15059,6 +16232,9 @@ V    1 *
 M  END
 >  <SMILES>  (392) 
 *OCc1ccncc1
+
+>  <rgroup_id>  (392) 
+391
 
 $$$$
 
@@ -15114,6 +16290,9 @@ M  END
 >  <SMILES>  (393) 
 *NC(=O)C1CCCCC1
 
+>  <rgroup_id>  (393) 
+392
+
 $$$$
 
      RDKit          3D
@@ -15166,6 +16345,9 @@ M  END
 >  <SMILES>  (394) 
 *c1ccc(C(C)C)cc1
 
+>  <rgroup_id>  (394) 
+393
+
 $$$$
 
      RDKit          3D
@@ -15199,6 +16381,9 @@ M  END
 >  <SMILES>  (395) 
 *C(=O)C=C(O)C(=O)O
 
+>  <rgroup_id>  (395) 
+394
+
 $$$$
 
      RDKit          3D
@@ -15223,6 +16408,9 @@ V    1 *
 M  END
 >  <SMILES>  (396) 
 *C(=O)NN
+
+>  <rgroup_id>  (396) 
+395
 
 $$$$
 
@@ -15251,6 +16439,9 @@ V    1 *
 M  END
 >  <SMILES>  (397) 
 *c1ncc[nH]1
+
+>  <rgroup_id>  (397) 
+396
 
 $$$$
 
@@ -15294,6 +16485,9 @@ V    1 *
 M  END
 >  <SMILES>  (398) 
 *NC(P(=O)(O)O)P(=O)(O)O
+
+>  <rgroup_id>  (398) 
+397
 
 $$$$
 
@@ -15345,6 +16539,9 @@ M  END
 >  <SMILES>  (399) 
 *c1ccc(N(C)C)cc1
 
+>  <rgroup_id>  (399) 
+398
+
 $$$$
 
      RDKit          3D
@@ -15381,6 +16578,9 @@ M  END
 >  <SMILES>  (400) 
 *C1CCOC1
 
+>  <rgroup_id>  (400) 
+399
+
 $$$$
 
      RDKit          3D
@@ -15413,6 +16613,9 @@ M  END
 >  <SMILES>  (401) 
 *c1ccc(F)cn1
 
+>  <rgroup_id>  (401) 
+400
+
 $$$$
 
      RDKit          3D
@@ -15438,6 +16641,9 @@ V    1 *
 M  END
 >  <SMILES>  (402) 
 *c1cncs1
+
+>  <rgroup_id>  (402) 
+401
 
 $$$$
 
@@ -15481,6 +16687,9 @@ M  END
 >  <SMILES>  (403) 
 *C(=O)NCC1CC1
 
+>  <rgroup_id>  (403) 
+402
+
 $$$$
 
      RDKit          3D
@@ -15512,6 +16721,9 @@ V    1 *
 M  END
 >  <SMILES>  (404) 
 *c1ccccn1
+
+>  <rgroup_id>  (404) 
+403
 
 $$$$
 
@@ -15548,6 +16760,9 @@ M  END
 >  <SMILES>  (405) 
 *OCCOC
 
+>  <rgroup_id>  (405) 
+404
+
 $$$$
 
      RDKit          3D
@@ -15574,6 +16789,9 @@ M  END
 >  <SMILES>  (406) 
 *n1cncn1
 
+>  <rgroup_id>  (406) 
+405
+
 $$$$
 
      RDKit          3D
@@ -15598,6 +16816,9 @@ V    1 *
 M  END
 >  <SMILES>  (407) 
 *C(=O)OC
+
+>  <rgroup_id>  (407) 
+406
 
 $$$$
 
@@ -15631,6 +16852,9 @@ M  END
 >  <SMILES>  (408) 
 *c1cncc(F)c1
 
+>  <rgroup_id>  (408) 
+407
+
 $$$$
 
      RDKit          3D
@@ -15661,6 +16885,9 @@ V    1 *
 M  END
 >  <SMILES>  (409) 
 *C(=O)OCC
+
+>  <rgroup_id>  (409) 
+408
 
 $$$$
 
@@ -15705,6 +16932,9 @@ M  END
 >  <SMILES>  (410) 
 *C(=O)OC(C)(C)C
 
+>  <rgroup_id>  (410) 
+409
+
 $$$$
 
      RDKit          3D
@@ -15739,6 +16969,9 @@ M  END
 >  <SMILES>  (411) 
 *c1cc(F)cc(F)c1
 
+>  <rgroup_id>  (411) 
+410
+
 $$$$
 
      RDKit          3D
@@ -15772,6 +17005,9 @@ V    1 *
 M  END
 >  <SMILES>  (412) 
 *c1ccc(F)cc1
+
+>  <rgroup_id>  (412) 
+411
 
 $$$$
 
@@ -15812,6 +17048,9 @@ V    1 *
 M  END
 >  <SMILES>  (413) 
 *Cc1cccc(Cl)c1
+
+>  <rgroup_id>  (413) 
+412
 
 $$$$
 
@@ -15855,6 +17094,9 @@ V    1 *
 M  END
 >  <SMILES>  (414) 
 *c1ccc2[nH]ccc2c1
+
+>  <rgroup_id>  (414) 
+413
 
 $$$$
 
@@ -15903,6 +17145,9 @@ V    1 *
 M  END
 >  <SMILES>  (415) 
 *Cc1cccc(OC)c1
+
+>  <rgroup_id>  (415) 
+414
 
 $$$$
 
@@ -15965,6 +17210,9 @@ M  END
 >  <SMILES>  (416) 
 *CCCCCCCC
 
+>  <rgroup_id>  (416) 
+415
+
 $$$$
 
      RDKit          3D
@@ -16009,6 +17257,9 @@ M  END
 >  <SMILES>  (417) 
 *c1cccc(CN)c1
 
+>  <rgroup_id>  (417) 
+416
+
 $$$$
 
      RDKit          3D
@@ -16029,6 +17280,9 @@ V    1 *
 M  END
 >  <SMILES>  (418) 
 *OC(F)(F)F
+
+>  <rgroup_id>  (418) 
+417
 
 $$$$
 
@@ -16080,6 +17334,9 @@ M  END
 >  <SMILES>  (419) 
 *NC(=O)c1ccc(OC)cc1
 
+>  <rgroup_id>  (419) 
+418
+
 $$$$
 
      RDKit          3D
@@ -16123,6 +17380,9 @@ M  END
 >  <SMILES>  (420) 
 *c1c[nH]c2ccccc12
 
+>  <rgroup_id>  (420) 
+419
+
 $$$$
 
      RDKit          3D
@@ -16146,6 +17406,9 @@ M  END
 >  <SMILES>  (421) 
 *CN
 
+>  <rgroup_id>  (421) 
+420
+
 $$$$
 
      RDKit          3D
@@ -16163,6 +17426,9 @@ V    1 *
 M  END
 >  <SMILES>  (422) 
 *[N+](=O)[O-]
+
+>  <rgroup_id>  (422) 
+421
 
 $$$$
 
@@ -16196,6 +17462,9 @@ V    1 *
 M  END
 >  <SMILES>  (423) 
 *CNC(C)=O
+
+>  <rgroup_id>  (423) 
+422
 
 $$$$
 
@@ -16243,6 +17512,9 @@ M  END
 >  <SMILES>  (424) 
 *N1CCC(O)CC1
 
+>  <rgroup_id>  (424) 
+423
+
 $$$$
 
      RDKit          3D
@@ -16287,6 +17559,9 @@ M  END
 >  <SMILES>  (425) 
 *CN1CCCC1
 
+>  <rgroup_id>  (425) 
+424
+
 $$$$
 
      RDKit          3D
@@ -16320,6 +17595,9 @@ V    1 *
 M  END
 >  <SMILES>  (426) 
 *c1cc(Cl)cc(Cl)c1
+
+>  <rgroup_id>  (426) 
+425
 
 $$$$
 
@@ -16355,6 +17633,9 @@ M  END
 >  <SMILES>  (427) 
 *c1ccnn1C
 
+>  <rgroup_id>  (427) 
+426
+
 $$$$
 
      RDKit          3D
@@ -16382,6 +17663,9 @@ M  END
 >  <SMILES>  (428) 
 *CCO
 
+>  <rgroup_id>  (428) 
+427
+
 $$$$
 
      RDKit          3D
@@ -16402,6 +17686,9 @@ V    1 *
 M  END
 >  <SMILES>  (429) 
 *C=NO
+
+>  <rgroup_id>  (429) 
+428
 
 $$$$
 
@@ -16448,6 +17735,9 @@ V    1 *
 M  END
 >  <SMILES>  (430) 
 *C1CCCCC1
+
+>  <rgroup_id>  (430) 
+429
 
 $$$$
 
@@ -16496,6 +17786,9 @@ V    1 *
 M  END
 >  <SMILES>  (431) 
 *Cc1ccc(OC)cc1
+
+>  <rgroup_id>  (431) 
+430
 
 $$$$
 
@@ -16548,6 +17841,9 @@ V    1 *
 M  END
 >  <SMILES>  (432) 
 *C(=O)N1CCN(C)CC1
+
+>  <rgroup_id>  (432) 
+431
 
 $$$$
 
@@ -16605,6 +17901,9 @@ M  END
 >  <SMILES>  (433) 
 *N1CCN(CCO)CC1
 
+>  <rgroup_id>  (433) 
+432
+
 $$$$
 
      RDKit          3D
@@ -16635,6 +17934,9 @@ V    1 *
 M  END
 >  <SMILES>  (434) 
 *CCC(=O)O
+
+>  <rgroup_id>  (434) 
+433
 
 $$$$
 
@@ -16674,6 +17976,9 @@ M  END
 >  <SMILES>  (435) 
 *c1ccc(C)cn1
 
+>  <rgroup_id>  (435) 
+434
+
 $$$$
 
      RDKit          3D
@@ -16711,6 +18016,9 @@ M  END
 >  <SMILES>  (436) 
 *NC(=O)NCC
 
+>  <rgroup_id>  (436) 
+435
+
 $$$$
 
      RDKit          3D
@@ -16745,6 +18053,9 @@ V    1 *
 M  END
 >  <SMILES>  (437) 
 *S(=O)(=O)N(C)C
+
+>  <rgroup_id>  (437) 
+436
 
 $$$$
 
@@ -16781,6 +18092,9 @@ M  END
 >  <SMILES>  (438) 
 *CCNC
 
+>  <rgroup_id>  (438) 
+437
+
 $$$$
 
      RDKit          3D
@@ -16813,6 +18127,9 @@ V    1 *
 M  END
 >  <SMILES>  (439) 
 *C(C)(C)O
+
+>  <rgroup_id>  (439) 
+438
 
 $$$$
 
@@ -16859,6 +18176,9 @@ M  END
 >  <SMILES>  (440) 
 *c1cccc2cccnc12
 
+>  <rgroup_id>  (440) 
+439
+
 $$$$
 
      RDKit          3D
@@ -16898,6 +18218,9 @@ M  END
 >  <SMILES>  (441) 
 *NC(=O)C(C)C
 
+>  <rgroup_id>  (441) 
+440
+
 $$$$
 
      RDKit          3D
@@ -16914,6 +18237,9 @@ V    1 *
 M  END
 >  <SMILES>  (442) 
 *C=O
+
+>  <rgroup_id>  (442) 
+441
 
 $$$$
 
@@ -16962,6 +18288,9 @@ M  END
 >  <SMILES>  (443) 
 *CN(CC)CC
 
+>  <rgroup_id>  (443) 
+442
+
 $$$$
 
      RDKit          3D
@@ -16997,6 +18326,9 @@ V    1 *
 M  END
 >  <SMILES>  (444) 
 *c1ccc(C#N)cc1
+
+>  <rgroup_id>  (444) 
+443
 
 $$$$
 
@@ -17045,6 +18377,9 @@ M  END
 >  <SMILES>  (445) 
 *CCCN(C)C
 
+>  <rgroup_id>  (445) 
+444
+
 $$$$
 
      RDKit          3D
@@ -17074,6 +18409,9 @@ V    1 *
 M  END
 >  <SMILES>  (446) 
 *c1ncccn1
+
+>  <rgroup_id>  (446) 
+445
 
 $$$$
 
@@ -17121,6 +18459,9 @@ M  END
 >  <SMILES>  (447) 
 *c1ccc(S(C)(=O)=O)cc1
 
+>  <rgroup_id>  (447) 
+446
+
 $$$$
 
      RDKit          3D
@@ -17158,6 +18499,9 @@ V    1 *
 M  END
 >  <SMILES>  (448) 
 *Nc1ccc(F)cc1
+
+>  <rgroup_id>  (448) 
+447
 
 $$$$
 
@@ -17212,6 +18556,9 @@ M  END
 >  <SMILES>  (449) 
 *N1CCc2ccccc2C1
 
+>  <rgroup_id>  (449) 
+448
+
 $$$$
 
      RDKit          3D
@@ -17238,6 +18585,9 @@ V    1 *
 M  END
 >  <SMILES>  (450) 
 *COC
+
+>  <rgroup_id>  (450) 
+449
 
 $$$$
 
@@ -17274,6 +18624,9 @@ V    1 *
 M  END
 >  <SMILES>  (451) 
 *c1ccccc1O
+
+>  <rgroup_id>  (451) 
+450
 
 $$$$
 
@@ -17313,6 +18666,9 @@ M  END
 >  <SMILES>  (452) 
 *c1cc(C)ccn1
 
+>  <rgroup_id>  (452) 
+451
+
 $$$$
 
      RDKit          3D
@@ -17344,6 +18700,9 @@ V    1 *
 M  END
 >  <SMILES>  (453) 
 *C=C1SC(=S)NC1=O
+
+>  <rgroup_id>  (453) 
+452
 
 $$$$
 
@@ -17391,6 +18750,9 @@ M  END
 >  <SMILES>  (454) 
 *Cc1ccc(C(F)(F)F)cc1
 
+>  <rgroup_id>  (454) 
+453
+
 $$$$
 
      RDKit          3D
@@ -17413,6 +18775,9 @@ V    1 *
 M  END
 >  <SMILES>  (455) 
 *C(=O)NO
+
+>  <rgroup_id>  (455) 
+454
 
 $$$$
 
@@ -17459,6 +18824,9 @@ M  END
 >  <SMILES>  (456) 
 *c1ccc2ncccc2c1
 
+>  <rgroup_id>  (456) 
+455
+
 $$$$
 
      RDKit          3D
@@ -17501,6 +18869,9 @@ M  END
 >  <SMILES>  (457) 
 *NCc1cccnc1
 
+>  <rgroup_id>  (457) 
+456
+
 $$$$
 
      RDKit          3D
@@ -17541,6 +18912,9 @@ M  END
 >  <SMILES>  (458) 
 *Cc1ccccc1Cl
 
+>  <rgroup_id>  (458) 
+457
+
 $$$$
 
      RDKit          3D
@@ -17575,6 +18949,9 @@ V    1 *
 M  END
 >  <SMILES>  (459) 
 *CNCC
+
+>  <rgroup_id>  (459) 
+458
 
 $$$$
 
@@ -17624,6 +19001,9 @@ V    1 *
 M  END
 >  <SMILES>  (460) 
 *CN1C(=O)c2ccccc2C1=O
+
+>  <rgroup_id>  (460) 
+459
 
 $$$$
 
@@ -17679,6 +19059,9 @@ M  END
 >  <SMILES>  (461) 
 *N1CCC(N(C)C)C1
 
+>  <rgroup_id>  (461) 
+460
+
 $$$$
 
      RDKit          3D
@@ -17725,6 +19108,9 @@ V    1 *
 M  END
 >  <SMILES>  (462) 
 *c1cccc2ccccc12
+
+>  <rgroup_id>  (462) 
+461
 
 $$$$
 
@@ -17774,6 +19160,9 @@ M  END
 >  <SMILES>  (463) 
 *CNC(=O)c1ccccc1
 
+>  <rgroup_id>  (463) 
+462
+
 $$$$
 
      RDKit          3D
@@ -17790,6 +19179,9 @@ V    1 *
 M  END
 >  <SMILES>  (464) 
 *N=C=S
+
+>  <rgroup_id>  (464) 
+463
 
 $$$$
 
@@ -17815,6 +19207,9 @@ V    1 *
 M  END
 >  <SMILES>  (465) 
 *S(C)(=O)=O
+
+>  <rgroup_id>  (465) 
+464
 
 $$$$
 
@@ -17856,6 +19251,9 @@ M  END
 >  <SMILES>  (466) 
 *S(=O)(=O)c1ccc(Cl)cc1
 
+>  <rgroup_id>  (466) 
+465
+
 $$$$
 
      RDKit          3D
@@ -17887,6 +19285,9 @@ M  END
 >  <SMILES>  (467) 
 *C=CC(=O)NO
 
+>  <rgroup_id>  (467) 
+466
+
 $$$$
 
      RDKit          3D
@@ -17910,6 +19311,9 @@ V    1 *
 M  END
 >  <SMILES>  (468) 
 *c1nn[nH]n1
+
+>  <rgroup_id>  (468) 
+467
 
 $$$$
 
@@ -17965,6 +19369,9 @@ M  END
 >  <SMILES>  (469) 
 *C(=O)NC1CCCCC1
 
+>  <rgroup_id>  (469) 
+468
+
 $$$$
 
      RDKit          3D
@@ -17998,6 +19405,9 @@ V    1 *
 M  END
 >  <SMILES>  (470) 
 *c1nccn1C
+
+>  <rgroup_id>  (470) 
+469
 
 $$$$
 
@@ -18051,6 +19461,9 @@ M  END
 >  <SMILES>  (471) 
 *OCC1CCNCC1
 
+>  <rgroup_id>  (471) 
+470
+
 $$$$
 
      RDKit          3D
@@ -18092,6 +19505,9 @@ V    1 *
 M  END
 >  <SMILES>  (472) 
 *C(O)c1ccccc1
+
+>  <rgroup_id>  (472) 
+471
 
 $$$$
 
@@ -18136,6 +19552,9 @@ V    1 *
 M  END
 >  <SMILES>  (473) 
 *C(=O)c1ccc(C)cc1
+
+>  <rgroup_id>  (473) 
+472
 
 $$$$
 
@@ -18191,6 +19610,9 @@ M  END
 >  <SMILES>  (474) 
 *B1OC(C)(C)C(C)(C)O1
 
+>  <rgroup_id>  (474) 
+473
+
 $$$$
 
      RDKit          3D
@@ -18230,6 +19652,9 @@ V    1 *
 M  END
 >  <SMILES>  (475) 
 *Cc1ccc(Cl)c(Cl)c1
+
+>  <rgroup_id>  (475) 
+474
 
 $$$$
 
@@ -18272,6 +19697,9 @@ M  END
 >  <SMILES>  (476) 
 *c1cc2ccccc2s1
 
+>  <rgroup_id>  (476) 
+475
+
 $$$$
 
      RDKit          3D
@@ -18308,6 +19736,9 @@ M  END
 >  <SMILES>  (477) 
 *Oc1cccc(Cl)c1
 
+>  <rgroup_id>  (477) 
+476
+
 $$$$
 
      RDKit          3D
@@ -18342,6 +19773,9 @@ M  END
 >  <SMILES>  (478) 
 *c1c(F)cccc1F
 
+>  <rgroup_id>  (478) 
+477
+
 $$$$
 
      RDKit          3D
@@ -18358,6 +19792,9 @@ V    1 *
 M  END
 >  <SMILES>  (479) 
 *N
+
+>  <rgroup_id>  (479) 
+478
 
 $$$$
 
@@ -18394,6 +19831,9 @@ V    1 *
 M  END
 >  <SMILES>  (480) 
 *c1ccc(N)nc1
+
+>  <rgroup_id>  (480) 
+479
 
 $$$$
 
@@ -18434,6 +19874,9 @@ V    1 *
 M  END
 >  <SMILES>  (481) 
 *c1cccnc1OC
+
+>  <rgroup_id>  (481) 
+480
 
 $$$$
 
@@ -18480,6 +19923,9 @@ M  END
 >  <SMILES>  (482) 
 *C(=O)N(CC)CC
 
+>  <rgroup_id>  (482) 
+481
+
 $$$$
 
      RDKit          3D
@@ -18511,6 +19957,9 @@ V    1 *
 M  END
 >  <SMILES>  (483) 
 *c1ccc(Cl)nc1
+
+>  <rgroup_id>  (483) 
+482
 
 $$$$
 
@@ -18564,6 +20013,9 @@ M  END
 >  <SMILES>  (484) 
 *c1ccc(OC(C)C)nc1
 
+>  <rgroup_id>  (484) 
+483
+
 $$$$
 
      RDKit          3D
@@ -18576,6 +20028,9 @@ V    1 *
 M  END
 >  <SMILES>  (485) 
 *Cl
+
+>  <rgroup_id>  (485) 
+484
 
 $$$$
 
@@ -18595,6 +20050,9 @@ V    1 *
 M  END
 >  <SMILES>  (486) 
 *CF
+
+>  <rgroup_id>  (486) 
+485
 
 $$$$
 
@@ -18631,6 +20089,9 @@ V    1 *
 M  END
 >  <SMILES>  (487) 
 *OCC1CC1
+
+>  <rgroup_id>  (487) 
+486
 
 $$$$
 
@@ -18669,6 +20130,9 @@ V    1 *
 M  END
 >  <SMILES>  (488) 
 *c1ccc(O)c(O)c1
+
+>  <rgroup_id>  (488) 
+487
 
 $$$$
 
@@ -18725,6 +20189,9 @@ M  END
 >  <SMILES>  (489) 
 *CCCCCCC
 
+>  <rgroup_id>  (489) 
+488
+
 $$$$
 
      RDKit          3D
@@ -18766,6 +20233,9 @@ M  END
 >  <SMILES>  (490) 
 *NCCCC
 
+>  <rgroup_id>  (490) 
+489
+
 $$$$
 
      RDKit          3D
@@ -18803,6 +20273,9 @@ V    1 *
 M  END
 >  <SMILES>  (491) 
 *C(=O)c1ccccc1
+
+>  <rgroup_id>  (491) 
+490
 
 $$$$
 
@@ -18844,6 +20317,9 @@ M  END
 >  <SMILES>  (492) 
 *Cc1cccc(F)c1
 
+>  <rgroup_id>  (492) 
+491
+
 $$$$
 
      RDKit          3D
@@ -18878,6 +20354,9 @@ M  END
 >  <SMILES>  (493) 
 *c1ccc(Cl)cc1
 
+>  <rgroup_id>  (493) 
+492
+
 $$$$
 
      RDKit          3D
@@ -18908,6 +20387,9 @@ V    1 *
 M  END
 >  <SMILES>  (494) 
 *C(C)C(=O)O
+
+>  <rgroup_id>  (494) 
+493
 
 $$$$
 
@@ -18949,6 +20431,9 @@ V    1 *
 M  END
 >  <SMILES>  (495) 
 *c1ccc2[nH]ncc2c1
+
+>  <rgroup_id>  (495) 
+494
 
 $$$$
 
@@ -19008,6 +20493,9 @@ M  END
 >  <SMILES>  (496) 
 *c1ccc(C(C)(C)C)cc1
 
+>  <rgroup_id>  (496) 
+495
+
 $$$$
 
      RDKit          3D
@@ -19034,6 +20522,9 @@ V    1 *
 M  END
 >  <SMILES>  (497) 
 *CC=C
+
+>  <rgroup_id>  (497) 
+496
 
 $$$$
 
@@ -19083,6 +20574,9 @@ M  END
 >  <SMILES>  (498) 
 *OCCc1ccccc1
 
+>  <rgroup_id>  (498) 
+497
+
 $$$$
 
      RDKit          3D
@@ -19101,6 +20595,9 @@ V    1 *
 M  END
 >  <SMILES>  (499) 
 *CCl
+
+>  <rgroup_id>  (499) 
+498
 
 $$$$
 
@@ -19143,6 +20640,9 @@ M  END
 >  <SMILES>  (500) 
 *CCN(C)C
 
+>  <rgroup_id>  (500) 
+499
+
 $$$$
 
      RDKit          3D
@@ -19173,5 +20673,8 @@ V    1 *
 M  END
 >  <SMILES>  (501) 
 *NCCO
+
+>  <rgroup_id>  (501) 
+500
 
 $$$$

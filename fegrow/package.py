@@ -671,18 +671,22 @@ class RGroupGrid(mols2grid.MolGrid):
         """
         molecules = []
         names = []
+        rgroup_ids = []
+
 
         builtin_rgroups = Path(__file__).parent / "data" / "rgroups" / "library.sdf"
         for rgroup in Chem.SDMolSupplier(str(builtin_rgroups), removeHs=False):
             molecules.append(rgroup)
             names.append(rgroup.GetProp("SMILES"))
+            rgroup_ids.append(rgroup.GetProp("rgroup_id"))
+
 
             # highlight the attachment atom
             for atom in rgroup.GetAtoms():
                 if atom.GetAtomicNum() == 0:
                     setattr(rgroup, "__sssAtoms", [atom.GetIdx()])
 
-        return pandas.DataFrame({"Mol": molecules, "Name": names})
+        return pandas.DataFrame({"Mol": molecules, "Name": names, "Rgroup_id": rgroup_ids})
 
     def _ipython_display_(self):
         from IPython.display import display_html
