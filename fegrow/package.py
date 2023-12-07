@@ -228,7 +228,17 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
 
         :param **kwargs: are passed further to Draw.MolToImage function.
         """
-        return rep2D(self, **kwargs)
+        numbered = copy.deepcopy(self)
+        numbered.RemoveAllConformers()
+        if idx:
+            for atom in numbered.GetAtoms():
+                atom.SetAtomMapNum(atom.GetIdx())
+        Chem.AllChem.Compute2DCoords(numbered)
+
+        if rdkit_mol:
+            return numbered
+        else:
+            return Draw.MolToImage(numbered, **kwargs)
 
     def rep3D(
         self,
@@ -757,25 +767,3 @@ def build_molecules(
     return rlist
 
 
-def rep2D(mol, idx=-1, rdkit_mol=False, **kwargs):
-    numbered = copy.deepcopy(mol)
-    numbered.RemoveAllConformers()
-    if idx:
-        for atom in numbered.GetAtoms():
-            atom.SetAtomMapNum(atom.GetIdx())
-    Chem.AllChem.Compute2DCoords(numbered)
-
-    if rdkit_mol:
-        return numbered
-    else:
-        return Draw.MolToImage(numbered, **kwargs)
-
-
-def rep3D(mol):
-    viewer = py3Dmol.view(width=300, height=300, viewergrid=(1, 1))
-    for i in range(mol.GetNumConformers()):
-        mb = Chem.MolToMolBlock(mol, confId=i)
-        viewer.addModel(mb, "mol")
-    viewer.setStyle({"stick": {}})
-    viewer.zoomTo()
-    return viewer

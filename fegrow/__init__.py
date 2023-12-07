@@ -4,7 +4,6 @@ from .conformers import generate_conformers, WrongCoreForMolecule
 from .package import (
     RList,
     RMol,
-    rep2D,
     build_molecules,
     RGroups,
     Linkers,
@@ -18,7 +17,6 @@ __version__ = open(Path(__file__).parent / "version.txt").read().strip()
 __all__ = [
     RMol,
     generate_conformers,
-    rep2D,
     fix_receptor,
     optimise_in_receptor,
     tox_props,
