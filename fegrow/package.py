@@ -533,7 +533,7 @@ class RList(RInterface, list):
         )
 
     @staticmethod
-    def _append_jupyter_visualisation(df):
+    def _add_smiles_2D_visualisation(df):
         if "Smiles" not in df:
             return
 
@@ -544,7 +544,7 @@ class RList(RInterface, list):
 
     def toxicity(self):
         df = pandas.concat([m.toxicity() for m in self] + [pandas.DataFrame()])
-        RList._append_jupyter_visualisation(df)
+        RList._add_smiles_2D_visualisation(df)
         return df
 
     def generate_conformers(
@@ -616,11 +616,12 @@ class RList(RInterface, list):
     def dataframe(self):
         return pandas.concat([rmol.df() for rmol in self] + [pandas.DataFrame()])
 
-    def _repr_html_(self):
-        # return the dataframe with the visualisation column of the dataframe
+    def _ipython_display_(self):
+        from IPython.display import display
+
         df = self.dataframe
-        RList._append_jupyter_visualisation(df)
-        return df._repr_html_()
+        RList._add_smiles_2D_visualisation(df)
+        return display(df)
 
 
 class RGroups(pandas.DataFrame):
