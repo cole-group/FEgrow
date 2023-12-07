@@ -1,14 +1,16 @@
 import pathlib
 import pytest
 
+import pandas
+
 import fegrow
-from fegrow import RGroupGrid, RLinkerGrid
+from fegrow import RGroups, Linkers
 from rdkit import Chem
 
 
 # instantiate the libraries
-RGroups = RGroupGrid._load_molecules()
-RLinkers = RLinkerGrid._load_molecules()
+RGroups = pandas.DataFrame(RGroups._load_data())
+RLinkers = pandas.DataFrame(Linkers._load_data())
 
 root = pathlib.Path(__file__).parent
 

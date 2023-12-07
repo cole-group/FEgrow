@@ -623,22 +623,24 @@ class RList(RInterface, list):
         return df._repr_html_()
 
 
-class RGroupGrid(mols2grid.MolGrid):
+class RGroups(pandas.DataFrame):
     """
-    A wrapper around the mols to grid class to load and process the r group folders locally.
+    The default R-Group library with visualisation (mols2grid).
     """
 
     def __init__(self):
-        dataframe = RGroupGrid._load_molecules()
+        data = RGroups._load_data()
+        super(RGroups, self).__init__(data)
 
-        super(RGroupGrid, self).__init__(
-            dataframe, removeHs=True, mol_col="Mol", use_coords=False, name="m2"
-        )
+        self._fegrow_grid = mols2grid.MolGrid(self, removeHs=True, mol_col="Mol", use_coords=False, name="m2")
 
     @staticmethod
-    def _load_molecules() -> pandas.DataFrame:
+    def _load_data() -> pandas.DataFrame:
         """
-        Load the library RGroups
+        Load the default R-Group library
+
+        The R-groups were largely extracted from (please cite accordingly):
+        Takeuchi, Kosuke, Ryo Kunimoto, and Jürgen Bajorath. "R-group replacement database for medicinal chemistry." Future Science OA 7.8 (2021): FSO742.
         """
         molecules = []
         names = []
@@ -653,29 +655,31 @@ class RGroupGrid(mols2grid.MolGrid):
                 if atom.GetAtomicNum() == 0:
                     setattr(rgroup, "__sssAtoms", [atom.GetIdx()])
 
-        return pandas.DataFrame({"Mol": molecules, "Name": names})
+        return {"Mol": molecules, "Name": names}
 
     def _ipython_display_(self):
         from IPython.display import display_html
 
         subset = ["img", "Name", "mols2grid-id"]
-        display_html(self.display(subset=subset, substruct_highlight=True))
+        display_html(self._fegrow_grid.display(subset=subset, substruct_highlight=True))
 
     def get_selected(self):
-        df = self.get_selection()
+        df = self._fegrow_grid.get_selection()
         return list(df["Mol"])
 
 
-class RLinkerGrid(mols2grid.MolGrid):
+class Linkers(pandas.DataFrame):
     """
-    A wrapper around the mols to grid class to load and process the linker folders locally.
+    A linker library presented as a grid molecules using mols2grid library.
     """
 
     def __init__(self):
-        dataframe = RLinkerGrid._load_molecules()
+        # initialise self dataframe
+        data = Linkers._load_data()
+        super(Linkers, self).__init__(data)
 
-        super(RLinkerGrid, self).__init__(
-            dataframe,
+        self._fegrow_grid = mols2grid.MolGrid(
+            self,
             removeHs=True,
             mol_col="Mol",
             use_coords=False,
@@ -684,36 +688,34 @@ class RLinkerGrid(mols2grid.MolGrid):
         )
 
     @staticmethod
-    def _load_molecules() -> pandas.DataFrame:
-        """
-        Load the library linkers
-        """
-
+    def _load_data():
         # note that the linkers are pre-sorted so that:
         #  - [R1]C[R2] is next to [R2]C[R1]
         #  - according to how common they are (See the original publication) as described with SmileIndex
         builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
 
-        linkers = []
+        mols = []
+        display_names = []
+        smile_indices = []
         for mol in Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False):
+            mols.append(mol)
+
             # use easier searchable SMILES, e.g. [*:1] was replaced with R1
-            display_name = mol.GetProp("display_smiles")
+            display_names.append(mol.GetProp("display_smiles"))
 
             # extract the index property from the original publication
-            smile_index = mol.GetIntProp("SmileIndex")
+            smile_indices.append(mol.GetIntProp("SmileIndex"))
 
-            linkers.append([mol, display_name, smile_index])
-
-        return pandas.DataFrame(linkers, columns=["Mol", "Name", "Common"])
+        return {"Mol": mols, "Name": display_names, "Common": smile_indices}
 
     def _ipython_display_(self):
         from IPython.display import display
 
         subset = ["img", "Name", "mols2grid-id"]
-        return display(self.display(subset=subset, substruct_highlight=True))
+        return display(self._fegrow_grid.display(subset=subset, substruct_highlight=True))
 
     def get_selected(self):
-        df = self.get_selection()
+        df = self._fegrow_grid.get_selection()
         return list(df["Mol"])
 
 
