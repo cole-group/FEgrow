@@ -641,7 +641,7 @@ class RGroups(pandas.DataFrame):
 
     def __init__(self):
         data = RGroups._load_data()
-        super(RGroups, self).__init__(data)
+        super().__init__(data)
 
         self._fegrow_grid = mols2grid.MolGrid(self, removeHs=True, mol_col="Mol", use_coords=False, name="m2")
 
@@ -687,7 +687,7 @@ class Linkers(pandas.DataFrame):
     def __init__(self):
         # initialise self dataframe
         data = Linkers._load_data()
-        super(Linkers, self).__init__(data)
+        super().__init__(data)
 
         self._fegrow_grid = mols2grid.MolGrid(
             self,
