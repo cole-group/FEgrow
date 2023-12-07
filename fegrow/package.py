@@ -731,14 +731,14 @@ class Linkers(pandas.DataFrame):
 
 
 def build_molecules(
-    templates: Union[Chem.Mol, List[Chem.Mol]],
+    scaffolds: Union[Chem.Mol, List[Chem.Mol]],
     r_groups: Union[Chem.Mol, List[Chem.Mol], int],
     attachment_points: Optional[List[int]] = None,
     keep_components: Optional[List[int]] = None,
 ):
     """
 
-    :param templates:
+    :param scaffolds:
     :param r_groups:
     :param attachment_points:
     :param keep_components: When the scaffold is grown from an internal atom that divides the molecules into separate
@@ -750,7 +750,7 @@ def build_molecules(
         raise ValueError("Empty list received. Please pass any R-groups or R-linkers. ")
 
     built_mols = build_molecules_with_rdkit(
-        templates, r_groups, attachment_points, keep_components
+        scaffolds, r_groups, attachment_points, keep_components
     )
     rlist = RList()
     for mol, scaffold, scaffold_no_attachement in built_mols:
