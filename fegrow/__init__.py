@@ -6,8 +6,8 @@ from .package import (
     RMol,
     rep2D,
     build_molecules,
-    RGroupGrid,
-    RLinkerGrid,
+    RGroups,
+    Linkers,
 )
 from .receptor import fix_receptor, optimise_in_receptor, sort_conformers
 from .toxicity import tox_props
@@ -23,8 +23,8 @@ __all__ = [
     optimise_in_receptor,
     tox_props,
     sort_conformers,
-    RGroupGrid,
-    RLinkerGrid,
+    RGroups,
+    Linkers,
     build_molecules,
     __version__,
     WrongCoreForMolecule,

@@ -1,7 +1,7 @@
 
 Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, Daniel J. Cole
 
-** [UNPUBLISHED] version 1.*.***
+** [UNPUBLISHED] version 1.4.***
  - rmol.to_file now writes all conformers into the PDB using the "MODEL / ENDMDL" flavour which can be ready by
     MDAnalysis.
  - ANI in some cases explodes. Remove the bad conformers with bonds that have lengths larger than 3A.
@@ -18,6 +18,7 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
  - Do not cache openff parameters into db.json which right now crashes when multiple threads are used (same filename)
  - using a tempfile with the anipotential .pt model file for for thread safety
  - gnina column is renamed from "CNNaffinity->IC50s" to "Kd" with nM unit. We added pint-pandas package for units.
+ - rgroups and linkers are now dataframe (simpler API access)
 
 **version 1.3.0**
 
