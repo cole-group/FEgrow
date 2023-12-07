@@ -28,10 +28,10 @@ import prody
 from rdkit import Chem
 
 import fegrow
-from fegrow import RGroupGrid, RLinkerGrid
+from fegrow import RGroups, Linkers
 
-RGroups = RGroupGrid()
-RLinkers = RLinkerGrid()
+rgroups = RGroups()
+linkers = Linkers()
 
 
 # # Prepare the ligand template
@@ -79,27 +79,12 @@ attachment_index = [40]
 # 
 # ### Note : If you want to use linkers make sure that you use the correct function below, in cell [11].
 
-# In[ ]:
-
-
-RLinkers
-
-
-# In[ ]:
-
-
-# select the linker from the grid
-linker = RGroups.get_selected()
 
 # or select one programmatically
-df = RLinkers.dataframe
-linker = df.loc[df['Name']=='R1CR2']['Mol'].values[0]
+selected_linkers = linkers.loc[linkers['Name']=='R1CR2'].Mol.item()
 
 # create just one template merged with a linker
-template_with_linker = fegrow.build_molecules(template, [linker], attachment_index)[0]
-
-
-# In[ ]:
+template_with_linker = fegrow.build_molecules(template, [selected_linkers], attachment_index)[0]
 
 
 # note that the linker leaves the second attachement point prespecified (* character)
@@ -118,26 +103,14 @@ template_with_linker.rep2D(idx=True, size=(500, 500))
 
 # In[ ]:
 
-
-RGroups
-
-
-# In[ ]:
-
-
-# retrieve the interactively selected groups
-interactive_rgroups = RGroups.get_selected()
-
 # you can also directly access the built-in dataframe programmatically
-groups = RGroups.dataframe
-R_group_ethanol = groups.loc[groups['Name']=='*CCO']['Mol'].values[0]
+R_group_ethanol = rgroups.loc[rgroups['Name']=='*CCO'].Mol.item()
 
 # add your own R-groups files
 R_group_propanol = Chem.MolFromMolFile('manual_rgroups/propan-1-ol-r.mol', removeHs=False)
 
 # make a list of R-group molecule
-selected_rgroups = [R_group_propanol, R_group_ethanol] + interactive_rgroups
-selected_rgroups
+selected_rgroups = [R_group_propanol, R_group_ethanol]
 
 
 # # Build a congeneric series
