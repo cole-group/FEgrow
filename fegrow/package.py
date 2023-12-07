@@ -632,7 +632,7 @@ class RGroups(pandas.DataFrame):
         data = RGroups._load_data()
         super(RGroups, self).__init__(data)
 
-        self._fegrow_grid = mols2grid.MolGrid(self, removeHs = True, mol_col = "Mol", use_coords = False, name = "m2")
+        self._fegrow_grid = mols2grid.MolGrid(self, removeHs=True, mol_col="Mol", use_coords=False, name="m2")
 
     @staticmethod
     def _load_data() -> pandas.DataFrame:
@@ -675,8 +675,8 @@ class Linkers(pandas.DataFrame):
 
     def __init__(self):
         # initialise self dataframe
-        linkers, columns = Linkers._load_data()
-        super(Linkers, self).__init__(linkers, columns=columns)
+        data = Linkers._load_data()
+        super(Linkers, self).__init__(data)
 
         self._fegrow_grid = mols2grid.MolGrid(
             self,
@@ -694,18 +694,19 @@ class Linkers(pandas.DataFrame):
         #  - according to how common they are (See the original publication) as described with SmileIndex
         builtin_rlinkers = Path(__file__).parent / "data" / "linkers" / "library.sdf"
 
-        linkers = []
+        mols = []
+        display_names = []
+        smile_indices = []
         for mol in Chem.SDMolSupplier(str(builtin_rlinkers), removeHs=False):
+            mols.append(mol)
+
             # use easier searchable SMILES, e.g. [*:1] was replaced with R1
-            display_name = mol.GetProp("display_smiles")
+            display_names.append(mol.GetProp("display_smiles"))
 
             # extract the index property from the original publication
-            smile_index = mol.GetIntProp("SmileIndex")
+            smile_indices.append(mol.GetIntProp("SmileIndex"))
 
-            linkers.append([mol, display_name, smile_index])
-
-        columns = ["Mol", "Name", "Common"]
-        return linkers, columns
+        return {"Mol": mols, "Name": display_names, "Common": smile_indices}
 
     def _ipython_display_(self):
         from IPython.display import display
