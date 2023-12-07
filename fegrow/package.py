@@ -219,7 +219,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
 
         return df
 
-    def rep2D(self, **kwargs):
+    def rep2D(self, idx=-1, rdkit_mol=False, **kwargs):
         """
         Use RDKit and get a 2D diagram.
         Uses Compute2DCoords and Draw.MolToImage function
