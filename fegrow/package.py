@@ -579,7 +579,7 @@ class ChemSpace(): # RInterface
                      ("remove_clashing_confs", RMol.remove_clashing_confs),
                      ("optimise_in_receptor", optimise_in_receptor),
                      ("gnina", RMol.gnina),
-                     ("build_molecules", build_molecules)
+                     ("build_molecule", build_molecule)
                      ]:
                 ChemSpace._rmol_functions[name] = delayed(function)
 
@@ -811,9 +811,9 @@ class ChemSpace(): # RInterface
         scaffold = delayed(self._scaffolds[0])
 
         # create the dask jobs
-        jobs = [ChemSpace._rmol_functions['build_molecules'](scaffold, rgroup) for rgroup in rgroups]
+        jobs = [ChemSpace._rmol_functions["build_molecule"](scaffold, rgroup) for rgroup in rgroups]
         results = self.dask_client.compute(jobs)
-        built_mols = [r.result()[0] for r in results]
+        built_mols = [r.result() for r in results]
 
         # get Smiles
         built_mols_smiles = [Chem.MolToSmiles(mol) for mol in built_mols]
@@ -937,23 +937,23 @@ class Linkers(pandas.DataFrame):
         return list(df["Mol"])
 
 
-def build_molecules(
+def build_molecule(
     scaffolds: Chem.Mol,
-    r_groups: Chem.Mol,
-    attachment_points: Optional[int] = None,
-    keep_components: Optional[int] = None,
+    r_group: Chem.Mol,
+    attachment_point: Optional[int] = None,
+    keep_component: Optional[int] = None,
 ):
     """
 
     :param scaffolds:
     :param r_groups:
-    :param attachment_points:
-    :param keep_components: When the scaffold is grown from an internal atom that divides the molecules into separate
+    :param attachment_point:
+    :param keep_component: When the scaffold is grown from an internal atom that divides the molecules into separate
         submolecules, keep the submolecule with this atom index.
     :return:
     """
 
-    if isinstance(r_groups, list) and len(r_groups) == 0:
+    if isinstance(r_group, list) and len(r_group) == 0:
         raise ValueError("Empty list received. Please pass any R-groups or R-linkers. ")
 
     # scaffolds were created earlier, they are most likely templates combined with linkers,
@@ -962,7 +962,7 @@ def build_molecules(
         scaffolds = [mol for idx, mol in scaffolds.dataframe.Mol.items()]
 
     built_mols = build_molecules_with_rdkit(
-        scaffolds, r_groups, attachment_points, keep_components
+        scaffolds, r_group, attachment_point, keep_component
     )
 
     mol, scaffold, scaffold_no_attachement = built_mols

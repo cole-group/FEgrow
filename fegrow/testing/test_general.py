@@ -14,13 +14,13 @@ from rdkit import Chem
 
 def test_adding_ethanol_1mol(RGroups, sars_core_scaffold):
     # use a hydrogen bond N-H
-    attachment_index = [7]
+    attachment_index = 7
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmols = fegrow.build_molecules(
-        sars_core_scaffold, [ethanol_rgroup], attachment_index
+    rmol = fegrow.build_molecule(
+        sars_core_scaffold, ethanol_rgroup, attachment_index
     )
 
-    assert len(rmols) == 1, "Did not generate 1 molecule"
+    assert isinstance(rmol, Chem.Mol), "Did not generate a molecule"
 
 
 def test_growing_keep_larger_component(RGroups):
@@ -32,9 +32,9 @@ def test_growing_keep_larger_component(RGroups):
     Chem.AllChem.Compute2DCoords(scaffold)
 
     # use C on the chlorinated benzene
-    attachment_index = [3]
+    attachment_index = 3
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index).pop()
+    rmol = fegrow.build_molecule(scaffold, ethanol_rgroup, attachment_index)
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "O=c1c(CCO)cccn1-c1cccnc1"
 
@@ -50,12 +50,12 @@ def test_growing_keep_cue_component(RGroups):
     Chem.AllChem.Compute2DCoords(scaffold)
 
     # use C on the chlorinated benzene
-    attachment_index = [2]
-    keep_smaller_ring = [3]
+    attachment_index = 2
+    keep_smaller_ring = 3
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmol = fegrow.build_molecules(
-        scaffold, [ethanol_rgroup], attachment_index, keep_smaller_ring
-    ).pop()
+    rmol = fegrow.build_molecule(
+        scaffold, ethanol_rgroup, attachment_index, keep_smaller_ring
+    )
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "OCCc1cccc(Cl)c1"
 
@@ -72,9 +72,9 @@ def test_replace_methyl(RGroups, sars_core_scaffold):
     scaffold = fegrow.RMol(mol)
 
     # replace the methyl group
-    attachment_index = [8]
+    attachment_index = 8
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index).pop()
+    rmol = fegrow.build_molecule(scaffold, ethanol_rgroup, attachment_index)
 
     assert Chem.MolToSmiles(rmol) == "[H]OC([H])([H])C([H])([H])C(=O)N([H])c1nc([H])c([H])c([H])c1[H]"
 
@@ -91,55 +91,38 @@ def test_replace_methyl_keep_h(RGroups, sars_core_scaffold):
     scaffold = fegrow.RMol(mol)
 
     # replace the methyl group
-    attachment_index = [8]
-    keep_only_h = [10]
+    attachment_index = 8
+    keep_only_h = 10
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmol = fegrow.build_molecules(scaffold, [ethanol_rgroup], attachment_index, keep_only_h).pop()
+    rmol = fegrow.build_molecule(scaffold, ethanol_rgroup, attachment_index, keep_only_h)
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "CCO"
 
 def test_adding_ethanol_number_of_atoms(RGroups, sars_scaffold_sdf):
     # Check if merging ethanol with a molecule yields the right number of atoms.
     template_atoms_num = sars_scaffold_sdf.GetNumAtoms()
-    attachment_index = [40]
 
     # get a group
     ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
     ethanol_atoms_num = ethanol.GetNumAtoms()
 
     # merge
-    rmols = fegrow.build_molecules(sars_scaffold_sdf, [ethanol], attachment_index)
+    rmol = fegrow.build_molecule(sars_scaffold_sdf, ethanol, 40)
 
-    assert (template_atoms_num + ethanol_atoms_num - 2) == rmols[0].GetNumAtoms()
-
-
-def test_growing_plural_groups(RGroups, sars_scaffold_sdf):
-    # Check if adding two groups to a templates creates two molecules.
-    attachment_index = [40]
-
-    # get r-group
-    ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.values[0]
-
-    rmols = fegrow.build_molecules(
-        sars_scaffold_sdf, [ethanol, cyclopropane], attachment_index
-    )
-
-    assert len(rmols) == 2
+    assert (template_atoms_num + ethanol_atoms_num - 2) == rmol.GetNumAtoms()
 
 
 def test_added_ethanol_conformer_generation(RGroups, sars_scaffold_sdf):
     # Check if conformers are generated correctly.
-    attachment_index = [40]
 
     # get r-group
     ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
 
-    rmols = fegrow.build_molecules(sars_scaffold_sdf, [ethanol], attachment_index)
+    rmol = fegrow.build_molecule(sars_scaffold_sdf, ethanol, 40)
 
-    rmols[0].generate_conformers(num_conf=20, minimum_conf_rms=0.1)
+    rmol.generate_conformers(num_conf=20, minimum_conf_rms=0.1)
 
-    assert rmols[0].GetNumConformers() > 2
+    assert rmol.GetNumConformers() > 2
 
 
 def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
@@ -153,30 +136,11 @@ def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
     :return:
     """
     # Check if conformers are generated correctly.
-    attachment_index = [40]
+    attachment_index = 40
     # Select a linker
     linker = RLinkers[RLinkers.Name == "R1NC(R2)=O"].Mol.values[0]
-    template_with_linker = fegrow.build_molecules(
-        sars_scaffold_sdf, [linker], attachment_index
-    )[0]
+    template_with_linker = fegrow.build_molecule(sars_scaffold_sdf, linker, attachment_index)
+
     for atom in template_with_linker.GetAtoms():
         if atom.GetAtomicNum() == 0:
             assert len(atom.GetBonds()) == 1
-
-
-def test_two_linkers_two_rgroups(RGroups, RLinkers):
-    # Check combinatorial: ie 2 rgroups and 2 linkers create 4 molecles that contain both
-
-    # get two R-groups
-    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.values[0]
-
-    # get two linkers
-    linker1 = RLinkers[RLinkers.Name == "R1CR2"].Mol.values[0]
-    linker2 = RLinkers[RLinkers.Name == "R1OR2"].Mol.values[0]
-
-    built_molecules = fegrow.build_molecules(
-        [linker1, linker2], [R_group_ethanol, R_group_cyclopropane]
-    )
-
-    assert len(built_molecules) == 4

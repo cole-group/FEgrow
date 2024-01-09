@@ -31,3 +31,4 @@ def test_chem_space(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     rec_final = prody.parsePDB(rec_7l10_final_path)
     chemspace.remove_clashing_confs(rec_final)
+

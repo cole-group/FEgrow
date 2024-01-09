@@ -4,7 +4,7 @@ from .conformers import generate_conformers, WrongCoreForMolecule
 from .package import (
     ChemSpace,
     RMol,
-    build_molecules,
+    build_molecule,
     RGroups,
     Linkers,
 )
@@ -23,7 +23,7 @@ __all__ = [
     sort_conformers,
     RGroups,
     Linkers,
-    build_molecules,
+    build_molecule,
     __version__,
     WrongCoreForMolecule,
 ]

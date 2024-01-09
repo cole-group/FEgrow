@@ -12,95 +12,52 @@ logger = logging.getLogger(__name__)
 
 
 def build_molecules_with_rdkit(
-    templates: Chem.Mol,
-    r_groups: Union[Chem.Mol, List[Chem.Mol], int],
-    attachment_points: Optional[List[int]] = None,
-    keep_components: Optional[List[int]] = None,
+    scaffold: Chem.Mol,
+    r_group: Chem.Mol,
+    attachment_point: Optional[int] = None,
+    keep_components: Optional[int] = None,
 ):
     """
     For the given core molecule and list of attachment points
      and r groups enumerate the possible molecules and
      return a list of them.
 
-    :param template: The core scaffold molecule to attach the r groups to, or a list of them.
+    :param scaffold: The core scaffold molecule to attach the r groups to, or a list of them.
     :param r_group: The list of rdkit molecules which should be considered
       r groups or the RGroup Grid with highlighted molecules.
-    :param attachment_points: The list of atom index in the core ligand
+    :param attachment_point: The list of atom index in the core ligand
       that the r groups should be attached to. If it is empty, connecting points are sought out and matched.
     """
 
     if keep_components is None:
         keep_components = []
 
-    # fixme - special case after changing the API: remove in the future
-    # This is a temporary warning about the change in the interface.
-    # This change is because there are situations where the attachment_points do not need to be passed to the function.
-    if (
-        isinstance(r_groups, list)
-        and len(r_groups) > 0
-        and isinstance(r_groups[0], int)
-    ):
-        print(
-            'Warning: second argument is detected to be an integer. It is now "r_groups" '
-            "whereas attachement_points are provided as the 3rd argument. "
-        )
-        raise Exception(
-            "Please note that after adding the linker to FEgrow (version 1.1), "
-            'the "build_molecules" function interface has changed to'
-            ' "build_molecules(core_ligand, r_groups, attachment_points)". '
-        )
-
-    # ensure template and r_group are lists
-    if not issubclass(templates.__class__, List):
-        templates = [templates]
-    if not issubclass(r_groups.__class__, List):
-        r_groups = [r_groups]
-
     # make a deep copy of r_groups/linkers to ensure we don't modify the library
-    templates = [copy.deepcopy(mol) for mol in templates]
-    r_groups = [copy.deepcopy(mol) for mol in r_groups]
+    scaffold = copy.deepcopy(scaffold)
+    r_group = copy.deepcopy(r_group)
 
     # get attachment points for each template
-    if not attachment_points:
+    if not attachment_point:
         # attempt to generate the attachment points by picking the joining molecule
         # case: a list of templates previously joined with linkers requires iterating over them
-        attachment_points = [
-            get_attachment_vector(lig)[0].GetIdx() for lig in templates
-        ]
-    elif str(attachment_points).isdigit():
-        attachment_points = [attachment_points]
+        attachment_point = get_attachment_vector(scaffold)[0].GetIdx()
 
-    if not attachment_points:
-        raise Exception("Could not find attachement points. ")
+    if not attachment_point:
+        raise Exception("Could not find attachement points. Either the atom index has to be specified,"
+                        "or an atom needs to be marked rdkit.atom.SetAtomicNum(0). ")
 
-    if len(attachment_points) != len(templates):
-        raise Exception(
-            f"There must be one attachment point for each template. "
-            f"Provided attachement points = {len(attachment_points)} "
-            f"with templates number: {len(templates)}"
-        )
+    # for atom_idx, scaffold_ligand, keep_submolecule_cue in itertools.zip_longest(
+    #     attachment_points, template, keep_components, fillvalue=None
+    # ):
+    #     for r_mol in r_groups:
+    merged_mol, scaffold_no_attachement = merge_R_group(
+        scaffold=scaffold,
+        RGroup=r_group,
+        replace_index=attachment_point,
+        keep_cue_idx=keep_components,
+    )
 
-    combined_mols = []
-    id_counter = 0
-    for atom_idx, scaffold_ligand, keep_submolecule_cue in itertools.zip_longest(
-        attachment_points, templates, keep_components, fillvalue=None
-    ):
-        for r_mol in r_groups:
-            scaffold_mol = copy.deepcopy(scaffold_ligand)
-            merged_mol, scaffold_no_attachement = merge_R_group(
-                scaffold=scaffold_mol,
-                RGroup=r_mol,
-                replace_index=atom_idx,
-                keep_cue_idx=keep_submolecule_cue,
-            )
-            # assign the identifying index to the molecule
-            merged_mol.id = id_counter
-            combined_mols.append((merged_mol, scaffold_ligand, scaffold_no_attachement))
-            id_counter += 1
-
-    assert len(combined_mols) == 1
-
-    return combined_mols[0]
+    return merged_mol, scaffold, scaffold_no_attachement
 
 
 def split(molecule, splitting_atom, keep_neighbour_idx=None):
