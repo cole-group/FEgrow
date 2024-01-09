@@ -67,7 +67,7 @@ template = fegrow.RMol(init_mol)
 # In[ ]:
 
 
-attachment_index = [40]
+attachment_index = 40
 
 
 # # Optional: insert a linker
@@ -80,10 +80,10 @@ attachment_index = [40]
 
 
 # or select one programmatically
-selected_linkers = linkers.loc[linkers['Name']=='R1CR2'].Mol.item()
+selected_linker = linkers.loc[linkers['Name']=='R1CR2'].Mol.item()
 
 # create just one template merged with a linker
-template_with_linker = fegrow.build_molecules(template, [selected_linkers], attachment_index)
+template_with_linker = fegrow.build_molecule(template, selected_linker, attachment_index)
 
 
 # note that the linker leaves the second attachement point prespecified (* character)
@@ -119,7 +119,7 @@ R_group_ethanol = rgroups.loc[rgroups['Name']=='*CCO'].Mol.item()
 
 # we can either use the original template (so no linker)
 # in this case we have to specify the attachment index
-rmol = fegrow.build_molecules(template, R_group_ethanol, attachment_index)
+rmol = fegrow.build_molecule(template, R_group_ethanol, attachment_index)
 
 # or we can use the template merged with the linker
 # in which case the attachement point is not needed (R* atom is used)
