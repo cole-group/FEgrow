@@ -60,7 +60,6 @@ template = fegrow.RMol(init_mol)
 # In[ ]:
 
 
-template.rep2D(idx=True, size=(500, 500))
 
 
 # Using the 2D drawing, select an index for the growth vector. Note that it is currently only possible to grow from hydrogen atom positions. In this case, we are selecting the hydrogen atom labelled H:40 to enable growth into the S3/S4 pocket of Mpro.
@@ -88,7 +87,6 @@ template_with_linker = fegrow.build_molecules(template, [selected_linkers], atta
 
 
 # note that the linker leaves the second attachement point prespecified (* character)
-template_with_linker.rep2D(idx=True, size=(500, 500))
 
 
 # # Select RGroups for your template
@@ -142,13 +140,11 @@ rmols
 # In[ ]:
 
 
-rmols.rep2D()
 
 
 # In[ ]:
 
 
-rmols[0].rep3D()
 
 
 # Once the ligands have been generated, they can be assessed for various ADMET properties, including Lipinksi rule of 5 properties, the presence of unwanted substructures or problematic functional groups, and synthetic accessibility.
@@ -203,7 +199,6 @@ rec_final = prody.parsePDB("rec_final.pdb")
 # In[ ]:
 
 
-rmols[0].rep3D(prody=rec_final)
 
 
 # Any conformers that clash with the protein (any atom-atom distance less than 1 Angstrom), are removed.
@@ -217,7 +212,6 @@ rmols.remove_clashing_confs(rec_final)
 # In[ ]:
 
 
-rmols[0].rep3D(prody=rec_final)
 
 
 # ### Optimise conformers in context of protein
@@ -257,7 +251,6 @@ missing_ids = rmols.discard_missing()
 # In[ ]:
 
 
-rmols[0].rep3D()
 
 
 # Conformers are now sorted by energy, only retaining those within 5 kcal/mol of the lowest energy structure:
