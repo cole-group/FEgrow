@@ -26,3 +26,4 @@ dependencies:
   - conda-forge::mols2grid>=0.2.4
   - conda-forge::networkx
   - conda-forge::pint-pandas
+  - conda-forge::dask
