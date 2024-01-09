@@ -2,7 +2,7 @@ from pathlib import Path
 
 from .conformers import generate_conformers, WrongCoreForMolecule
 from .package import (
-    RList,
+    ChemSpace,
     RMol,
     build_molecules,
     RGroups,

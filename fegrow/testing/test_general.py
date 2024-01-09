@@ -4,27 +4,15 @@ import pytest
 import pandas
 
 import fegrow
-from fegrow import RGroups, Linkers
 from rdkit import Chem
 
 
-# instantiate the libraries
-RGroups = pandas.DataFrame(RGroups._load_data())
-RLinkers = pandas.DataFrame(Linkers._load_data())
-
-root = pathlib.Path(__file__).parent
 
 
-@pytest.fixture
-def sars_core_scaffold():
-    params = Chem.SmilesParserParams()
-    params.removeHs = False  # keep the hydrogens
-    scaffold = Chem.MolFromSmiles("[H]c1c([H])c([H])n([H])c(=O)c1[H]", params=params)
-    Chem.AllChem.Compute2DCoords(scaffold)
-    return scaffold
 
 
-def test_adding_ethanol_1mol(sars_core_scaffold):
+
+def test_adding_ethanol_1mol(RGroups, sars_core_scaffold):
     # use a hydrogen bond N-H
     attachment_index = [7]
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
@@ -35,7 +23,7 @@ def test_adding_ethanol_1mol(sars_core_scaffold):
     assert len(rmols) == 1, "Did not generate 1 molecule"
 
 
-def test_growing_keep_larger_component():
+def test_growing_keep_larger_component(RGroups):
     """
     When a growing vector is an internal atom that divides the molecule,
     the largest component becomes the scaffold.
@@ -51,7 +39,7 @@ def test_growing_keep_larger_component():
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "O=c1c(CCO)cccn1-c1cccnc1"
 
 
-def test_growing_keep_cue_component():
+def test_growing_keep_cue_component(RGroups):
     """
     When a growing vector is an atom that divides the molecule,
     the user can specify which side to keep.
@@ -72,7 +60,7 @@ def test_growing_keep_cue_component():
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "OCCc1cccc(Cl)c1"
 
 
-def test_replace_methyl(sars_core_scaffold):
+def test_replace_methyl(RGroups, sars_core_scaffold):
     """
 
     """
@@ -91,7 +79,7 @@ def test_replace_methyl(sars_core_scaffold):
     assert Chem.MolToSmiles(rmol) == "[H]OC([H])([H])C([H])([H])C(=O)N([H])c1nc([H])c([H])c([H])c1[H]"
 
 
-def test_replace_methyl_keep_h(sars_core_scaffold):
+def test_replace_methyl_keep_h(RGroups, sars_core_scaffold):
     """
 
     """
@@ -110,12 +98,9 @@ def test_replace_methyl_keep_h(sars_core_scaffold):
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "CCO"
 
-def test_adding_ethanol_number_of_atoms():
+def test_adding_ethanol_number_of_atoms(RGroups, sars_scaffold_sdf):
     # Check if merging ethanol with a molecule yields the right number of atoms.
-    template_mol = Chem.SDMolSupplier(
-        str(root / "data" / "sarscov2_coreh.sdf"), removeHs=False
-    )[0]
-    template_atoms_num = template_mol.GetNumAtoms()
+    template_atoms_num = sars_scaffold_sdf.GetNumAtoms()
     attachment_index = [40]
 
     # get a group
@@ -123,16 +108,13 @@ def test_adding_ethanol_number_of_atoms():
     ethanol_atoms_num = ethanol.GetNumAtoms()
 
     # merge
-    rmols = fegrow.build_molecules(template_mol, [ethanol], attachment_index)
+    rmols = fegrow.build_molecules(sars_scaffold_sdf, [ethanol], attachment_index)
 
     assert (template_atoms_num + ethanol_atoms_num - 2) == rmols[0].GetNumAtoms()
 
 
-def test_growing_plural_groups():
+def test_growing_plural_groups(RGroups, sars_scaffold_sdf):
     # Check if adding two groups to a templates creates two molecules.
-    template_mol = Chem.SDMolSupplier(
-        str(root / "data" / "sarscov2_coreh.sdf"), removeHs=False
-    )[0]
     attachment_index = [40]
 
     # get r-group
@@ -140,30 +122,27 @@ def test_growing_plural_groups():
     cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.values[0]
 
     rmols = fegrow.build_molecules(
-        template_mol, [ethanol, cyclopropane], attachment_index
+        sars_scaffold_sdf, [ethanol, cyclopropane], attachment_index
     )
 
     assert len(rmols) == 2
 
 
-def test_added_ethanol_conformer_generation():
+def test_added_ethanol_conformer_generation(RGroups, sars_scaffold_sdf):
     # Check if conformers are generated correctly.
-    template_mol = Chem.SDMolSupplier(
-        str(root / "data" / "sarscov2_coreh.sdf"), removeHs=False
-    )[0]
     attachment_index = [40]
 
     # get r-group
     ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
 
-    rmols = fegrow.build_molecules(template_mol, [ethanol], attachment_index)
+    rmols = fegrow.build_molecules(sars_scaffold_sdf, [ethanol], attachment_index)
 
-    rmols.generate_conformers(num_conf=20, minimum_conf_rms=0.1)
+    rmols[0].generate_conformers(num_conf=20, minimum_conf_rms=0.1)
 
     assert rmols[0].GetNumConformers() > 2
 
 
-def test_add_a_linker_check_star():
+def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
     """
     1. load the core
     2. load the linker
@@ -174,21 +153,18 @@ def test_add_a_linker_check_star():
     :return:
     """
     # Check if conformers are generated correctly.
-    template_mol = Chem.SDMolSupplier(
-        str(root / "data" / "sarscov2_coreh.sdf"), removeHs=False
-    )[0]
     attachment_index = [40]
     # Select a linker
     linker = RLinkers[RLinkers.Name == "R1NC(R2)=O"].Mol.values[0]
     template_with_linker = fegrow.build_molecules(
-        template_mol, [linker], attachment_index
+        sars_scaffold_sdf, [linker], attachment_index
     )[0]
     for atom in template_with_linker.GetAtoms():
         if atom.GetAtomicNum() == 0:
             assert len(atom.GetBonds()) == 1
 
 
-def test_two_linkers_two_rgroups():
+def test_two_linkers_two_rgroups(RGroups, RLinkers):
     # Check combinatorial: ie 2 rgroups and 2 linkers create 4 molecles that contain both
 
     # get two R-groups

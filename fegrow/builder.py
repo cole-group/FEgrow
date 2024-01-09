@@ -67,6 +67,8 @@ def build_molecules_with_rdkit(
         attachment_points = [
             get_attachment_vector(lig)[0].GetIdx() for lig in templates
         ]
+    elif str(attachment_points).isdigit():
+        attachment_points = [attachment_points]
 
     if not attachment_points:
         raise Exception("Could not find attachement points. ")

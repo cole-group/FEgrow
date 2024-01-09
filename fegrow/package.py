@@ -3,6 +3,7 @@ import copy
 import functools
 import logging
 import os
+import warnings
 from pathlib import Path
 import re
 import stat
@@ -22,9 +23,12 @@ import py3Dmol
 import rdkit
 from rdkit import Chem
 from rdkit.Chem import Draw, PandasTools
+from dask import delayed
+from dask.distributed import LocalCluster, Client, Scheduler, Worker
 
 from .builder import build_molecules_with_rdkit
 from .conformers import generate_conformers
+from .receptor import optimise_in_receptor, sort_conformers
 from .toxicity import tox_props
 
 # default options
@@ -153,8 +157,6 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
             print("Warning: no conformers so cannot optimise_in_receptor. Ignoring.")
             return
 
-        from .receptor import optimise_in_receptor
-
         opt_mol, energies = optimise_in_receptor(self, *args, **kwargs)
         # replace the conformers with the optimised ones
         self.RemoveAllConformers()
@@ -194,7 +196,6 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                 "Please run the optimise_in_receptor in order to generate the energies first. "
             )
 
-        from .receptor import sort_conformers
 
         final_mol, final_energies = sort_conformers(
             self, self.opt_energies, energy_range=energy_range
@@ -334,6 +335,9 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                     rm_counter += 1
                     break
         print(f"Removed {rm_counter} conformers. ")
+
+        # return self for Dask
+        return self
 
 
     @staticmethod
@@ -531,16 +535,69 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         return df._repr_html_()
 
 
-class RList(RInterface, list):
+class ChemSpace(): # RInterface
     """
-    Streamline working with RMol by presenting the same interface on the list,
-    and allowing to dispatch the functions to any single member.
+    Streamline working with many RMols or a specific chemical space by employing a pandas dataframe,
+    in combination with Dask for parallellisation.
     """
 
     def rep2D(self, subImgSize=(400, 400), **kwargs):
         return Draw.MolsToGridImage(
-            [mol.rep2D(rdkit_mol=True, **kwargs) for mol in self], subImgSize=subImgSize
+            [row.Mol.rep2D(rdkit_mol=True, **kwargs) for i, row in self.dataframe.iterrows()], subImgSize=subImgSize
         )
+
+    # def __getitem__(self, item):
+    #     """
+    #     Provide list like behaviour that returns the molecule.
+    #     ps. Mol column always has to be present.
+    #     """
+    #     return self.loc[item].Mol
+    _dask_cluster = None
+    _rmol_functions = {}
+
+    def __init__(self, data={"Smiles": [], "Mol": []}):
+        self.dataframe = pandas.DataFrame(data)
+
+        # PandasTools.ChangeMoleculeRendering(self)
+        if ChemSpace._dask_cluster is None:
+            print('None cluster')
+            import asyncio
+            # silence_logs=logging.DEBUG
+            ChemSpace._dask_cluster = LocalCluster(n_workers=2,
+                                                   processes=False, # turn off Nanny to avoid the problem
+                                                   # with loading of the main file (ie executing it)
+                                                   )
+            # ChemSpace._dask_cluster = Scheduler()
+            # ChemSpace._dask_cluster = LocalCluster(preload_nanny=["print('Hi Nanny')"],
+            #                                        preload=["pint"], n_workers=1
+            #                                        ) #asynchronous=True)
+            ChemSpace._dask_client = Client(ChemSpace._dask_cluster) #ChemSpace._dask_cluster, asynchronous=True)
+
+            # prepare the functions for dask
+            for name, function in \
+                    [("generate_conformers", generate_conformers),
+                     ("remove_clashing_confs", RMol.remove_clashing_confs),
+                     ("optimise_in_receptor", optimise_in_receptor),
+                     ("gnina", RMol.gnina),
+                     ("build_molecules", build_molecules)
+                     ]:
+                ChemSpace._rmol_functions[name] = delayed(function)
+
+        # self._dask_client = None
+        # self._dask_cluster = None
+
+        #
+        self._scaffolds = []
+
+    @property
+    def dask_client(self):
+        if self._dask_client is None:
+            print("Initialising Local Dask")
+            self._dask_cluster = LocalCluster()
+            self._dask_client = Client(ChemSpace._dask_cluster)
+
+        return self._dask_client
+
 
     @staticmethod
     def _add_smiles_2D_visualisation(df):
@@ -554,54 +611,144 @@ class RList(RInterface, list):
 
     def toxicity(self):
         df = pandas.concat([m.toxicity() for m in self] + [pandas.DataFrame()])
-        RList._add_smiles_2D_visualisation(df)
+        ChemSpace._add_smiles_2D_visualisation(df)
         return df
 
     def generate_conformers(
-        self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
+            self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
     ):
-        for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
-            rmol.generate_conformers(num_conf, minimum_conf_rms, **kwargs)
+        # prepare the dask parameters to be send
+        num_conf = delayed(num_conf)
+        minimum_conf_rms = delayed(minimum_conf_rms)
+
+        # create the dask jobs
+        jobs = {}
+        for i, row in self.dataframe.iterrows():
+            jobs[row.Mol] = (
+                ChemSpace._rmol_functions['generate_conformers'](row.Mol, num_conf, minimum_conf_rms, **kwargs))
+
+        # dask batch compute
+        results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
+
+        # extract results
+        for mol, result in results.items():
+            new_mol = result.result()
+            mol.RemoveAllConformers()
+            [mol.AddConformer(c, assignId=True) for c in new_mol.GetConformers()]
 
     def GetNumConformers(self):
         return [rmol.GetNumConformers() for rmol in self]
 
     def remove_clashing_confs(self, prot, min_dst_allowed=1):
-        for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
-            rmol.remove_clashing_confs(prot, min_dst_allowed=min_dst_allowed)
+        prot = delayed(prot)
+        min_dst_allowed = delayed(min_dst_allowed)
+
+        # create the dask jobs
+        jobs = {}
+        for i, row in self.dataframe.iterrows():
+            jobs[row.Mol] = ChemSpace._rmol_functions['remove_clashing_confs'](row.Mol, prot,
+                                                                               min_dst_allowed=min_dst_allowed)
+
+        # dask batch compute
+        results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
+
+        # extract results
+        for mol, result in results.items():
+            unclashed_mol = result.result()
+            mol.RemoveAllConformers()
+            [mol.AddConformer(c) for c in unclashed_mol.GetConformers()]
 
     def optimise_in_receptor(self, *args, **kwargs):
         """
         Replace the current molecule with the optimised one. Return lists of energies.
         """
-        # return pandas.concat([m.toxicity() for m in self])
 
-        dfs = []
-        for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
-            dfs.append(rmol.optimise_in_receptor(*args, **kwargs))
+        # dfs = []
+        # for i, rmol in enumerate(self):
+        #     print(f"RMol index {i}")
+        #     dfs.append(rmol.optimise_in_receptor(*args, **kwargs))
+        #
+        # df = pandas.concat(dfs)
+        # df.set_index(["ID", "Conformer"], inplace=True)
+        # return df
 
-        df = pandas.concat(dfs)
-        df.set_index(["ID", "Conformer"], inplace=True)
-        return df
+        # daskify objects
+        args = (delayed(arg) for arg in args)
+        kwargs = {k: delayed(v) for k, v in kwargs.items()}
+
+        # create the dask jobs
+        jobs = {}
+        for i, row in self.dataframe.iterrows():
+            if row.Mol.GetNumConformers() == 0:
+                print(f"Warning: mol {i} has no conformers. Ignoring receptor optimisation.")
+                continue
+
+            jobs[row.Mol] = ChemSpace._rmol_functions['optimise_in_receptor'](row.Mol, *args, **kwargs)
+
+        # dask batch compute
+        results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
+
+        # extract results
+        for mol, result in results.items():
+            opt_mol, energies = result.result()
+            mol.RemoveAllConformers()
+            # replace the conformers with the optimised ones
+            [mol.AddConformer(c) for c in opt_mol.GetConformers()]
+
+            mol._save_opt_energies(energies)
+
+        # build a dataframe with the molecules
+        # conformer_ids = [c.GetId() for c in self.GetConformers()]
+        # df = pandas.DataFrame(
+        #     {
+        #         "ID": [self.id] * len(energies),
+        #         "Conformer": conformer_ids,
+        #         "Energy": energies,
+        #     }
+        # )
+
+        # return df
 
     def sort_conformers(self, energy_range=5):
         dfs = []
-        for i, rmol in enumerate(self):
+        for i, row in self.dataframe.iterrows():
             print(f"RMol index {i}")
-            dfs.append(rmol.sort_conformers(energy_range))
+            dfs.append(row.Mol.sort_conformers(energy_range))
 
         df = pandas.concat(dfs)
         df.set_index(["ID", "Conformer"], inplace=True)
         return df
 
     def gnina(self, receptor_file):
+        # dfs = []
+        # for i, rmol in enumerate(self):
+        #     print(f"RMol index {i}")
+        #     dfs.append(rmol.gnina(receptor_file))
+        #
+        # df = pandas.concat(dfs)
+        # df.set_index(["ID", "Conformer"], inplace=True)
+        # return df
+
+        # daskify objects
+        receptor_file = delayed(receptor_file)
+
+        # create the dask jobs
+        jobs = {}
+        for i, row in self.dataframe.iterrows():
+            if row.Mol.GetNumConformers() == 0:
+                print(f"Warning: mol {i} has no conformers. Ignoring gnina.")
+                continue
+
+            jobs[row.Mol] = ChemSpace._rmol_functions['gnina'](row.Mol, receptor_file)
+
+        # dask batch compute
+        results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
+
+        # extract results
         dfs = []
-        for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
-            dfs.append(rmol.gnina(receptor_file))
+        for mol, result in results.items():
+            df = result.result()
+            dfs.append(df)
 
         df = pandas.concat(dfs)
         df.set_index(["ID", "Conformer"], inplace=True)
@@ -611,27 +758,87 @@ class RList(RInterface, list):
         """
         Remove from this list the molecules that have no conformers
         """
-        removed = []
-        for rmol in self[::-1]:
-            if rmol.GetNumConformers() == 0:
-                rmindex = self.index(rmol)
+        ids_to_remove = []
+        for i, row in self.dataframe.iterrows():
+            if row.Mol.GetNumConformers() == 0:
                 print(
-                    f"Discarding a molecule (id {rmindex}) due to the lack of conformers. "
+                    f"Discarding a molecule (id {i}) due to the lack of conformers. "
                 )
-                self.remove(rmol)
-                removed.append(rmindex)
-        return removed
+                ids_to_remove.append(i)
 
-    @property
-    def dataframe(self):
-        return pandas.concat([rmol.df() for rmol in self] + [pandas.DataFrame()])
+        self.dataframe = self.dataframe[~self.dataframe.index.isin(ids_to_remove)]
+        return ids_to_remove
 
-    def _ipython_display_(self):
-        from IPython.display import display
+    # @property
+    # def dataframe(self):
+    #     return pandas.concat([rmol.df() for rmol in self] + [pandas.DataFrame()])
 
-        df = self.dataframe
-        RList._add_smiles_2D_visualisation(df)
-        return display(df)
+    # def _ipython_display_(self):
+    #     from IPython.display import display
+    #
+    #     df = self.dataframe
+    #     RList._add_smiles_2D_visualisation(df)
+    #     return display(df)
+
+    def add_scaffold(self, template, atom_replacement_index=None):
+
+        # check if any atom is marked for joining
+        if atom_replacement_index is None:
+            if not any(atom.GetAtomicNum() == 0 for atom in template.GetAtoms()):
+                raise ValueError("The template ")
+        else:
+            # mark the right atom for replacement by assigning it atomic number == 0
+            template.GetAtomWithIdx(atom_replacement_index).SetAtomicNum(0)
+
+        self._scaffolds.append(template)
+
+    def add_rgroups(self, rgroups):
+        """
+        Note that if they are Smiles:
+         - if they have an * atom (e.g. RDKit atom.SetAtomicNum(0)), this will be used for attachment to the scaffold
+         - if they don't have an * atom, the scaffold will be fitted as a substructure
+
+        # fixme - add support for smiles
+
+        :param rgroups: A list of Smiles. Molecules will be accepted and converted to Smiles.
+        :return:
+        """
+
+        # convert molecules into smiles
+        # if isinstance(smi_list[0], Chem.Mol):
+        #     smi_list = [Chem.MolToSmiles(mol) for mol in smi_list]
+
+        scaffold = delayed(self._scaffolds[0])
+
+        # create the dask jobs
+        jobs = [ChemSpace._rmol_functions['build_molecules'](scaffold, rgroup) for rgroup in rgroups]
+        results = self.dask_client.compute(jobs)
+        built_mols = [r.result()[0] for r in results]
+
+        # get Smiles
+        built_mols_smiles = [Chem.MolToSmiles(mol) for mol in built_mols]
+
+        # update the internal dataframe
+        rgroups = pandas.DataFrame({"Smiles": built_mols_smiles, "Mol": built_mols})
+        self.dataframe = pandas.concat([self.dataframe, rgroups])
+
+    def assemble_molecules(self):
+        """
+        Use the ChemicalSpace created in combination with the scaffolds to build the molecules.
+
+        Combine the topologies to create a new Smiles.
+
+        This modified the ChemicalSpace by creating full smiles (Scaffold + RGroups).
+
+        fixme: Add support for several scaffolds. This means that they all can be tried and potentially scored.
+        :return:
+        """
+
+        if len(self._scaffolds) > 1:
+            raise NotImplementedError("Currently we only allow for 1 scaffold at a time in the chemical space. ")
+
+        # for each row, send it with the scaffold to be assembled
+        pass
 
 
 class RGroups(pandas.DataFrame):
@@ -749,10 +956,16 @@ def build_molecules(
     if isinstance(r_groups, list) and len(r_groups) == 0:
         raise ValueError("Empty list received. Please pass any R-groups or R-linkers. ")
 
+    # scaffolds were created earlier, they are most likely templates combined with linkers,
+    if isinstance(scaffolds, ChemSpace):
+        # fixme - these should become "the cores", it's simple with one mol, and tricky with more of them,
+        scaffolds = [mol for idx, mol in scaffolds.dataframe.Mol.items()]
+
     built_mols = build_molecules_with_rdkit(
         scaffolds, r_groups, attachment_points, keep_components
     )
-    rlist = RList()
+
+    mols = []
     for mol, scaffold, scaffold_no_attachement in built_mols:
         rmol = RMol(mol)
 
@@ -762,8 +975,6 @@ def build_molecules(
             rmol._save_template(scaffold.template)
         else:
             rmol._save_template(scaffold_no_attachement)
-        rlist.append(rmol)
+        mols.append(rmol)
 
-    return rlist
-
-
+    return mols
