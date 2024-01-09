@@ -938,10 +938,10 @@ class Linkers(pandas.DataFrame):
 
 
 def build_molecules(
-    scaffolds: Union[Chem.Mol, List[Chem.Mol]],
-    r_groups: Union[Chem.Mol, List[Chem.Mol], int],
-    attachment_points: Optional[List[int]] = None,
-    keep_components: Optional[List[int]] = None,
+    scaffolds: Chem.Mol,
+    r_groups: Chem.Mol,
+    attachment_points: Optional[int] = None,
+    keep_components: Optional[int] = None,
 ):
     """
 
@@ -965,16 +965,14 @@ def build_molecules(
         scaffolds, r_groups, attachment_points, keep_components
     )
 
-    mols = []
-    for mol, scaffold, scaffold_no_attachement in built_mols:
-        rmol = RMol(mol)
+    mol, scaffold, scaffold_no_attachement = built_mols
+    rmol = RMol(mol)
 
-        if hasattr(scaffold, 'template') and isinstance(scaffold.template, rdkit.Chem.Mol):
-            # save the original scaffold (e.g. before the linker was added)
-            # this means that conformer generation will always have to regenerate the previously added R-groups/linkers
-            rmol._save_template(scaffold.template)
-        else:
-            rmol._save_template(scaffold_no_attachement)
-        mols.append(rmol)
+    if hasattr(scaffold, 'template') and isinstance(scaffold.template, rdkit.Chem.Mol):
+        # save the original scaffold (e.g. before the linker was added)
+        # this means that conformer generation will always have to regenerate the previously added R-groups/linkers
+        rmol._save_template(scaffold.template)
+    else:
+        rmol._save_template(scaffold_no_attachement)
 
-    return mols
+    return rmol

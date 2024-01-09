@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_molecules_with_rdkit(
-    templates: Union[Chem.Mol, List[Chem.Mol]],
+    templates: Chem.Mol,
     r_groups: Union[Chem.Mol, List[Chem.Mol], int],
     attachment_points: Optional[List[int]] = None,
     keep_components: Optional[List[int]] = None,
@@ -98,7 +98,9 @@ def build_molecules_with_rdkit(
             combined_mols.append((merged_mol, scaffold_ligand, scaffold_no_attachement))
             id_counter += 1
 
-    return combined_mols
+    assert len(combined_mols) == 1
+
+    return combined_mols[0]
 
 
 def split(molecule, splitting_atom, keep_neighbour_idx=None):
