@@ -422,22 +422,27 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
 
         _, CNNaffinities = gnina(self, receptor)
 
-        def ic50(x):
-            return 10 ** (-x - -9)
+        return RMol._parse_gnina_cnnaffinities(self, CNNaffinities)
 
+    @staticmethod
+    def _ic50(x):
+        return 10 ** (-x - -9)
+
+    @staticmethod
+    def _parse_gnina_cnnaffinities(mol, CNNAffinities, mol_id=0):
         # generate IC50 from the CNNaffinities
-        ic50s = list(map(ic50, CNNaffinities))
+        ic50s = list(map(RMol._ic50, CNNAffinities))
 
         # add nM units
         ic50s_nM = pandas.Series(ic50s, dtype="pint[nM]")
 
         # create a dataframe
-        conformer_ids = [c.GetId() for c in self.GetConformers()]
+        conformer_ids = [c.GetId() for c in mol.GetConformers()]
         df = pandas.DataFrame(
             {
-                "ID": [self.id] * len(CNNaffinities),
+                "ID": [mol_id] * len(CNNAffinities),
                 "Conformer": conformer_ids,
-                "CNNaffinity": CNNaffinities,
+                "CNNaffinity": CNNAffinities,
                 "Kd": ic50s_nM,
             }
         )
@@ -706,6 +711,8 @@ class ChemSpace: # RInterface
 
         # daskify objects
         receptor_file = delayed(receptor_file)
+        RMol._check_download_gnina()
+        gnina_path = delayed(os.path.join(RMol.gnina_dir, 'gnina'))
 
         # create the dask jobs
         jobs = {}
@@ -714,7 +721,7 @@ class ChemSpace: # RInterface
                 print(f"Warning: mol {i} has no conformers. Ignoring gnina.")
                 continue
 
-            jobs[i] = ChemSpace._rmol_functions['gnina'](row.Mol, receptor_file)
+            jobs[i] = ChemSpace._rmol_functions['gnina'](row.Mol, receptor_file, gnina_path)
 
         # dask batch compute
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -722,8 +729,8 @@ class ChemSpace: # RInterface
         # extract results
         dfs = []
         for i, result in results.items():
-            df = result.result()
-            df.ID = i
+            _, cnnaffinities = result.result()
+            df = RMol._parse_gnina_cnnaffinities(self.dataframe.Mol[i], cnnaffinities, mol_id=i)
             dfs.append(df)
 
 
