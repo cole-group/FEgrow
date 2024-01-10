@@ -412,6 +412,9 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         """
         self._check_download_gnina()
 
+        if not isinstance(receptor_file, str) and not isinstance(receptor_file, Path):
+            raise ValueError(f"gnina function requires a file path to the receptor. Instead, was given: {type(receptor_file)}")
+
         # get the absolute path
         receptor = Path(receptor_file)
         if not receptor.exists():
@@ -535,7 +538,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         return df._repr_html_()
 
 
-class ChemSpace(): # RInterface
+class ChemSpace: # RInterface
     """
     Streamline working with many RMols or a specific chemical space by employing a pandas dataframe,
     in combination with Dask for parallellisation.
@@ -739,16 +742,18 @@ class ChemSpace(): # RInterface
                 print(f"Warning: mol {i} has no conformers. Ignoring gnina.")
                 continue
 
-            jobs[row.Mol] = ChemSpace._rmol_functions['gnina'](row.Mol, receptor_file)
+            jobs[i] = ChemSpace._rmol_functions['gnina'](row.Mol, receptor_file)
 
         # dask batch compute
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
 
         # extract results
         dfs = []
-        for mol, result in results.items():
+        for i, result in results.items():
             df = result.result()
+            df.ID = i
             dfs.append(df)
+
 
         df = pandas.concat(dfs)
         df.set_index(["ID", "Conformer"], inplace=True)
@@ -822,23 +827,20 @@ class ChemSpace(): # RInterface
         rgroups = pandas.DataFrame({"Smiles": built_mols_smiles, "Mol": built_mols})
         self.dataframe = pandas.concat([self.dataframe, rgroups])
 
-    def assemble_molecules(self):
-        """
-        Use the ChemicalSpace created in combination with the scaffolds to build the molecules.
+    def __str__(self):
+        return f"Chemical Space with {len(self.dataframe)} smiles and {len(self._scaffolds)} scaffolds. "
 
-        Combine the topologies to create a new Smiles.
+    def __repr__(self):
+        return str(self)
 
-        This modified the ChemicalSpace by creating full smiles (Scaffold + RGroups).
+    def __len__(self):
+        return len(self.dataframe)
 
-        fixme: Add support for several scaffolds. This means that they all can be tried and potentially scored.
-        :return:
-        """
+    @property
+    def df(self):
+        return self.dataframe
 
-        if len(self._scaffolds) > 1:
-            raise NotImplementedError("Currently we only allow for 1 scaffold at a time in the chemical space. ")
 
-        # for each row, send it with the scaffold to be assembled
-        pass
 
 
 class RGroups(pandas.DataFrame):

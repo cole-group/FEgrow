@@ -15,6 +15,7 @@ root = pathlib.Path(__file__).parent
 
 
 def test_chem_space(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    # check if two molecules were built with chemspace
     chemspace = ChemSpace()
 
     R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
@@ -31,4 +32,11 @@ def test_chem_space(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     rec_final = prody.parsePDB(rec_7l10_final_path)
     chemspace.remove_clashing_confs(rec_final)
+
+    assert len(chemspace) == 2
+
+    cnnaff = chemspace.gnina(rec_7l10_final_path)
+
+    # ensure unique IDs for each molecule
+    assert {i[0] for i in cnnaff.index} == len(chemspace)
 
