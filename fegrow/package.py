@@ -410,7 +410,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         :param receptor_file: Path to the receptor file.
         :type receptor_file: str
         """
-        self._check_download_gnina()
+        RMol._check_download_gnina()
 
         if not isinstance(receptor_file, str) and not isinstance(receptor_file, Path):
             raise ValueError(f"gnina function requires a file path to the receptor. Instead, was given: {type(receptor_file)}")
@@ -420,35 +420,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         if not receptor.exists():
             raise ValueError(f'Your receptor "{receptor_file}" does not seem to exist.')
 
-        # make a temporary sdf file for gnina
-        tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".sdf")
-        with Chem.SDWriter(tmp.name) as w:
-            for conformer in self.GetConformers():
-                w.write(self, confId=conformer.GetId())
-
-        # run the code on the sdf
-        process = subprocess.run(
-            [
-                os.path.join(RMol.gnina_dir, "gnina"),
-                "--score_only",
-                "-l",
-                tmp.name,
-                "-r",
-                receptor,
-                "--seed",
-                "0",
-                "--stripH",
-                "False",
-            ],
-            capture_output=True,
-            check=True,
-        )
-
-        output = process.stdout.decode("utf-8")
-        CNNaffinities_str = re.findall(r"CNNaffinity: (-?\d+.\d+)", output)
-
-        # convert to floats
-        CNNaffinities = list(map(float, CNNaffinities_str))
+        _, CNNaffinities = gnina(self, receptor)
 
         def ic50(x):
             return 10 ** (-x - -9)
@@ -558,7 +530,7 @@ class ChemSpace: # RInterface
     _dask_cluster = None
     _rmol_functions = {}
 
-    def __init__(self, data={"Smiles": [], "Mol": []}):
+    def __init__(self, data={"Smiles": [], "Mol": [], "CNNAffinity": []}):
         self.dataframe = pandas.DataFrame(data)
 
         # PandasTools.ChangeMoleculeRendering(self)
@@ -581,7 +553,7 @@ class ChemSpace: # RInterface
                     [("generate_conformers", generate_conformers),
                      ("remove_clashing_confs", RMol.remove_clashing_confs),
                      ("optimise_in_receptor", optimise_in_receptor),
-                     ("gnina", RMol.gnina),
+                     ("gnina", gnina),
                      ("build_molecule", build_molecule)
                      ]:
                 ChemSpace._rmol_functions[name] = delayed(function)
@@ -827,6 +799,67 @@ class ChemSpace: # RInterface
         rgroups = pandas.DataFrame({"Smiles": built_mols_smiles, "Mol": built_mols})
         self.dataframe = pandas.concat([self.dataframe, rgroups])
 
+    def evaluate(self, indices=None, num_conf=10, minimum_conf_rms=0.5, min_dst_allowed=1):
+        """
+        Generate the conformers and score the subset of molecules.
+
+        E.g.
+        :param indices: The indices in the dataframe to be run through the pipeline.
+            If None, all molecules are evaluated.
+        :return:
+        """
+
+        if indices is None:
+            # evaluate all molecules
+            rgroups = list(self.dataframe.Mol)
+
+        if len(self._scaffolds) == 0:
+            print("Please add scaffolds to the system for the evaluation. ")
+        elif len(self._scaffolds) > 1:
+            raise NotImplementedError("For now we only allow working with one scaffold. ")
+
+        # carry out the full pipeline, generate conformers, etc.
+        # note that we have to find a way to pass all the molecules
+        # this means creating a pipeline of tasks for Dask,
+        # a pipeline that is well conditional
+
+        ## GENERATE CONFORMERS
+        # self.generate_conformers(num_conf=num_conf, minimum_conf_rms=minimum_conf_rms)
+        num_conf = delayed(num_conf)
+        minimum_conf_rms = delayed(minimum_conf_rms)
+        protein = delayed(prody_package.parsePDB(self._protein_filename))
+        protein_file = delayed(self._protein_filename)
+        min_dst_allowed = delayed(min_dst_allowed)
+        RMol._check_download_gnina()
+        gnina_path = delayed(os.path.join(RMol.gnina_dir, 'gnina'))
+
+        # create dask jobs
+        jobs = {}
+        for i, row in self.dataframe.iterrows():
+            generated_confs = ChemSpace._rmol_functions['generate_conformers'](row.Mol, num_conf, minimum_conf_rms)
+            removed_clashes = ChemSpace._rmol_functions['remove_clashing_confs'](generated_confs, protein,
+                                                                               min_dst_allowed=min_dst_allowed)
+            jobs[i] = ChemSpace._rmol_functions['gnina'](removed_clashes, protein_file, gnina_path)
+
+        # run all jobs
+        results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
+
+        # gather the results
+        for i, result in results.items():
+            mol, cnnaffinities = result.result()
+
+            # extract the conformers
+            input_mol = self.dataframe.Mol[i]
+            input_mol.RemoveAllConformers()
+            [input_mol.AddConformer(c) for c in mol.GetConformers()]
+
+            # save the affinities so that one can retrace which conformer has the best energy
+            input_mol.SetProp("cnnaffinities", str(cnnaffinities))
+
+            self.dataframe.CNNAffinity[i] = max(cnnaffinities)
+
+        print(f"Evaluated {len(results)} cases")
+
     def __str__(self):
         return f"Chemical Space with {len(self.dataframe)} smiles and {len(self._scaffolds)} scaffolds. "
 
@@ -840,7 +873,8 @@ class ChemSpace: # RInterface
     def df(self):
         return self.dataframe
 
-
+    def add_protein(self, protein_filename):
+        self._protein_filename = protein_filename
 
 
 class RGroups(pandas.DataFrame):
@@ -937,6 +971,40 @@ class Linkers(pandas.DataFrame):
     def get_selected(self):
         df = self._fegrow_grid.get_selection()
         return list(df["Mol"])
+
+
+def gnina(mol, receptor, gnina_path):
+    # make a temporary sdf file for gnina
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".sdf") as TMP_SDF:
+        with Chem.SDWriter(TMP_SDF.name) as w:
+            for conformer in mol.GetConformers():
+                w.write(mol, confId=conformer.GetId())
+
+        # run the code on the sdf
+        process = subprocess.run(
+            [
+                gnina_path,
+                "--score_only",
+                "-l",
+                TMP_SDF.name,
+                "-r",
+                receptor,
+                "--seed",
+                "0",
+                "--stripH",
+                "False",
+            ],
+            capture_output=True,
+            check=True,
+        )
+
+    output = process.stdout.decode("utf-8")
+    CNNaffinities_str = re.findall(r"CNNaffinity: (-?\d+.\d+)", output)
+
+    # convert to floats
+    CNNaffinities = list(map(float, CNNaffinities_str))
+
+    return mol, CNNaffinities
 
 
 def build_molecule(

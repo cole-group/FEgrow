@@ -38,5 +38,19 @@ def test_chem_space(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     cnnaff = chemspace.gnina(rec_7l10_final_path)
 
     # ensure unique IDs for each molecule
-    assert {i[0] for i in cnnaff.index} == len(chemspace)
+    assert len({i[0] for i in cnnaff.index}) == len(chemspace)
 
+def test_pipeline(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
+    R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.values[0]
+
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
+    chemspace.add_rgroups([R_group_ethanol, R_group_cyclopropane])
+
+    chemspace.add_protein(rec_7l10_final_path)
+
+    chemspace.evaluate()
