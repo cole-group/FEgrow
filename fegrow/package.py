@@ -411,6 +411,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         :type receptor_file: str
         """
         RMol._check_download_gnina()
+        gnina_path = os.path.join(RMol.gnina_dir, 'gnina')
 
         if not isinstance(receptor_file, str) and not isinstance(receptor_file, Path):
             raise ValueError(f"gnina function requires a file path to the receptor. Instead, was given: {type(receptor_file)}")
@@ -420,7 +421,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         if not receptor.exists():
             raise ValueError(f'Your receptor "{receptor_file}" does not seem to exist.')
 
-        _, CNNaffinities = gnina(self, receptor)
+        _, CNNaffinities = gnina(self, receptor, gnina_path)
 
         return RMol._parse_gnina_cnnaffinities(self, CNNaffinities)
 
