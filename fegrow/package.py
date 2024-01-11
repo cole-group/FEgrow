@@ -654,7 +654,7 @@ class ChemSpace: # RInterface
         # return df
 
         # daskify objects
-        args = (delayed(arg) for arg in args)
+        args = [delayed(arg) for arg in args]
         kwargs = {k: delayed(v) for k, v in kwargs.items()}
 
         # create the dask jobs

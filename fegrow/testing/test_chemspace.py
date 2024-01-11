@@ -33,6 +33,8 @@ def test_chem_space(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     rec_final = prody.parsePDB(rec_7l10_final_path)
     chemspace.remove_clashing_confs(rec_final)
 
+    chemspace.optimise_in_receptor(rec_7l10_final_path, "openff")
+
     assert len(chemspace) == 2
 
     cnnaff = chemspace.gnina(rec_7l10_final_path)
@@ -53,4 +55,4 @@ def test_pipeline(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.add_protein(rec_7l10_final_path)
 
-    chemspace.evaluate()
+    chemspace.evaluate([0,1])
