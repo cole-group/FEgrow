@@ -25,6 +25,6 @@ def settings(gnina_path: pathlib.Path):
     Create a runtime settings object for scoring runs which can be configured.
     """
     config = Settings(gnina_path=gnina_path)
-    with open("settings.json") as output:
+    with open("settings.json", "w") as output:
         output.write(config.json(indent=2))
 

@@ -6,7 +6,6 @@ from fegrow.receptor import ForceField
 from fegrow import RMol
 import pathlib
 import pandas as pd
-from rdkit.Chem import PandasTools
 
 
 class Settings(BaseModel):
