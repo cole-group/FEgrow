@@ -94,7 +94,7 @@ def generate_conformers(
             coordinates_map[matched_index.id] = core_atom_coordinate
             manmap.append((matched_index.id, core_index.id))
         #
-        print("Used the TIES (Bieniek et al) package to get the mapping")
+        logger.info("Used the TIES (Bieniek et al) package to get the mapping")
 
     # use a reproducible random seed
     randomseed = 194715
@@ -121,7 +121,7 @@ def generate_conformers(
     if dup_count:
         logger.info(f"Removed {dup_count} duplicated conformations, leaving {rmol.GetNumConformers()} in total. ")
 
-    print(f"Generated {rmol.GetNumConformers()} conformers. ")
+    logger.info(f"Generated {rmol.GetNumConformers()} conformers. ")
     return rmol
 
 

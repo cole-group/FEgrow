@@ -17,7 +17,7 @@ cli.add_command(score)
 @click.option(
     "-g",
     "--gnina-path",
-    type=click.Path(exists=True, file_okay=True, dir_okay=False, executable=True),
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, executable=True, resolve_path=True),
     help="The path to the gnina executable which will override the settings.",
 )
 def settings(gnina_path: pathlib.Path):

@@ -2,7 +2,6 @@ import logging
 import tempfile
 from copy import deepcopy
 from typing import List, Tuple, Union
-import warnings
 
 import parmed
 from openmmforcefields.generators import SystemGenerator
@@ -18,11 +17,8 @@ from openmmml import MLPotential
 import numpy
 
 # fix for new openmm versions
-try:
-    from openmm import app, openmm, unit, Platform
-except (ImportError, ModuleNotFoundError):
-    from simtk.openmm import app, openmm
-    from simtk import unit
+from openmm import app, openmm, unit, Platform
+
 
 from openff.toolkit.topology import Molecule as OFFMolecule
 
@@ -92,7 +88,8 @@ def optimise_in_receptor(
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
-    platform_name: str = "CPU"
+    platform_name: str = "CPU",
+    show_progress: bool = True
 ) -> Tuple[RMol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -116,6 +113,8 @@ def optimise_in_receptor(
         platform_name:
             The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
             See the OpenMM documentation of Platform.
+        show_progress:
+            If a progress bar should be displayed.
 
     Returns:
         A copy of the input molecule with the optimised positions.
@@ -169,17 +168,18 @@ def optimise_in_receptor(
             system.setParticleMass(i, 0)
     # if we want to use ani2x check we can and adapt the system
     if use_ani and _can_use_ani2x(openff_mol):
-        print("using ani2x")
+        logger.info("using ani2x")
+        # use the torchani standard NNpops should not make much difference here
         potential = MLPotential("ani2x", platform_name=platform_name)
 
         # save the torch model animodel.pt to a temporary file to ensure this is thread safe
         _, tmpfile = tempfile.mkstemp()
 
         complex_system = potential.createMixedSystem(
-            complex_structure.topology, system, ligand_idx, filename=tmpfile
+            complex_structure.topology, system, ligand_idx, filename=tmpfile, implementation='torchani'
         )
     else:
-        print("Using force field")
+        logger.info("Using force field")
         complex_system = system
     # scale the charges and sigma values
     _scale_system(
@@ -209,7 +209,7 @@ def optimise_in_receptor(
     final_mol.RemoveAllConformers()
     energies = []
     for i, conformer in enumerate(
-        tqdm(openff_mol.conformers, desc="Optimising conformer: ", ncols=80)
+        tqdm(openff_mol.conformers, desc="Optimising conformer: ", ncols=80, disable=not show_progress)
     ):
         # make the ligand coords
         lig_vec = unit.Quantity([c.m.tolist() for c in conformer], unit=unit.angstrom)
