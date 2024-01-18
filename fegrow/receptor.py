@@ -1,4 +1,5 @@
 import logging
+import pathlib
 import tempfile
 from copy import deepcopy
 from typing import List, Tuple, Union
@@ -174,7 +175,7 @@ def optimise_in_receptor(
 
         # save the torch model animodel.pt to a temporary file to ensure this is thread safe
         _, tmpfile = tempfile.mkstemp()
-
+        logger.info('writing ani jit model to ', tmpfile)
         complex_system = potential.createMixedSystem(
             complex_structure.topology, system, ligand_idx, filename=tmpfile, implementation='torchani'
         )
@@ -244,6 +245,13 @@ def optimise_in_receptor(
             min_state.getPotentialEnergy().value_in_unit(unit.kilocalories_per_mole)
         )
         final_mol.AddConformer(final_conformer, assignId=True)
+
+    # clean up the ani tmp file if used
+    if use_ani and _can_use_ani2x(openff_mol):
+        logger.info('cleaning up ani jit model ', tmpfile)
+        tmp_file = pathlib.Path(tmpfile)
+        if tmp_file.exists():
+            tmp_file.unlink()
 
     return final_mol, energies
 

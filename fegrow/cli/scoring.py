@@ -85,7 +85,7 @@ def score(
 
 
     # hide warnings and logs from openff-toolkit
-    with warnings.catch_warnings(record=True):
+    with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         os.environ["PYTHONWARNINGS"] = "ignore"
         logging.getLogger('fegrow').setLevel(logging.ERROR)
