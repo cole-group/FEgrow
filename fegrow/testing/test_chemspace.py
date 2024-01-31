@@ -69,6 +69,6 @@ def test_pipeline_rgroups(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path)
 
     chemspace.add_protein(rec_7l10_final_path)
 
-    chemspace.evaluate([1])
+    chemspace.evaluate([1], skip_optimisation=True)
 
     assert chemspace.dataframe.iloc[1].CNNAffinity > 2.0

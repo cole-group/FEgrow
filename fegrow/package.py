@@ -852,7 +852,7 @@ class ChemSpace: # RInterface
 
         print(f"Evaluated {len(results)} cases")
 
-    def evaluate(self, indices=None, gnina_path=None, num_conf=10, minimum_conf_rms=0.5):
+    def evaluate(self, indices=None, gnina_path=None, num_conf=10, minimum_conf_rms=0.5, **kwargs):
 
         # evaluate all molecules if no indices are picked
         indices = indices or slice(None)
@@ -886,6 +886,7 @@ class ChemSpace: # RInterface
             jobs[i] = ChemSpace._rmol_functions['evaluate'](scaffold, 8, row.Smiles, protein_file,
                                                             num_conf=num_conf,
                                                             minimum_conf_rms=minimum_conf_rms,
+                                                            **kwargs
                                                             )
 
         # run all
@@ -1101,7 +1102,14 @@ def build_molecule(
     return rmol
 
 
-def _evaluate_atomic(scaffold, h, smiles, pdb_filename, num_conf=50, minimum_conf_rms=0.5, platform="CPU"):
+def _evaluate_atomic(scaffold,
+                     h,
+                     smiles,
+                     pdb_filename,
+                     num_conf=50,
+                     minimum_conf_rms=0.5,
+                     platform="CPU",
+                     skip_optimisation=False):
     """
 
     :param scaffold:
@@ -1124,20 +1132,22 @@ def _evaluate_atomic(scaffold, h, smiles, pdb_filename, num_conf=50, minimum_con
 
     rmol.generate_conformers(num_conf=num_conf, minimum_conf_rms=minimum_conf_rms)
     rmol.remove_clashing_confs(pdb_filename)
-    rmol.optimise_in_receptor(
-        receptor_file=pdb_filename,
-        ligand_force_field="openff",
-        use_ani=True,
-        sigma_scale_factor=0.8,
-        relative_permittivity=4,
-        water_model=None,
-        platform_name=platform,
-    )
+    if not skip_optimisation:
+        rmol.optimise_in_receptor(
+            receptor_file=pdb_filename,
+            ligand_force_field="openff",
+            use_ani=True,
+            sigma_scale_factor=0.8,
+            relative_permittivity=4,
+            water_model=None,
+            platform_name=platform,
+        )
 
-    if rmol.GetNumConformers() == 0:
-        raise Exception("No Conformers")
+        if rmol.GetNumConformers() == 0:
+            raise Exception("No Conformers")
 
-    rmol.sort_conformers(energy_range=2)  # kcal/mol
+        rmol.sort_conformers(energy_range=2)  # kcal/mol
+
     affinities = rmol.gnina(receptor_file=pdb_filename)
 
     # the first data point is a conformer that has the lowest energy according
