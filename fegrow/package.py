@@ -803,8 +803,13 @@ class ChemSpace: # RInterface
         params.removeHs = False
         mols = [Chem.MolFromSmiles(smiles, params=params) for smiles in smiles_list]
 
+        # ensure that the new indices start at the end
+        last_index = max(self.dataframe.index.max(), self.dataframe.index.max() + 1)
+        if np.isnan(last_index):
+            last_index = 0
+
         # update the internal dataframe
-        more_data = pandas.DataFrame({"Smiles": smiles_list, "Mol": mols})
+        more_data = pandas.DataFrame({"Smiles": smiles_list, "Mol": mols}, index=range(last_index, last_index + len(mols)))
         self.dataframe = pandas.concat([self.dataframe, more_data])
 
     def _evaluate_experimental(self, indices=None, num_conf=10, minimum_conf_rms=0.5, min_dst_allowed=1):
