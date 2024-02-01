@@ -872,7 +872,7 @@ class ChemSpace: # RInterface
 
         print(f"Evaluated {len(results)} cases")
 
-    def evaluate(self, indices=None, gnina_path=None, num_conf=10, minimum_conf_rms=0.5, **kwargs):
+    def evaluate(self, indices=None, scoring_function=None, gnina_path=None, num_conf=10, minimum_conf_rms=0.5, **kwargs):
 
         # evaluate all molecules if no indices are picked
         indices = indices or slice(None)
@@ -906,6 +906,7 @@ class ChemSpace: # RInterface
             jobs[i] = ChemSpace._rmol_functions['evaluate'](scaffold, h_attachement_index, row.Smiles, protein_file,
                                                             num_conf=num_conf,
                                                             minimum_conf_rms=minimum_conf_rms,
+                                                            scoring_function=scoring_function,
                                                             **kwargs
                                                             )
 
@@ -931,7 +932,7 @@ class ChemSpace: # RInterface
                 # failed to finish the protocol, set the penalty
                 score = 0
 
-            self.dataframe.CNNAffinity[i] = score
+            self.dataframe.score[i] = score
 
         print(f"Evaluated {len(results)} cases")
 

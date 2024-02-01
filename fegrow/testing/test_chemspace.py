@@ -1,5 +1,6 @@
 import pathlib
 import pytest
+import random
 
 import pandas
 
@@ -90,7 +91,16 @@ def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     assert chemspace.dataframe.iloc[1].score > 2.0
 
 
-def test_evaluate_functional_form(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+def test_evaluate_scoring_function_works(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    """
+    Ensure that the passed functional form is used.
+
+    :param RGroups:
+    :param sars_scaffold_chunk_sdf:
+    :param rec_7l10_final_path:
+    :return:
+    """
+
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
 
@@ -98,6 +108,37 @@ def test_evaluate_functional_form(RGroups, sars_scaffold_chunk_sdf, rec_7l10_fin
     chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]'])
     chemspace.add_protein(rec_7l10_final_path)
 
-    chemspace.evaluate([0], skip_optimisation=True)
+    random_score = random.random()
+    def scorer(rmol, pdb_filename, data):
+        return random_score
 
-    assert chemspace.dataframe.iloc[0].score > 2.0
+    chemspace.evaluate([0], scoring_function=scorer, skip_optimisation=True)
+
+    assert chemspace.dataframe.iloc[0].score == random_score
+
+
+def test_evaluate_scoring_function_saves_data(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    """
+    Ensure that the passed functional form is used.
+
+    :param RGroups:
+    :param sars_scaffold_chunk_sdf:
+    :param rec_7l10_final_path:
+    :return:
+    """
+
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]'])
+    chemspace.add_protein(rec_7l10_final_path)
+
+    hello_world = "Hi Frank!"
+    def scorer(rmol, pdb_filename, data):
+        data["hello_world"] = hello_world
+        return 5
+
+    chemspace.evaluate([0], scoring_function=scorer, skip_optimisation=True)
+
+    assert chemspace.dataframe.iloc[0].Mol.GetProp("hello_world") == hello_world
