@@ -792,6 +792,21 @@ class ChemSpace: # RInterface
         rgroups = pandas.DataFrame({"Smiles": built_mols_smiles, "Mol": built_mols})
         self.dataframe = pandas.concat([self.dataframe, rgroups])
 
+    def add_smiles(self, smiles_list):
+        """
+        Add a list of Smiles into this ChemicalSpace
+
+        :return:
+        """
+        # convert the Smiles into molecules
+        params = Chem.SmilesParserParams()
+        params.removeHs = False
+        mols = [Chem.MolFromSmiles(smiles, params=params) for smiles in smiles_list]
+
+        # update the internal dataframe
+        more_data = pandas.DataFrame({"Smiles": smiles_list, "Mol": mols})
+        self.dataframe = pandas.concat([self.dataframe, more_data])
+
     def _evaluate_experimental(self, indices=None, num_conf=10, minimum_conf_rms=0.5, min_dst_allowed=1):
         """
         Generate the conformers and score the subset of molecules.
