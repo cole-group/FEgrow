@@ -536,7 +536,7 @@ class ChemSpace: # RInterface
     _dask_cluster = None
     _rmol_functions = {}
 
-    def __init__(self, data={"Smiles": [], "Mol": [], "CNNAffinity": []}):
+    def __init__(self, data={"Smiles": [], "Mol": [], "score": []}):
         self.dataframe = pandas.DataFrame(data)
 
         # PandasTools.ChangeMoleculeRendering(self)
@@ -868,7 +868,7 @@ class ChemSpace: # RInterface
             # save the affinities so that one can retrace which conformer has the best energy
             input_mol.SetProp("cnnaffinities", str(cnnaffinities))
 
-            self.dataframe.CNNAffinity[i] = max(cnnaffinities)
+            self.dataframe.score[i] = max(cnnaffinities)
 
         print(f"Evaluated {len(results)} cases")
 
@@ -897,13 +897,13 @@ class ChemSpace: # RInterface
         RMol._check_download_gnina()
 
         scaffold = delayed(self._scaffolds[0])
-        # extract which hydrogen was used
+        # extract which hydrogen was used for the attachement
         h_attachement_index = [a.GetIdx() for a in self._scaffolds[0].GetAtoms() if a.GetAtomicNum() == 0][0]
 
         # create dask jobs
         jobs = {}
         for i, row in selected_rows.iterrows():
-            jobs[i] = ChemSpace._rmol_functions['evaluate'](scaffold, 8, row.Smiles, protein_file,
+            jobs[i] = ChemSpace._rmol_functions['evaluate'](scaffold, h_attachement_index, row.Smiles, protein_file,
                                                             num_conf=num_conf,
                                                             minimum_conf_rms=minimum_conf_rms,
                                                             **kwargs
@@ -922,10 +922,11 @@ class ChemSpace: # RInterface
                 original_mol.RemoveAllConformers()
                 [original_mol.AddConformer(c) for c in mol.GetConformers()]
 
-                # save the affinities so that one can retrace which conformer has the best energy
-                original_mol.SetProp("cnnaffinities", str(data["cnnaffinities"]))
-                # extract the best value (the conformers are assumed to be optimisation)
-                score = data["cnnaffinities"][0]
+                # save all data generated
+                for k, v in data.items():
+                    original_mol.SetProp(k, str(v))
+                # extract the score
+                score = data["score"]
             except Exception as E:
                 # failed to finish the protocol, set the penalty
                 score = 0
@@ -1126,6 +1127,7 @@ def _evaluate_atomic(scaffold,
                      h,
                      smiles,
                      pdb_filename,
+                     scoring_function=None,
                      num_conf=50,
                      minimum_conf_rms=0.5,
                      platform="CPU",
@@ -1135,6 +1137,7 @@ def _evaluate_atomic(scaffold,
     :param scaffold:
     :param h:
     :param smiles: Full Smiles.
+    :param scoring_function:
     :param pdb_filename:
     :param gnina_path:
     :return:
@@ -1168,10 +1171,13 @@ def _evaluate_atomic(scaffold,
 
         rmol.sort_conformers(energy_range=2)  # kcal/mol
 
-    affinities = rmol.gnina(receptor_file=pdb_filename)
+    data = {}
+    if scoring_function is None:
+        cnnaffinities = rmol.gnina(receptor_file=pdb_filename)
+        data = {"cnnaffinities": [float(affinity) for affinity in cnnaffinities.CNNaffinity]}
+        score = data["cnnaffinities"][0]
+    else:
+        score = scoring_function(rmol, pdb_filename, data)
 
-    # the first data point is a conformer that has the lowest energy according
-    # to the minimisation carried out in MD
-    # gnina might give a different ranking for the conformers than the MD energies
-    data = {"cnnaffinities": [float(affinity) for affinity in affinities.CNNaffinity]}
+    data["score"] = score
     return rmol, data

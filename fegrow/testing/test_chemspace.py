@@ -71,7 +71,7 @@ def test_pipeline_rgroups(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path)
 
     chemspace.evaluate([1], skip_optimisation=True)
 
-    assert chemspace.dataframe.iloc[1].CNNAffinity > 2.0
+    assert chemspace.dataframe.iloc[1].score > 2.0
 
 
 def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
@@ -87,4 +87,17 @@ def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.evaluate([1], skip_optimisation=True)
 
-    assert chemspace.dataframe.iloc[1].CNNAffinity > 2.0
+    assert chemspace.dataframe.iloc[1].score > 2.0
+
+
+def test_evaluate_functional_form(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]'])
+    chemspace.add_protein(rec_7l10_final_path)
+
+    chemspace.evaluate([0], skip_optimisation=True)
+
+    assert chemspace.dataframe.iloc[0].score > 2.0
