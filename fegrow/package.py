@@ -11,7 +11,9 @@ import subprocess
 import tempfile
 from typing import List, Optional, Union
 import urllib
+import time
 
+import requests
 import numpy as np
 import mols2grid
 import openmm
@@ -23,7 +25,7 @@ import py3Dmol
 import rdkit
 from rdkit import Chem
 from rdkit.Chem import Draw, PandasTools
-from dask import delayed
+import dask
 from dask.distributed import LocalCluster, Client, Scheduler, Worker
 
 from .builder import build_molecules_with_rdkit
@@ -516,6 +518,34 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         return df._repr_html_()
 
 
+class DaskTasks:
+    @staticmethod
+    @dask.delayed
+    def obabel_protonate(smi):
+        return subprocess.run(['obabel', f'-:{smi}', '-osmi', '-p', '7', '-xh'],
+                              capture_output=True).stdout.decode().strip()
+
+    @staticmethod
+    @dask.delayed
+    def scaffold_check(smih, scaffold):
+        """
+
+        :param smih:
+        :param scaffold:
+        :return: [has_scaffold_bool, protonated_smiles]
+        """
+        params = Chem.SmilesParserParams()
+        params.removeHs = False
+
+        mol = Chem.MolFromSmiles(smih, params=params)
+        if mol is None:
+            return False, None
+
+        if mol.HasSubstructMatch(scaffold):
+            return True, smih
+
+        return False, None
+
 class ChemSpace: # RInterface
     """
     Streamline working with many RMols or a specific chemical space by employing a pandas dataframe,
@@ -536,7 +566,18 @@ class ChemSpace: # RInterface
     _dask_cluster = None
     _rmol_functions = {}
 
-    def __init__(self, data={"Smiles": [], "Mol": [], "score": []}):
+    DATAFRAME_DEFAULT_VALUES = {"Smiles": [], # Smiles will always be replaced when inserting new data.
+                                "Mol": pandas.NA,
+                                "score": pandas.NA, # any scoring function, by default cnnaffinity
+                                "h": pandas.NA,
+                                "Training": False,
+                                "enamine_searched": False,
+                                "enamine_id": pandas.NA}
+
+    def __init__(self, data=None):
+        if data is None:
+            data = ChemSpace.DATAFRAME_DEFAULT_VALUES
+
         self.dataframe = pandas.DataFrame(data)
 
         # PandasTools.ChangeMoleculeRendering(self)
@@ -563,7 +604,7 @@ class ChemSpace: # RInterface
                      ("build_molecule", build_molecule),
                      ("evaluate", _evaluate_atomic)
                      ]:
-                ChemSpace._rmol_functions[name] = delayed(function)
+                ChemSpace._rmol_functions[name] = dask.delayed(function)
 
         # self._dask_client = None
         # self._dask_cluster = None
@@ -600,8 +641,8 @@ class ChemSpace: # RInterface
             self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
     ):
         # prepare the dask parameters to be send
-        num_conf = delayed(num_conf)
-        minimum_conf_rms = delayed(minimum_conf_rms)
+        num_conf = dask.delayed(num_conf)
+        minimum_conf_rms = dask.delayed(minimum_conf_rms)
 
         # create the dask jobs
         jobs = {}
@@ -622,8 +663,8 @@ class ChemSpace: # RInterface
         return [rmol.GetNumConformers() for rmol in self]
 
     def remove_clashing_confs(self, prot, min_dst_allowed=1):
-        prot = delayed(prot)
-        min_dst_allowed = delayed(min_dst_allowed)
+        prot = dask.delayed(prot)
+        min_dst_allowed = dask.delayed(min_dst_allowed)
 
         # create the dask jobs
         jobs = {}
@@ -646,8 +687,8 @@ class ChemSpace: # RInterface
         """
 
         # daskify parameters
-        args = [delayed(arg) for arg in args]
-        kwargs = {k: delayed(v) for k, v in kwargs.items()}
+        args = [dask.delayed(arg) for arg in args]
+        kwargs = {k: dask.delayed(v) for k, v in kwargs.items()}
 
         # create the dask jobs
         jobs = {}
@@ -697,9 +738,9 @@ class ChemSpace: # RInterface
 
     def gnina(self, receptor_file):
         # daskify objects
-        receptor_file = delayed(receptor_file)
+        receptor_file = dask.delayed(receptor_file)
         RMol._check_download_gnina()
-        gnina_path = delayed(os.path.join(RMol.gnina_dir, 'gnina'))
+        gnina_path = dask.delayed(os.path.join(RMol.gnina_dir, 'gnina'))
 
         # create the dask jobs
         jobs = {}
@@ -778,7 +819,7 @@ class ChemSpace: # RInterface
         # if isinstance(smi_list[0], Chem.Mol):
         #     smi_list = [Chem.MolToSmiles(mol) for mol in smi_list]
 
-        scaffold = delayed(self._scaffolds[0])
+        scaffold = dask.delayed(self._scaffolds[0])
 
         # create the dask jobs
         jobs = [ChemSpace._rmol_functions["build_molecule"](scaffold, rgroup) for rgroup in rgroups]
@@ -788,14 +829,18 @@ class ChemSpace: # RInterface
         # get Smiles
         built_mols_smiles = [Chem.MolToSmiles(mol) for mol in built_mols]
 
+        # extract the H indices used for attaching the scaffold
+        hs = [mol.GetProp('attachement_point') for mol in built_mols]
+
         # update the internal dataframe
-        rgroups = pandas.DataFrame({"Smiles": built_mols_smiles, "Mol": built_mols})
+        rgroups = pandas.DataFrame({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
         self.dataframe = pandas.concat([self.dataframe, rgroups])
 
-    def add_smiles(self, smiles_list):
+    def add_smiles(self, smiles_list, h=pandas.NA):
         """
         Add a list of Smiles into this ChemicalSpace
 
+        :param h: which h was used to connect to the
         :return:
         """
         # convert the Smiles into molecules
@@ -809,7 +854,9 @@ class ChemSpace: # RInterface
             last_index = 0
 
         # update the internal dataframe
-        more_data = pandas.DataFrame({"Smiles": smiles_list, "Mol": mols}, index=range(last_index, last_index + len(mols)))
+        data = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
+        data.update({"Smiles": smiles_list, "Mol": mols, "h":h})
+        more_data = pandas.DataFrame(data, index=range(last_index, last_index + len(mols)))
         self.dataframe = pandas.concat([self.dataframe, more_data])
 
     def _evaluate_experimental(self, indices=None, num_conf=10, minimum_conf_rms=0.5, min_dst_allowed=1):
@@ -837,20 +884,20 @@ class ChemSpace: # RInterface
         # a pipeline that is well conditional
 
         ## GENERATE CONFORMERS
-        num_conf = delayed(num_conf)
-        minimum_conf_rms = delayed(minimum_conf_rms)
-        protein = delayed(prody_package.parsePDB(self._protein_filename))
-        protein_file = delayed(self._protein_filename)
-        min_dst_allowed = delayed(min_dst_allowed)
+        num_conf = dask.delayed(num_conf)
+        minimum_conf_rms = dask.delayed(minimum_conf_rms)
+        protein = dask.delayed(prody_package.parsePDB(self._protein_filename))
+        protein_file = dask.delayed(self._protein_filename)
+        min_dst_allowed = dask.delayed(min_dst_allowed)
         RMol._check_download_gnina()
-        gnina_path = delayed(os.path.join(RMol.gnina_dir, 'gnina'))
+        gnina_path = dask.delayed(os.path.join(RMol.gnina_dir, 'gnina'))
 
         # create dask jobs
         jobs = {}
         for i, row in self.dataframe.iterrows():
             generated_confs = ChemSpace._rmol_functions['generate_conformers'](row.Mol, num_conf, minimum_conf_rms)
             removed_clashes = ChemSpace._rmol_functions['remove_clashing_confs'](generated_confs, protein,
-                                                                               min_dst_allowed=min_dst_allowed)
+                                                                                 min_dst_allowed=min_dst_allowed)
             jobs[i] = ChemSpace._rmol_functions['gnina'](removed_clashes, protein_file, gnina_path)
 
         # run all jobs
@@ -891,12 +938,12 @@ class ChemSpace: # RInterface
             RMol.set_gnina(os.path.join(RMol.gnina_dir, 'gnina'))
         RMol._check_download_gnina()
 
-        num_conf = delayed(num_conf)
-        minimum_conf_rms = delayed(minimum_conf_rms)
-        protein_file = delayed(self._protein_filename)
+        num_conf = dask.delayed(num_conf)
+        minimum_conf_rms = dask.delayed(minimum_conf_rms)
+        protein_file = dask.delayed(self._protein_filename)
         RMol._check_download_gnina()
 
-        scaffold = delayed(self._scaffolds[0])
+        scaffold = dask.delayed(self._scaffolds[0])
         # extract which hydrogen was used for the attachement
         h_attachement_index = [a.GetIdx() for a in self._scaffolds[0].GetAtoms() if a.GetAtomicNum() == 0][0]
 
@@ -935,6 +982,95 @@ class ChemSpace: # RInterface
             self.dataframe.score[i] = score
 
         print(f"Evaluated {len(results)} cases")
+
+    def add_enamine_molecules(self, results_per_search=100):
+        """
+        For the best scoring molecules, find similar molecules in Enamine REAL database
+         and add them to the dataset.
+
+        Make sure you have the permission/license to use https://sw.docking.org/search.html
+            this way.
+
+        @scaffold: The scaffold molecule that has to be present in the found molecules.
+            If None, this requirement will be ignored.
+        @molecules_per_smile: How many top results (molecules) per Smiles searched.
+        """
+
+        from pydockingorg import Enamine
+
+        if len(self._scaffolds) > 1:
+            raise NotImplementedError("Only one scaffold is supported atm.")
+
+        scaffold = self._scaffolds[0]
+
+        # get the best performing molecules
+        vl = self.dataframe.sort_values(by="score")
+        best_vl_for_searching = vl[:100]
+
+        # nothing to search for yet
+        if len(best_vl_for_searching[~best_vl_for_searching.score.isna()]) == 0:
+            return
+
+        if len(set(best_vl_for_searching.h)) > 1:
+            raise NotImplementedError('Multiple growth vectors are used. ')
+
+        # filter out previously queried molecules
+        new_searches = best_vl_for_searching[best_vl_for_searching.enamine_searched == False]
+        smiles_to_search = list(new_searches.Smiles)[:10]
+
+        start = time.time()
+        print('Querying Enamine REAL. ')
+        try:
+            with Enamine() as DB:
+                results: pandas.DataFrame = DB.search_smiles(smiles_to_search, remove_duplicates=True,
+                                                             results_per_search=results_per_search)
+        except requests.exceptions.HTTPError as HTTPError:
+            print("Enamine API call failed. ", HTTPError)
+            return
+        print(f"Enamine returned with {len(results)} rows in {time.time() - start:.1f}s.")
+
+        # prepare the scaffold for testing its presence
+        # specifically, the hydrogen was replaced and has to be removed
+        # for now we assume we only are growing one vector at a time - fixme
+        scaffold_noh = Chem.EditableMol(scaffold)
+        scaffold_noh.RemoveAtom(int(best_vl_for_searching.iloc[0].h))
+        dask_scaffold = dask.delayed(scaffold_noh.GetMol())
+
+        start = time.time()
+        # protonate and check for scaffold
+        delayed_protonations = [DaskTasks.obabel_protonate(smi.rsplit(maxsplit=1)[0])
+                                for smi in results.hitSmiles.values]
+        jobs = self.dask_client.compute([DaskTasks.scaffold_check(smih, dask_scaffold)
+                                         for smih in delayed_protonations])
+        scaffold_test_results = [job.result() for job in jobs]
+        scaffold_mask = [r[0] for r in scaffold_test_results]
+        # smiles None means that the molecule did not have our scaffold
+        protonated_smiles = [r[1] for r in scaffold_test_results if r[1] is not None]
+        print(f"Dask obabel protonation + scaffold test finished in {time.time() - start:.2f}s.")
+        print(f"Tested scaffold presence. Kept {sum(scaffold_mask)}/{len(scaffold_mask)}.")
+
+        if len(scaffold_mask) > 0:
+            similar = results[scaffold_mask]
+            similar.hitSmiles = protonated_smiles
+        else:
+            similar = pandas.DataFrame(columns=results.columns)
+
+        # filter out Enamine molecules which were previously added
+        new_enamines = similar[~similar.id.isin(vl.enamine_id)]
+
+        # fixme: automate creating empty dataframes. Allow to configure default values initially.
+        last_index = max(self.dataframe.index.max(), self.dataframe.index.max() + 1)
+
+        data = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
+        data.update({
+            'Smiles': list(new_enamines.hitSmiles.values),
+            'h': vl.h[0], # fixme: for now assume that only one vector is used
+            'enamine_id': list(new_enamines.id.values)})
+        new_enamines_df = pandas.DataFrame(data, index=range(last_index, last_index + len(new_enamines)))
+
+        print("Adding: ", len(new_enamines_df))
+        self.dataframe = pandas.concat([self.dataframe, new_enamines_df],
+                                       ignore_index=False)
 
     def __str__(self):
         return f"Chemical Space with {len(self.dataframe)} smiles and {len(self._scaffolds)} scaffolds. "

@@ -142,3 +142,31 @@ def test_evaluate_scoring_function_saves_data(RGroups, sars_scaffold_chunk_sdf, 
     chemspace.evaluate([0], scoring_function=scorer, skip_optimisation=True)
 
     assert chemspace.dataframe.iloc[0].Mol.GetProp("hello_world") == hello_world
+
+
+def test_adding_enamines(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    """
+    Ensure that the passed functional form is used.
+
+    :param RGroups:
+    :param sars_scaffold_chunk_sdf:
+    :param rec_7l10_final_path:
+    :return:
+    """
+
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]'], h=8)
+    chemspace.add_protein(rec_7l10_final_path)
+    def scorer(rmol, pdb_filename, data):
+        return 5
+
+    chemspace.evaluate([0], scoring_function=scorer, skip_optimisation=True)
+    assert len(chemspace) == 1
+
+    chemspace.add_enamine_molecules(results_per_search=10)
+
+    # at least one extra one must have made it
+    assert len(chemspace) > 1
