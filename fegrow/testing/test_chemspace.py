@@ -144,6 +144,7 @@ def test_evaluate_scoring_function_saves_data(RGroups, sars_scaffold_chunk_sdf, 
     assert chemspace.dataframe.iloc[0].Mol.GetProp("hello_world") == hello_world
 
 
+@pytest.mark.skip(reason="requires the pydockingorg interface. ")
 def test_adding_enamines(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
     Ensure that the passed functional form is used.
