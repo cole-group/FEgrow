@@ -199,8 +199,6 @@ def test_al(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     df.loc[df.index == 0, ['score', 'Training']] = [3.2475, True]
     df.loc[df.index == 1, ['score', 'Training']] = [3.57196, True]
 
-    # df[df.index.isin([0, 1])]
-
     to_study = chemspace.active_learning(n_instances=1)
 
     assert to_study.iloc[0].Smiles in not_studied_smiles
