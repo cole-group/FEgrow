@@ -965,10 +965,12 @@ class ChemSpace: # RInterface
             try:
                 mol, data = result.result()
 
-                # extract the conformers
                 original_mol = self.dataframe.Mol[i]
-                original_mol.RemoveAllConformers()
-                [original_mol.AddConformer(c) for c in mol.GetConformers()]
+
+                # copy the conformers
+                if mol is not None:
+                    original_mol.RemoveAllConformers()
+                    [original_mol.AddConformer(c) for c in mol.GetConformers()]
 
                 # save all data generated
                 for k, v in data.items():
@@ -1268,7 +1270,8 @@ def _evaluate_atomic(scaffold,
                      num_conf=50,
                      minimum_conf_rms=0.5,
                      platform="CPU",
-                     skip_optimisation=False):
+                     skip_optimisation=False,
+                     full_evaluation=None):
     """
 
     :param scaffold:
@@ -1279,6 +1282,18 @@ def _evaluate_atomic(scaffold,
     :param gnina_path:
     :return:
     """
+
+    if full_evaluation is not None:
+        return full_evaluation(scaffold,
+                     h,
+                     smiles,
+                     pdb_filename,
+                     scoring_function=None,
+                     num_conf=50,
+                     minimum_conf_rms=0.5,
+                     platform="CPU",
+                     skip_optimisation=False)
+
     params = Chem.SmilesParserParams()
     params.removeHs = False  # keep the hydrogens
     rmol = RMol(Chem.MolFromSmiles(smiles, params=params))
