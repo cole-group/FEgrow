@@ -27,6 +27,7 @@ from rdkit import Chem
 from rdkit.Chem import Draw, PandasTools
 import dask
 from dask.distributed import LocalCluster, Client, Scheduler, Worker
+import modAL
 from sklearn import gaussian_process
 
 from .builder import build_molecules_with_rdkit
@@ -1091,7 +1092,6 @@ class ChemSpace: # RInterface
 
         library_features = self.compute_fps(self.dataframe.index)
         train_features = library_features[training.index]
-
         selection_features = library_features[selection.index]
 
         estimator = gaussian_process.GaussianProcessRegressor(
@@ -1120,8 +1120,7 @@ class ChemSpace: # RInterface
 
         train_targets = train_targets * target_multiplier
 
-        from modAL import models
-        learner = models.BayesianOptimizer(
+        learner = modAL.models.BayesianOptimizer(
             estimator=estimator,
             X_training=train_features,
             y_training=train_targets,
