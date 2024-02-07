@@ -3,6 +3,7 @@ import pathlib
 import click
 from fegrow.cli.scoring import score
 from fegrow.cli.utils import Settings
+from fegrow.cli.report import report
 
 
 @click.group()
@@ -11,6 +12,7 @@ def cli():
 
 
 cli.add_command(score)
+cli.add_command(report)
 
 
 @cli.command()

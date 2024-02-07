@@ -114,6 +114,7 @@ def score_ligand(
             "cnnaffinity": cnnaffinity,
             "cnnaffinityIC50": cnnaffinityIC50,
             "molecule": rmol,
+            'smiles': target_smiles
         }
 
         return data
@@ -139,3 +140,17 @@ def load_target_ligands(ligand_file: pathlib.Path) -> list[str]:
 
     smiles = [Chem.MolToSmiles(mol) for mol in ligands]
     return smiles
+
+
+def draw_mol(smiles: str) -> str:
+    import base64
+    from rdkit.Chem import Draw
+
+    rdkit_mol = Chem.RemoveHs(Chem.MolFromSmiles(smiles))
+    rdkit_mol = Draw.PrepareMolForDrawing(rdkit_mol, forceCoords=True)
+    drawer = Draw.rdMolDraw2D.MolDraw2DSVG(400, 200)
+    drawer.DrawMolecule(rdkit_mol)
+    drawer.FinishDrawing()
+
+    data = base64.b64encode(drawer.GetDrawingText().encode()).decode()
+    return f'<img src="data:image/svg+xml;base64,{data}"></img>'

@@ -1,5 +1,4 @@
 import pathlib
-import time
 
 import click
 from typing import Optional
@@ -81,7 +80,9 @@ def score(
     import os
     import logging
     from fegrow.cli.utils import score_ligand, Settings, load_target_ligands
+    from fegrow.package import RMol
     from dask.distributed import LocalCluster
+    import time
 
 
     # hide warnings and logs from openff-toolkit
@@ -97,10 +98,13 @@ def score(
         if settings is not None:
             config = Settings.parse_file(settings)
             if gnina_path is not None:
-                config.gnina_path = gnina_path
+                config.gnina_path = gnina_path.as_posix()
         else:
             # build the base settings object this needs the gnina path
-            config = Settings(gnina_path=gnina_path)
+            config = Settings(gnina_path=gnina_path.as_posix())
+        # set the gnina directory
+        RMol.set_gnina(loc=config.gnina_path)
+        click.echo(f'Setting Gnina path to: {config.gnina_path}')
 
         click.echo(f"Loading core ligand from {core_ligand}")
         # we remove all Hs rather than specific ones at the attachment point
