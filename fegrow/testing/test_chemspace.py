@@ -175,6 +175,37 @@ def test_evaluate_full_hijack(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_p
     assert chemspace.dataframe.iloc[0].score == 5
 
 
+def test_al(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    """
+    Ensure that the passed functional form is used.
+
+    :param RGroups:
+    :param sars_scaffold_chunk_sdf:
+    :param rec_7l10_final_path:
+    :return:
+    """
+
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    not_studied_smiles = ['[H]OC(=O)N([H])c1c([H])nc([H])c([H])c1[H]', '[H]ON([H])c1c([H])nc([H])c([H])c1[H]']
+    chemspace.add_smiles(['[H]OC([H])([H])c1c([H])nc([H])c([H])c1[H]',
+                          '[H]ON([H])C(=O)c1c([H])nc([H])c([H])c1[H]',] + not_studied_smiles)
+    chemspace.add_protein(rec_7l10_final_path)
+
+    # set the results for the studied smiles
+    df = chemspace.dataframe
+    df.loc[df.index == 0, ['score', 'Training']] = [3.2475, True]
+    df.loc[df.index == 1, ['score', 'Training']] = [3.57196, True]
+
+    # df[df.index.isin([0, 1])]
+
+    to_study = chemspace.active_learning(n_instances=1)
+
+    assert to_study.iloc[0].Smiles in not_studied_smiles
+
+
 @pytest.mark.skip(reason="requires the pydockingorg interface. ")
 def test_adding_enamines(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """

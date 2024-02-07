@@ -27,6 +27,7 @@ from rdkit import Chem
 from rdkit.Chem import Draw, PandasTools
 import dask
 from dask.distributed import LocalCluster, Client, Scheduler, Worker
+from sklearn import gaussian_process
 
 from .builder import build_molecules_with_rdkit
 from .conformers import generate_conformers
@@ -1074,63 +1075,100 @@ class ChemSpace: # RInterface
         self.dataframe = pandas.concat([self.dataframe, new_enamines_df],
                                        ignore_index=False)
 
-    def al_next_cycle(self):
-        model_config = self._cycle_config.model_config
+    def active_learning(self,
+                        model_params={},
+                        n_instances=1):
+        """
+        It's better to save the FPs in the dataframe. Or in the underlying system.
+        :return:
+        """
 
-        # training cases here are the S ie selected for oracle, ideally these would have the oracle predictions
-        train_features, train_targets = self._get_train_features_and_targets(
-            model_config, virtual_library[virtual_library[TRAINING_KEY]])
+        training = self.dataframe[self.dataframe.Training]
+        selection = self.dataframe[~self.dataframe.Training]
 
-        library_features = self._get_selection_pool_features(
-            model_config, virtual_library)
+        # get the scores
+        train_targets = training["score"].to_numpy(dtype=float)
 
-        selection_pool = virtual_library[~virtual_library[TRAINING_KEY]]
-        selection_pool_features = self._get_selection_pool_features(
-            model_config, selection_pool)
+        library_features = self.compute_fps(self.dataframe.index)
+        train_features = library_features[training.index]
 
-        estimator = utils.MODELS[model_config.model_type](
-            model_config.hyperparameters, model_config.tuning_hyperparameters)
+        selection_features = library_features[selection.index]
 
-        if 'halfsample_log2_shards' in model_config:
-            estimator = utils.HALF_SAMPLE_WRAPPER(
-                subestimator=estimator.get_model(),
-                shards_log2=model_config.halfsample_log2_shards,
-                add_estimators=model_config.model_type in ['rf', 'gbm'])
+        estimator = gaussian_process.GaussianProcessRegressor(
+            kernel=TanimotoKernel(), **model_params)
 
-        selection_config = self._cycle_config.selection_config
-        query_strategy = functools.partial(
-            utils.QUERY_STRATEGIES[selection_config.selection_type],
-            n_instances=selection_config.num_elements,
-            **selection_config.hyperparameters)
+        def greedy(optimizer,
+                   features,
+                   n_instances=n_instances):
+            """Takes the best instances by inference value sorted in ascending order.
+
+            Args:
+              optimizer: BaseLearner. Model to use to score instances.
+              features: modALinput. Featurization of the instances to choose from.
+              n_instances: Integer. The number of instances to select.
+
+            Returns:
+              Indices of the instances chosen.
+            """
+            return np.argpartition(optimizer.predict(features), n_instances)[:n_instances]
+
+        query_strategy = greedy
 
         target_multiplier = 1
-        if selection_config.selection_type in ['thompson', 'EI', 'PI', 'UCB']:
-            target_multiplier = -1
+        # if selection_config.selection_type in ['thompson', 'EI', 'PI', 'UCB']:
+        #     target_multiplier = -1
 
         train_targets = train_targets * target_multiplier
 
-        if model_config.model_type in single_cycle_lib._BAYESIAN_MODELS:
-            learner = models.BayesianOptimizer(
-                estimator=estimator.get_model(),
-                X_training=train_features,
-                y_training=train_targets,
-                query_strategy=query_strategy)
-        else:
-            learner = models.ActiveLearner(
-                estimator=estimator.get_model(),
-                X_training=train_features,
-                y_training=train_targets,
-                query_strategy=query_strategy)
+        from modAL import models
+        learner = models.BayesianOptimizer(
+            estimator=estimator,
+            X_training=train_features,
+            y_training=train_targets,
+            query_strategy=query_strategy)
+        # else:
+        #     learner = models.ActiveLearner(
+        #         estimator=estimator.get_model(),
+        #         X_training=train_features,
+        #         y_training=train_targets,
+        #         query_strategy=query_strategy)
 
         inference = learner.predict(library_features) * target_multiplier
 
-        virtual_library['regression'] = inference.T.tolist()
+        self.dataframe['regression'] = inference.T.tolist()
 
-        selection_idx, _ = learner.query(selection_pool_features)
-        selection_columns = self._cycle_config.selection_config.selection_columns
+        selection_idx, _ = learner.query(selection_features)
 
-        # selections, virtual_library
-        return selection_pool.iloc[selection_idx][selection_columns], virtual_library
+        return selection.iloc[selection_idx]
+
+    @staticmethod
+    def _dask_tanimito_similarity(a, b):
+        print(f"About to compute tanimoto for array lengths {len(a)} and {len(b)}")
+        start = time.time()
+        chunk_size = 8_000
+        da = dask.array.from_array(a, chunks=chunk_size)
+        db = dask.array.from_array(b, chunks=chunk_size)
+        aa = dask.array.sum(da, axis=1, keepdims=True)
+        bb = dask.array.sum(db, axis=1, keepdims=True)
+        ab = dask.array.matmul(da, db.T)
+        td = dask.array.true_divide(ab, aa + bb.T - ab)
+        td_computed = td.compute()
+        print(f"Computed tanimoto similarity in {time.time() - start:.2f}s for array lengths {len(a)} and {len(b)}")
+        return td_computed
+
+    @staticmethod
+    def _compute_fp_from_smiles(smiles, radius=3, size=2048):
+        mol = Chem.MolFromSmiles(smiles)
+        return np.array(Chem.AllChem.GetMorganFingerprintAsBitVect(mol, radius=radius, nBits=size))
+
+    def compute_fps(self, ids):
+        df = self.dataframe
+        smiles_list = df.iloc[ids].Smiles.to_list()
+
+        futures = self._dask_client.map(ChemSpace._compute_fp_from_smiles, smiles_list)
+        fps = np.array([r.result() for r in futures])
+
+        return fps
 
     def __str__(self):
         return f"Chemical Space with {len(self.dataframe)} smiles and {len(self._scaffolds)} scaffolds. "
@@ -1147,6 +1185,36 @@ class ChemSpace: # RInterface
 
     def add_protein(self, protein_filename):
         self._protein_filename = protein_filename
+
+
+class TanimotoKernel(gaussian_process.kernels.NormalizedKernelMixin,
+                     gaussian_process.kernels.StationaryKernelMixin,
+                     gaussian_process.kernels.Kernel):
+  """Custom Gaussian process kernel that computes Tanimoto similarity."""
+
+  def __init__(self):
+    """Initializer."""
+
+  def __call__(self, X, Y=None, eval_gradient=False):  # pylint: disable=invalid-name
+    """Computes the pairwise Tanimoto similarity.
+
+    Args:
+      X: Numpy array with shape [batch_size_a, num_features].
+      Y: Numpy array with shape [batch_size_b, num_features]. If None, X is
+        used.
+      eval_gradient: Whether to compute the gradient.
+
+    Returns:
+      Numpy array with shape [batch_size_a, batch_size_b].
+
+    Raises:
+      NotImplementedError: If eval_gradient is True.
+    """
+    if eval_gradient:
+      raise NotImplementedError
+    if Y is None:
+      Y = X
+    return ChemSpace._dask_tanimito_similarity(X, Y)
 
 
 class RGroups(pandas.DataFrame):
