@@ -154,3 +154,28 @@ def draw_mol(smiles: str) -> str:
 
     data = base64.b64encode(drawer.GetDrawingText().encode()).decode()
     return f'<img src="data:image/svg+xml;base64,{data}"></img>'
+
+
+def has_bad_geometry(molecule: Chem.Mol) -> bool:
+    """
+    Try to detect if a molecule has as bad geometry from the ML/MM optimisation.
+    We find that rings buckle and protons can dissociate causing inaccurate geometries.
+
+    Notes:
+        We try to detect the bonding pattern using qcelemental based on the overlap of atomic radii.
+    """
+    from qcelemental.molutil import guess_connectivity
+    from qcelemental.exceptions import ValidationError
+    from qcelemental import constants
+    from qcelemental import periodictable
+    # convert the rdkit molecule to qcelemental
+    try:
+        symbols = [periodictable.to_symbol(atom.GetAtomicNum()) for atom in molecule.GetAtoms()]
+        geometry = molecule.GetConformer().GetPositions() * constants.conversion_factor('angstrom', 'bohr')
+        # guess the connectivity from the geometry
+        connectivity_guess = {tuple(sorted([a + 1, b + 1])) for a, b in guess_connectivity(symbols=symbols, geometry=geometry)}
+        expected_connectivity = {tuple(sorted([bond.GetBeginAtomIdx() + 1, bond.GetEndAtomIdx() + 1])) for bond in molecule.GetBonds()}
+        return expected_connectivity == connectivity_guess
+    except ValidationError:
+        # some atoms get too close and raise a validation error
+        return False

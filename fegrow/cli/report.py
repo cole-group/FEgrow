@@ -1,5 +1,7 @@
 import click
 import pathlib
+from typing import Optional
+
 
 @click.command()
 @click.option(
@@ -21,17 +23,24 @@ import pathlib
     type=click.STRING,
     help='The title of the dataset which will be used for the report and sdf file names'
 )
+@click.option(
+    '-tn',
+    '--top-n',
+    help='The top N molecules to keep after sorting by predicted affinity',
+    type=click.INT
+)
 def report(
         ligands: list[pathlib.Path],
         output: pathlib.Path,
-        title: str
+        title: str,
+        top_n: Optional[int] = None
 ):
     """
     Generate an interactive HTML report of the molecules from the scored SDF files and an SDF file ordered by the top
-    performing molecules.
+    performing molecules. Use top_n to restrict the report and sdf file to only include n molecules.
     """
     from rdkit import Chem
-    from fegrow.cli.utils import draw_mol
+    from fegrow.cli.utils import draw_mol, has_bad_geometry
     import pandas as pd
     import tqdm
     import panel
@@ -44,7 +53,13 @@ def report(
         # load the low energy ligands and the predicted affinity
         supplier = Chem.SDMolSupplier(file.as_posix(), removeHs=True)
         for molecule in supplier:
-            molecules_and_affinities.append((molecule, float(molecule.GetProp('cnnaffinity'))))
+            if not has_bad_geometry(molecule):
+                continue
+            try:
+                molecules_and_affinities.append((molecule, float(molecule.GetProp('cnnaffinity'))))
+            except KeyError:
+                # catch cases where the sd tags were not writen
+                continue
 
     click.echo(f'Total number of molecules and predictions: {len(molecules_and_affinities)}')
 
@@ -54,7 +69,7 @@ def report(
     output_file = output.joinpath(f'{title}.sdf')
     with Chem.SDWriter(output_file.as_posix()) as sdf_out:
         rows = []
-        for mol, affinity in tqdm.tqdm(ranked_all_mols, desc="Creating report...", ncols=80):
+        for mol, affinity in tqdm.tqdm(ranked_all_mols[:top_n], desc="Creating report...", ncols=80):
             try:
                 smiles = mol.GetProp('smiles')
             except KeyError:
