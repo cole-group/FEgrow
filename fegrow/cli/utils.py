@@ -6,7 +6,7 @@ from fegrow.receptor import ForceField
 from fegrow import RMol
 import pathlib
 import pandas as pd
-from rdkit.Chem import PandasTools
+import warnings
 
 
 class Settings(BaseModel):
@@ -67,51 +67,57 @@ def score_ligand(
     Note:
         We assume the core does not need to be altered and is a substructure of the target ligand
     """
-    # create the target ligand with Hs
-    candidate_mol = Chem.MolFromSmiles(target_smiles)
-    candidate_mol = Chem.AddHs(candidate_mol)
-    rmol = RMol(candidate_mol)
-    # set up the core as the template
-    rmol._save_template(core_ligand)
+    # hide the openff warnings as we catch errors later
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
 
-    # conformer gen
-    rmol.generate_conformers(
-        num_conf=settings.num_confs, minimum_conf_rms=settings.conf_rms
-    )
-    # remove missing
-    rmol.remove_clashing_confs(protein=receptor.as_posix())
+        # create the target ligand with Hs
+        candidate_mol = Chem.MolFromSmiles(target_smiles)
+        candidate_mol = Chem.AddHs(candidate_mol)
+        rmol = RMol(candidate_mol)
+        # set up the core as the template
+        rmol._save_template(core_ligand)
 
-    # optimise
-    rmol.optimise_in_receptor(
-        receptor_file=receptor,
-        ligand_force_field=settings.ligand_force_field,
-        use_ani=settings.use_ani,
-        sigma_scale_factor=settings.sigma_scale_factor,
-        relative_permittivity=settings.relative_permittivity,
-        water_model=settings.water_model,
-        platform_name=settings.platform_name,
-    )
+        # conformer gen
+        rmol.generate_conformers(
+            num_conf=settings.num_confs, minimum_conf_rms=settings.conf_rms
+        )
+        # remove missing
+        rmol.remove_clashing_confs(protein=receptor.as_posix())
 
-    if rmol.GetNumConformers() == 0:
-        # set a pentalty
-        cnnaffinity = 0
-        cnnaffinityIC50 = 0
-    else:
-        # score only the lowest energy conformer
-        rmol.sort_conformers(energy_range=settings.energy_filter)  # kcal/mol
-        # purge all but the lowest energy conformers
-        rmol = Rmol(rmol, confId=0)
-        affinities = rmol.gnina(receptor_file=receptor.as_posix())
-        cnnaffinity = -affinities.CNNaffinity.values[0]
-        cnnaffinityIC50 = affinities["CNNaffinity->IC50s"].values[0]
+        # optimise
+        rmol.optimise_in_receptor(
+            receptor_file=receptor.as_posix(),
+            ligand_force_field=settings.ligand_force_field,
+            use_ani=settings.use_ani,
+            sigma_scale_factor=settings.sigma_scale_factor,
+            relative_permittivity=settings.relative_permittivity,
+            water_model=settings.water_model,
+            platform_name=settings.platform_name,
+            show_progress=False
+        )
 
-    data = {
-        "cnnaffinity": cnnaffinity,
-        "cnnaffinityIC50": cnnaffinityIC50,
-        "molecule": rmol,
-    }
+        if rmol.GetNumConformers() == 0:
+            # set a pentalty
+            cnnaffinity = 0
+            cnnaffinityIC50 = 0
+        else:
+            # score only the lowest energy conformer
+            rmol.sort_conformers(energy_range=settings.energy_filter)  # kcal/mol
+            # purge all but the lowest energy conformers
+            rmol = RMol(rmol, confId=0)
+            affinities = rmol.gnina(receptor_file=receptor.as_posix())
+            cnnaffinity = -affinities.CNNaffinity.values[0]
+            cnnaffinityIC50 = affinities["Kd"].values[0]
 
-    return data
+        data = {
+            "cnnaffinity": cnnaffinity,
+            "cnnaffinityIC50": cnnaffinityIC50,
+            "molecule": rmol,
+            'smiles': target_smiles
+        }
+
+        return data
 
 
 def load_target_ligands(ligand_file: pathlib.Path) -> list[str]:
@@ -121,16 +127,55 @@ def load_target_ligands(ligand_file: pathlib.Path) -> list[str]:
     Note:
         For CSV we assume that the smiles have the column name "Smiles"
     """
-    if ligand_file.stem.lower == "csv":
-        target_molecules = pd.read_csv(ligand_file)
-        return list(target_molecules.Smiles.values)
+    if ligand_file.suffix.lower() == ".csv":
+        target_molecules = pd.read_csv(ligand_file.as_posix())
+        return target_molecules.Smiles.values.tolist()
 
-    if ligand_file.stem.lower() in ["sdf", "mol"]:
-        ligands = list(Chem.SDMolSupplier(ligand_file, removeHs=False))
-    elif ligand_file.stem.lower() == "smi":
-        ligands = list(Chem.SmilesMolSupplier(ligand_file, remoeHs=False))
+    if ligand_file.suffix.lower() in [".sdf", ".mol"]:
+        ligands = list(Chem.SDMolSupplier(ligand_file.as_posix(), removeHs=False))
+    elif ligand_file.suffix.lower() == ".smi":
+        ligands = list(Chem.SmilesMolSupplier(ligand_file.as_posix(), remoeHs=False))
     else:
-        raise RuntimeError(f"Can extract smiles from input file {ligand_file}")
+        raise RuntimeError(f"Can not extract smiles from input file {ligand_file}")
 
     smiles = [Chem.MolToSmiles(mol) for mol in ligands]
     return smiles
+
+
+def draw_mol(smiles: str) -> str:
+    import base64
+    from rdkit.Chem import Draw
+
+    rdkit_mol = Chem.RemoveHs(Chem.MolFromSmiles(smiles))
+    rdkit_mol = Draw.PrepareMolForDrawing(rdkit_mol, forceCoords=True)
+    drawer = Draw.rdMolDraw2D.MolDraw2DSVG(400, 200)
+    drawer.DrawMolecule(rdkit_mol)
+    drawer.FinishDrawing()
+
+    data = base64.b64encode(drawer.GetDrawingText().encode()).decode()
+    return f'<img src="data:image/svg+xml;base64,{data}"></img>'
+
+
+def has_bad_geometry(molecule: Chem.Mol) -> bool:
+    """
+    Try to detect if a molecule has as bad geometry from the ML/MM optimisation.
+    We find that rings buckle and protons can dissociate causing inaccurate geometries.
+
+    Notes:
+        We try to detect the bonding pattern using qcelemental based on the overlap of atomic radii.
+    """
+    from qcelemental.molutil import guess_connectivity
+    from qcelemental.exceptions import ValidationError
+    from qcelemental import constants
+    from qcelemental import periodictable
+    # convert the rdkit molecule to qcelemental
+    try:
+        symbols = [periodictable.to_symbol(atom.GetAtomicNum()) for atom in molecule.GetAtoms()]
+        geometry = molecule.GetConformer().GetPositions() * constants.conversion_factor('angstrom', 'bohr')
+        # guess the connectivity from the geometry
+        connectivity_guess = {tuple(sorted([a + 1, b + 1])) for a, b in guess_connectivity(symbols=symbols, geometry=geometry)}
+        expected_connectivity = {tuple(sorted([bond.GetBeginAtomIdx() + 1, bond.GetEndAtomIdx() + 1])) for bond in molecule.GetBonds()}
+        return expected_connectivity == connectivity_guess
+    except ValidationError:
+        # some atoms get too close and raise a validation error
+        return False

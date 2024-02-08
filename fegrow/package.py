@@ -150,7 +150,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         :param water_model: can be used to set the force field for any water molecules present in the binding site.
         """
         if self.GetNumConformers() == 0:
-            print("Warning: no conformers so cannot optimise_in_receptor. Ignoring.")
+            logger.info("No conformers so cannot optimise_in_receptor. Ignoring.")
             return
 
         from .receptor import optimise_in_receptor
@@ -187,7 +187,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
             above the minimum, for which conformers should be kept.
         """
         if self.GetNumConformers() == 0:
-            print("An rmol doesn't have any conformers. Ignoring.")
+            logger.info("An rmol doesn't have any conformers. Ignoring.")
             return None
         elif self.opt_energies is None:
             raise AttributeError(
@@ -323,7 +323,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                     )
                     rm_counter += 1
                     break
-        print(f"Removed {rm_counter} conformers. ")
+        logger.info(f"Removed {rm_counter} conformers. ")
 
 
     @staticmethod
@@ -366,7 +366,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
             pass
 
         # gnina is not found, try downloading it
-        print(f"Gnina not found or set. Download gnina (~500MB) into {RMol.gnina_dir}")
+        logger.info(f"Gnina not found or set. Download gnina (~500MB) into {RMol.gnina_dir}")
         gnina = os.path.join(RMol.gnina_dir, "gnina")
         # fixme - currently download to the working directory (Home could be more applicable).
         urllib.request.urlretrieve(
@@ -551,7 +551,7 @@ class RList(RInterface, list):
         self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
     ):
         for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
+            logger.info(f"RMol index {i}")
             rmol.generate_conformers(num_conf, minimum_conf_rms, **kwargs)
 
     def GetNumConformers(self):
@@ -559,7 +559,7 @@ class RList(RInterface, list):
 
     def remove_clashing_confs(self, prot, min_dst_allowed=1):
         for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
+            logger.info(f"RMol index {i}")
             rmol.remove_clashing_confs(prot, min_dst_allowed=min_dst_allowed)
 
     def optimise_in_receptor(self, *args, **kwargs):
@@ -570,7 +570,7 @@ class RList(RInterface, list):
 
         dfs = []
         for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
+            logger.info(f"RMol index {i}")
             dfs.append(rmol.optimise_in_receptor(*args, **kwargs))
 
         df = pandas.concat(dfs)
@@ -580,7 +580,7 @@ class RList(RInterface, list):
     def sort_conformers(self, energy_range=5):
         dfs = []
         for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
+            logger.info(f"RMol index {i}")
             dfs.append(rmol.sort_conformers(energy_range))
 
         df = pandas.concat(dfs)
@@ -590,7 +590,7 @@ class RList(RInterface, list):
     def gnina(self, receptor_file):
         dfs = []
         for i, rmol in enumerate(self):
-            print(f"RMol index {i}")
+            logger.info(f"RMol index {i}")
             dfs.append(rmol.gnina(receptor_file))
 
         df = pandas.concat(dfs)
@@ -605,7 +605,7 @@ class RList(RInterface, list):
         for rmol in self[::-1]:
             if rmol.GetNumConformers() == 0:
                 rmindex = self.index(rmol)
-                print(
+                logger.info(
                     f"Discarding a molecule (id {rmindex}) due to the lack of conformers. "
                 )
                 self.remove(rmol)

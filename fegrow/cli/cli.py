@@ -3,6 +3,7 @@ import pathlib
 import click
 from fegrow.cli.scoring import score
 from fegrow.cli.utils import Settings
+from fegrow.cli.report import report
 
 
 @click.group()
@@ -11,13 +12,14 @@ def cli():
 
 
 cli.add_command(score)
+cli.add_command(report)
 
 
 @cli.command()
 @click.option(
     "-g",
     "--gnina-path",
-    type=click.Path(exists=True, file_okay=True, dir_okay=False, executable=True),
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, executable=True, resolve_path=True),
     help="The path to the gnina executable which will override the settings.",
 )
 def settings(gnina_path: pathlib.Path):
@@ -25,6 +27,6 @@ def settings(gnina_path: pathlib.Path):
     Create a runtime settings object for scoring runs which can be configured.
     """
     config = Settings(gnina_path=gnina_path)
-    with open("settings.json") as output:
+    with open("settings.json", "w") as output:
         output.write(config.json(indent=2))
 
