@@ -9,10 +9,11 @@ import re
 import stat
 import subprocess
 import tempfile
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Sequence
 import urllib
 import time
 
+import functools
 import requests
 import numpy as np
 import mols2grid
@@ -921,11 +922,20 @@ class ChemSpace: # RInterface
 
         print(f"Evaluated {len(results)} cases")
 
-    def evaluate(self, indices=None, scoring_function=None, gnina_path=None, num_conf=10, minimum_conf_rms=0.5, **kwargs):
+    def evaluate(self, indices : Union[Sequence[int], pandas.DataFrame]=None,
+                 scoring_function=None,
+                 gnina_path=None,
+                 num_conf=10,
+                 minimum_conf_rms=0.5, **kwargs):
 
         # evaluate all molecules if no indices are picked
-        indices = indices or slice(None)
-        selected_rows = self.dataframe.iloc[indices]
+        if indices is None:
+            indices = slice(None)
+
+        if isinstance(indices, pandas.DataFrame):
+            indices = indices.index
+
+        selected_rows = self.dataframe.loc[indices]
 
         if len(self._scaffolds) == 0:
             print("Please add scaffolds to the system for the evaluation. ")
@@ -983,9 +993,10 @@ class ChemSpace: # RInterface
                 # failed to finish the protocol, set the penalty
                 score = 0
 
-            self.dataframe.score[i] = score
+            self.dataframe.loc[i, ["score", "Training"]] = score, True
 
         print(f"Evaluated {len(results)} cases")
+        return self.dataframe.loc[indices]
 
     def add_enamine_molecules(self, results_per_search=100):
         """
@@ -1077,6 +1088,8 @@ class ChemSpace: # RInterface
                                        ignore_index=False)
 
     def active_learning(self,
+                        first_random=True,
+                        score_higher_better=True,
                         model_params={},
                         n_instances=1):
         """
@@ -1087,10 +1100,15 @@ class ChemSpace: # RInterface
         training = self.dataframe[self.dataframe.Training]
         selection = self.dataframe[~self.dataframe.Training]
 
+        if training.empty:
+            if first_random:
+                return selection.sample(n_instances)
+
         # get the scores
         train_targets = training["score"].to_numpy(dtype=float)
 
-        library_features = self.compute_fps(self.dataframe.index)
+
+        library_features = self.compute_fps(tuple(self.dataframe.Smiles))
         train_features = library_features[training.index]
         selection_features = library_features[selection.index]
 
@@ -1115,6 +1133,8 @@ class ChemSpace: # RInterface
         query_strategy = greedy
 
         target_multiplier = 1
+        if score_higher_better:
+            target_multiplier = -1
         # if selection_config.selection_type in ['thompson', 'EI', 'PI', 'UCB']:
         #     target_multiplier = -1
 
@@ -1160,11 +1180,14 @@ class ChemSpace: # RInterface
         mol = Chem.MolFromSmiles(smiles)
         return np.array(Chem.AllChem.GetMorganFingerprintAsBitVect(mol, radius=radius, nBits=size))
 
-    def compute_fps(self, ids):
-        df = self.dataframe
-        smiles_list = df.iloc[ids].Smiles.to_list()
+    @functools.cache
+    def compute_fps(self, smiles_tuple):
+        """
 
-        futures = self._dask_client.map(ChemSpace._compute_fp_from_smiles, smiles_list)
+        :param smiles_tuple: It has to be a tuple to be hashable (to work with caching).
+        :return:
+        """
+        futures = self._dask_client.map(ChemSpace._compute_fp_from_smiles, smiles_tuple)
         fps = np.array([r.result() for r in futures])
 
         return fps
