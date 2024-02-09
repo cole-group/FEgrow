@@ -214,10 +214,10 @@ def test_al_local(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
 
-    scaffold = Chem.SDMolSupplier("data/5R83_core.sdf", removeHs=False)[0]
+    scaffold = Chem.SDMolSupplier(str(root / "data/5R83_core.sdf"), removeHs=False)[0]
     chemspace.add_scaffold(scaffold, 6)
 
-    oracle = pandas.read_csv("data/cs50k_scored49578_unique47710.csv.zip")
+    oracle = pandas.read_csv(root / "data/cs50k_scored49578_unique47710.csv.zip")
 
     # separate the Smiles to be scanned
     smiles_list = oracle.Smiles.to_list()[:40]
