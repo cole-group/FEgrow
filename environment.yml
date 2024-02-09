@@ -27,3 +27,4 @@ dependencies:
   - conda-forge::networkx
   - conda-forge::pint-pandas
   - conda-forge::dask
+  - conda-forge::modAL
