@@ -614,6 +614,7 @@ class ChemSpace: # RInterface
 
         #
         self._scaffolds = []
+        self._model = None
 
     def set_dask_caching(self, bytes_num=4e9):
         # Leverage 4 gigabytes of memory
@@ -1093,10 +1094,17 @@ class ChemSpace: # RInterface
         self.dataframe = pandas.concat([self.dataframe, new_enamines_df],
                                        ignore_index=False)
 
+    @property
+    def model(self):
+        return self._model
+
+    @model.setter
+    def model(self, model):
+        self._model = model
+
     def active_learning(self,
-                        first_random=True,
+                        first_random=False,
                         score_higher_better=True,
-                        model_params={},
                         n_instances=1):
         """
         It's better to save the FPs in the dataframe. Or in the underlying system.
@@ -1109,17 +1117,19 @@ class ChemSpace: # RInterface
         if training.empty:
             if first_random:
                 return selection.sample(n_instances)
+            else:
+                raise ValueError("There is no scores for active learning. Please use the \"first_random\" property. ")
 
         # get the scores
         train_targets = training["score"].to_numpy(dtype=float)
-
 
         library_features = self.compute_fps(tuple(self.dataframe.Smiles))
         train_features = library_features[training.index]
         selection_features = library_features[selection.index]
 
-        estimator = gaussian_process.GaussianProcessRegressor(
-            kernel=TanimotoKernel(), **model_params)
+        if self.model is None:
+            from fegrow.al import AL
+            self.model = AL.get_gaussian_process_estimator()
 
         def greedy(optimizer,
                    features,
@@ -1147,7 +1157,7 @@ class ChemSpace: # RInterface
         train_targets = train_targets * target_multiplier
 
         learner = modAL.models.BayesianOptimizer(
-            estimator=estimator,
+            estimator=self.model,
             X_training=train_features,
             y_training=train_targets,
             query_strategy=query_strategy)
@@ -1165,21 +1175,6 @@ class ChemSpace: # RInterface
         selection_idx, _ = learner.query(selection_features)
 
         return selection.iloc[selection_idx]
-
-    @staticmethod
-    def _dask_tanimito_similarity(a, b):
-        print(f"About to compute tanimoto for array lengths {len(a)} and {len(b)}")
-        start = time.time()
-        chunk_size = 8_000
-        da = dask.array.from_array(a, chunks=chunk_size)
-        db = dask.array.from_array(b, chunks=chunk_size)
-        aa = dask.array.sum(da, axis=1, keepdims=True)
-        bb = dask.array.sum(db, axis=1, keepdims=True)
-        ab = dask.array.matmul(da, db.T)
-        td = dask.array.true_divide(ab, aa + bb.T - ab)
-        td_computed = td.compute()
-        print(f"Computed tanimoto similarity in {time.time() - start:.2f}s for array lengths {len(a)} and {len(b)}")
-        return td_computed
 
     @staticmethod
     def _compute_fp_from_smiles(smiles, radius=3, size=2048):
@@ -1213,37 +1208,6 @@ class ChemSpace: # RInterface
 
     def add_protein(self, protein_filename):
         self._protein_filename = protein_filename
-
-
-class TanimotoKernel(gaussian_process.kernels.NormalizedKernelMixin,
-                     gaussian_process.kernels.StationaryKernelMixin,
-                     gaussian_process.kernels.Kernel):
-  """Custom Gaussian process kernel that computes Tanimoto similarity."""
-
-  def __init__(self):
-    """Initializer."""
-
-  def __call__(self, X, Y=None, eval_gradient=False):  # pylint: disable=invalid-name
-    """Computes the pairwise Tanimoto similarity.
-
-    Args:
-      X: Numpy array with shape [batch_size_a, num_features].
-      Y: Numpy array with shape [batch_size_b, num_features]. If None, X is
-        used.
-      eval_gradient: Whether to compute the gradient.
-
-    Returns:
-      Numpy array with shape [batch_size_a, batch_size_b].
-
-    Raises:
-      NotImplementedError: If eval_gradient is True.
-    """
-    if eval_gradient:
-      raise NotImplementedError
-    if Y is None:
-      Y = X
-    return ChemSpace._dask_tanimito_similarity(X, Y)
-
 
 class RGroups(pandas.DataFrame):
     """
