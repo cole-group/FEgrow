@@ -247,7 +247,7 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
 
     """
-    from fegrow.al import AL
+    from fegrow.al import Model
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
 
@@ -272,7 +272,7 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     chemspace.evaluate(random_pics, full_evaluation=oracle_look_up)
 
     # configure active learning
-    chemspace.model = AL.get_gaussian_process_estimator()
+    chemspace.model = Model.get_gaussian_process_estimator()
 
     # set the results for the studied smiles
     for i in range(2):

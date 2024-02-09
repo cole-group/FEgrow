@@ -1,6 +1,7 @@
 import time
 
 import dask
+import numpy
 from sklearn import gaussian_process
 
 
@@ -48,8 +49,24 @@ class TanimotoKernel(gaussian_process.kernels.NormalizedKernelMixin,
       Y = X
     return _dask_tanimito_similarity(X, Y)
 
+class Query:
+    @staticmethod
+    def greedy(optimizer,
+               features,
+               n_instances=1):
+        """Takes the best instances by inference value sorted in ascending order.
 
-class AL:
+        Args:
+          optimizer: BaseLearner. Model to use to score instances.
+          features: modALinput. Featurization of the instances to choose from.
+          n_instances: Integer. The number of instances to select.
+
+        Returns:
+          Indices of the instances chosen.
+        """
+        return numpy.argpartition(optimizer.predict(features), n_instances)[:n_instances]
+
+class Model:
 
     @staticmethod
     def get_gaussian_process_estimator(**model_params):

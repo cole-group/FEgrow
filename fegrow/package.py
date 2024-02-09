@@ -612,9 +612,9 @@ class ChemSpace: # RInterface
         # self._dask_client = None
         # self._dask_cluster = None
 
-        #
         self._scaffolds = []
         self._model = None
+        self._query = None
 
     def set_dask_caching(self, bytes_num=4e9):
         # Leverage 4 gigabytes of memory
@@ -1102,10 +1102,19 @@ class ChemSpace: # RInterface
     def model(self, model):
         self._model = model
 
+    @property
+    def query(self):
+        return self._query
+
+    @query.setter
+    def query(self, query):
+        self._query = query
+
     def active_learning(self,
                         first_random=False,
                         score_higher_better=True,
-                        n_instances=1):
+                        n_instances=1,
+                        learner_type=None):
         """
         It's better to save the FPs in the dataframe. Or in the underlying system.
         :return:
@@ -1127,26 +1136,13 @@ class ChemSpace: # RInterface
         train_features = library_features[training.index]
         selection_features = library_features[selection.index]
 
+        from fegrow.al import Model, Query
+
         if self.model is None:
-            from fegrow.al import AL
-            self.model = AL.get_gaussian_process_estimator()
+            self.model = Model.get_gaussian_process_estimator()
 
-        def greedy(optimizer,
-                   features,
-                   n_instances=n_instances):
-            """Takes the best instances by inference value sorted in ascending order.
-
-            Args:
-              optimizer: BaseLearner. Model to use to score instances.
-              features: modALinput. Featurization of the instances to choose from.
-              n_instances: Integer. The number of instances to select.
-
-            Returns:
-              Indices of the instances chosen.
-            """
-            return np.argpartition(optimizer.predict(features), n_instances)[:n_instances]
-
-        query_strategy = greedy
+        if self.query is None:
+            self.query = Query.greedy
 
         target_multiplier = 1
         if score_higher_better:
@@ -1156,17 +1152,25 @@ class ChemSpace: # RInterface
 
         train_targets = train_targets * target_multiplier
 
-        learner = modAL.models.BayesianOptimizer(
-            estimator=self.model,
-            X_training=train_features,
-            y_training=train_targets,
-            query_strategy=query_strategy)
-        # else:
-        #     learner = models.ActiveLearner(
-        #         estimator=estimator.get_model(),
-        #         X_training=train_features,
-        #         y_training=train_targets,
-        #         query_strategy=query_strategy)
+        # only GP uses Bayesian Optimizer
+        if learner_type is not None:
+            learner = learner_type(
+                estimator=self.model,
+                X_training=train_features,
+                y_training=train_targets,
+                query_strategy=self.query)
+        elif isinstance(self.model, gaussian_process.GaussianProcessRegressor):
+            learner = modAL.models.BayesianOptimizer(
+                estimator=self.model,
+                X_training=train_features,
+                y_training=train_targets,
+                query_strategy=self.query)
+        else:
+            learner = modAL.models.ActiveLearner(
+                estimator=self.model,
+                X_training=train_features,
+                y_training=train_targets,
+                query_strategy=self.query)
 
         inference = learner.predict(library_features) * target_multiplier
 
@@ -1184,7 +1188,6 @@ class ChemSpace: # RInterface
     @functools.cache
     def compute_fps(self, smiles_tuple):
         """
-
         :param smiles_tuple: It has to be a tuple to be hashable (to work with caching).
         :return:
         """
