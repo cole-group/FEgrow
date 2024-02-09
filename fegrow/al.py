@@ -6,6 +6,10 @@ from sklearn import gaussian_process
 
 
 def _dask_tanimito_similarity(a, b):
+    """
+    Fixme this does not need to use matmul anymore because it's not a single core.
+    This can be transitioned to simple row by row dispatching.
+    """
     print(f"About to compute tanimoto for array lengths {len(a)} and {len(b)}")
     start = time.time()
     chunk_size = 8_000
