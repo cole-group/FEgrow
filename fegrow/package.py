@@ -615,6 +615,12 @@ class ChemSpace: # RInterface
         #
         self._scaffolds = []
 
+    def set_dask_caching(self, bytes_num=4e9):
+        # Leverage 4 gigabytes of memory
+        from dask.cache import Cache
+        self.cache = Cache(bytes_num)
+        self.cache.register()
+
     @property
     def dask_client(self):
         if self._dask_client is None:
