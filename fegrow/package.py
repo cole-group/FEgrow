@@ -615,6 +615,7 @@ class ChemSpace: # RInterface
         self._scaffolds = []
         self._model = None
         self._query = None
+        self._query_label = None
 
     def set_dask_caching(self, bytes_num=4e9):
         # Leverage 4 gigabytes of memory
@@ -1113,11 +1114,18 @@ class ChemSpace: # RInterface
         if 'fegrow_label' in query.keywords:
             self._query_label = query.keywords.pop('fegrow_label')
 
+    @property
+    def query_label(self):
+        return self._query_label
+
     def active_learning(self,
+                        n_instances=1,
                         first_random=False,
                         score_higher_better=None,
-                        n_instances=1,
-                        learner_type=None):
+                        model=None,
+                        query=None,
+                        learner_type=None,
+                        ):
         """
         Model the data using the Training subset. Then use the active learning query method.
 
@@ -1146,17 +1154,25 @@ class ChemSpace: # RInterface
 
         import fegrow.al
 
+        if model is not None:
+            self.model = model
         if self.model is None:
             self.model = fegrow.al.Model.gaussian_process()
 
+        if query is not None:
+            self.query = query
         if self.query is None:
             self.query = fegrow.al.Query.greedy
 
         target_multiplier = 1
         if score_higher_better is True:
             target_multiplier = -1
-        elif self._query_label in ['thompson', 'EI', 'PI', 'UCB']:
-            train_targets = train_targets * target_multiplier
+        elif score_higher_better is False:
+            target_multiplier = 1
+        elif self.query_label in ['thompson', 'EI', 'PI', 'UCB']:
+            target_multiplier = -1
+
+        train_targets = train_targets * target_multiplier
 
         # only GP uses Bayesian Optimizer
         if learner_type is not None:
