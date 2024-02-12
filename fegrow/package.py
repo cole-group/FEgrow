@@ -1119,7 +1119,7 @@ class ChemSpace: # RInterface
         return self._query_label
 
     def active_learning(self,
-                        n_instances=1,
+                        n=1,
                         first_random=False,
                         score_higher_better=None,
                         model=None,
@@ -1140,7 +1140,7 @@ class ChemSpace: # RInterface
 
         if training.empty:
             if first_random:
-                return selection.sample(n_instances)
+                return selection.sample(n)
             else:
                 raise ValueError("There is no scores for active learning. Please use the \"first_random\" property. ")
 
@@ -1162,7 +1162,7 @@ class ChemSpace: # RInterface
         if query is not None:
             self.query = query
         if self.query is None:
-            self.query = fegrow.al.Query.greedy
+            self.query = fegrow.al.Query.UCB(beta=10)
 
         target_multiplier = 1
         if score_higher_better is True:

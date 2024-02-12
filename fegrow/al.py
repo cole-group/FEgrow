@@ -143,6 +143,7 @@ class Model:
     @staticmethod
     def gaussian_process(**model_params):
         return gaussian_process.GaussianProcessRegressor(kernel=TanimotoKernel(), **model_params)
+
     @staticmethod
     def mlp_regressor(**model_params):
         return neural_network.MLPRegressor(**model_params)
