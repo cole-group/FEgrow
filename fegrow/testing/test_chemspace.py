@@ -201,7 +201,7 @@ def test_al(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     df.loc[df.index == 0, ['score', 'Training']] = [3.2475, True]
     df.loc[df.index == 1, ['score', 'Training']] = [3.57196, True]
 
-    to_study = chemspace.active_learning(n_instances=1)
+    to_study = chemspace.active_learning(n=1)
 
     assert to_study.iloc[0].Smiles in not_studied_smiles
 
@@ -231,12 +231,12 @@ def test_al_local(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
         return None, {"score": oracle[oracle.Smiles == smiles].iloc[0].cnnaffinity}
 
     # select random molecules
-    random_pics = chemspace.active_learning(n_instances=5, first_random=True)
+    random_pics = chemspace.active_learning(n=5, first_random=True)
     chemspace.evaluate(random_pics, full_evaluation=oracle_look_up)
 
     # set the results for the studied smiles
     for i in range(2):
-        picks = chemspace.active_learning(n_instances=5)
+        picks = chemspace.active_learning(n=5)
         res = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
         # filter out the penalties
         res = res[res.score != 0]
@@ -267,7 +267,7 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
         return None, {"score": oracle[oracle.Smiles == smiles].iloc[0].cnnaffinity}
 
     # select random molecules
-    random_pics = chemspace.active_learning(n_instances=5, first_random=True)
+    random_pics = chemspace.active_learning(n=5, first_random=True)
     chemspace.evaluate(random_pics, full_evaluation=oracle_look_up)
 
     # configure active learning
@@ -275,29 +275,29 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     chemspace.model = Model.gaussian_process()
 
     chemspace.query = Query.UCB(beta=10)
-    picks = chemspace.active_learning(n_instances=5)
+    picks = chemspace.active_learning(n=5)
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     # another go without changing any settings
-    picks = chemspace.active_learning(n_instances=5)
+    picks = chemspace.active_learning(n=5)
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     # use every querrying strategy
     chemspace.query = Query.greedy()
-    picks = chemspace.active_learning(n_instances=5)
+    picks = chemspace.active_learning(n=5)
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.query = Query.EI(tradeoff=0.1)
-    picks = chemspace.active_learning(n_instances=5)
+    picks = chemspace.active_learning(n=5)
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.query = Query.PI(tradeoff=0.1)
-    picks = chemspace.active_learning(n_instances=5)
+    picks = chemspace.active_learning(n=5)
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.model = Model.linear()
     chemspace.query = Query.greedy()
-    picks = chemspace.active_learning(n_instances=5)
+    picks = chemspace.active_learning(n=5)
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
 

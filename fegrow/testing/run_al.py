@@ -26,12 +26,12 @@ def oracle_look_up(scaffold, h, smiles, *args, **kwargs):
     return None, {"score": oracle[oracle.Smiles == smiles].iloc[0].cnnaffinity}
 
 # select random molecules
-random_pics = chemspace.active_learning(n_instances=5, first_random=True)
+random_pics = chemspace.active_learning(n=5, first_random=True)
 chemspace.evaluate(random_pics, full_evaluation=oracle_look_up)
 
 # set the results for the studied smiles
 for i in range(2):
-    picks = chemspace.active_learning(n_instances=5)
+    picks = chemspace.active_learning(n=5)
     res = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
     # filter out the penalties
     res = res[res.score != 0]
