@@ -1110,12 +1110,19 @@ class ChemSpace: # RInterface
     def query(self, query):
         self._query = query
 
+        if 'fegrow_label' in query.keywords:
+            self._query_label = query.keywords.pop('fegrow_label')
+
     def active_learning(self,
                         first_random=False,
-                        score_higher_better=True,
+                        score_higher_better=None,
                         n_instances=1,
                         learner_type=None):
         """
+        Model the data using the Training subset. Then use the active learning query method.
+
+        See properties "model" and "query" for finer control.
+
         It's better to save the FPs in the dataframe. Or in the underlying system.
         :return:
         """
@@ -1129,28 +1136,26 @@ class ChemSpace: # RInterface
             else:
                 raise ValueError("There is no scores for active learning. Please use the \"first_random\" property. ")
 
-        # get the scores
+        # get the scored subset
         train_targets = training["score"].to_numpy(dtype=float)
 
         library_features = self.compute_fps(tuple(self.dataframe.Smiles))
         train_features = library_features[training.index]
         selection_features = library_features[selection.index]
 
-        from fegrow.al import Model, Query
+        import fegrow.al
 
         if self.model is None:
-            self.model = Model.get_gaussian_process_estimator()
+            self.model = fegrow.al.Model.get_gaussian_process_estimator()
 
         if self.query is None:
-            self.query = Query.greedy
+            self.query = fegrow.al.Query.greedy
 
         target_multiplier = 1
-        if score_higher_better:
+        if score_higher_better is True:
             target_multiplier = -1
-        # if selection_config.selection_type in ['thompson', 'EI', 'PI', 'UCB']:
-        #     target_multiplier = -1
-
-        train_targets = train_targets * target_multiplier
+        elif self._query_label in ['thompson', 'EI', 'PI', 'UCB']:
+            train_targets = train_targets * target_multiplier
 
         # only GP uses Bayesian Optimizer
         if learner_type is not None:
