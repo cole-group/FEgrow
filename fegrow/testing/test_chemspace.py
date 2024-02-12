@@ -247,7 +247,6 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
 
     """
-    from fegrow.al import Model
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
 
@@ -272,15 +271,29 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     chemspace.evaluate(random_pics, full_evaluation=oracle_look_up)
 
     # configure active learning
+    from fegrow.al import Model, Query
     chemspace.model = Model.get_gaussian_process_estimator()
 
-    # set the results for the studied smiles
-    for i in range(2):
-        picks = chemspace.active_learning(n_instances=5)
-        res = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
-        # filter out the penalties
-        res = res[res.score != 0]
-        print(f"AL cycle cnnaffinity. Mean: {res.score.mean():.2f}, Min: {res.score.min():.2f}, Max: {res.score.max():.2f}")
+    chemspace.query = Query.UCB(beta=10)
+    picks = chemspace.active_learning(n_instances=5)
+    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+
+    # another go without changing any settings
+    picks = chemspace.active_learning(n_instances=5)
+    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+
+    # use every querrying strategy
+    chemspace.query = Query.greedy()
+    picks = chemspace.active_learning(n_instances=5)
+    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+
+    chemspace.query = Query.EI(tradeoff=0.1)
+    picks = chemspace.active_learning(n_instances=5)
+    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+
+    chemspace.query = Query.PI(tradeoff=0.1)
+    picks = chemspace.active_learning(n_instances=5)
+    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
 
 @pytest.mark.skip(reason="requires the pydockingorg interface. ")

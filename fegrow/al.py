@@ -1,8 +1,11 @@
+import functools
 import time
+from typing import Callable
 
 import dask
-import numpy
+import numpy as np
 from sklearn import gaussian_process
+from modAL.acquisition import max_UCB, max_EI, max_PI
 
 
 def _dask_tanimito_similarity(a, b):
@@ -53,22 +56,70 @@ class TanimotoKernel(gaussian_process.kernels.NormalizedKernelMixin,
       Y = X
     return _dask_tanimito_similarity(X, Y)
 
+
 class Query:
     @staticmethod
-    def greedy(optimizer,
-               features,
-               n_instances=1):
+    def greedy() -> Callable:
         """Takes the best instances by inference value sorted in ascending order.
 
+        Returns:
+          The greedy function.
+        """
+
+        def greedy(optimizer,
+                   features,
+                   n_instances=1):
+            """Takes the best instances by inference value sorted in ascending order.
+
+            Args:
+              optimizer: BaseLearner. Model to use to score instances.
+              features: modALinput. Featurization of the instances to choose from.
+              n_instances: Integer. The number of instances to select.
+
+            Returns:
+              Indices of the instances chosen.
+            """
+            return np.argpartition(optimizer.predict(features), n_instances)[:n_instances]
+        return functools.partial(greedy, fegrow_label="greedy")
+
+    def PI(tradeoff: float = 0) -> Callable:
+        """
+        Maximum PI query strategy. Selects the instance with highest probability of improvement.
+
         Args:
-          optimizer: BaseLearner. Model to use to score instances.
-          features: modALinput. Featurization of the instances to choose from.
-          n_instances: Integer. The number of instances to select.
+            tradeoff: Value controlling the tradeoff parameter.
 
         Returns:
-          Indices of the instances chosen.
+            The function with pre-populated parameters.
         """
-        return numpy.argpartition(optimizer.predict(features), n_instances)[:n_instances]
+        return functools.partial(max_PI, tradeoff=tradeoff, fegrow_label="PI")
+
+    def EI(tradeoff: float = 0) -> Callable:
+        """
+        Maximum EI query strategy. Selects the instance with highest expected improvement.
+
+        Args:
+            tradeoff: Value controlling the tradeoff parameter.
+
+        Returns:
+            The function with pre-populated parameters.
+        """
+        return functools.partial(max_EI, tradeoff=tradeoff, fegrow_label="EI")
+
+
+
+    def UCB(beta: float = 1) -> Callable:
+        """
+            Maximum UCB query strategy. Selects the instance with highest upper confidence bound.
+
+            Args:
+                beta: Value controlling the beta parameter.
+
+            Returns:
+                The function with pre-populated parameters.
+        """
+        return functools.partial(max_UCB, beta=beta, fegrow_label="UCB")
+
 
 class Model:
 
