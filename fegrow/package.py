@@ -1137,6 +1137,7 @@ class ChemSpace: # RInterface
                 raise ValueError("There is no scores for active learning. Please use the \"first_random\" property. ")
 
         # get the scored subset
+        # fixme - multitarget?
         train_targets = training["score"].to_numpy(dtype=float)
 
         library_features = self.compute_fps(tuple(self.dataframe.Smiles))
