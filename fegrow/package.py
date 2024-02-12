@@ -585,7 +585,7 @@ class ChemSpace: # RInterface
 
         # PandasTools.ChangeMoleculeRendering(self)
         if ChemSpace._dask_cluster is None:
-            print('None cluster')
+            logger.info("No Dask cluster configured. Creating a local cluster. ")
             import asyncio
             # silence_logs=logging.DEBUG
             ChemSpace._dask_cluster = LocalCluster(n_workers=2,
@@ -928,7 +928,7 @@ class ChemSpace: # RInterface
 
             self.dataframe.score[i] = max(cnnaffinities)
 
-        print(f"Evaluated {len(results)} cases")
+        logger.info(f"Evaluated {len(results)} cases")
 
     def evaluate(self, indices : Union[Sequence[int], pandas.DataFrame]=None,
                  scoring_function=None,
@@ -1003,7 +1003,7 @@ class ChemSpace: # RInterface
 
             self.dataframe.loc[i, ["score", "Training"]] = score, True
 
-        print(f"Evaluated {len(results)} cases")
+        logger.info(f"Evaluated {len(results)} cases")
         return self.dataframe.loc[indices]
 
     def add_enamine_molecules(self, results_per_search=100):

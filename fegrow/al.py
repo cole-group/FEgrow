@@ -1,6 +1,7 @@
 import functools
 import time
 from typing import Callable
+import logging
 
 import dask
 import numpy as np
@@ -8,12 +9,15 @@ from sklearn import linear_model, neural_network, ensemble, gaussian_process
 from modAL.acquisition import max_UCB, max_EI, max_PI
 
 
+logger = logging.getLogger(__name__)
+
+
 def _dask_tanimito_similarity(a, b):
     """
     Fixme this does not need to use matmul anymore because it's not a single core.
     This can be transitioned to simple row by row dispatching.
     """
-    print(f"About to compute tanimoto for array lengths {len(a)} and {len(b)}")
+    logger.info(f"About to compute tanimoto for array lengths {len(a)} and {len(b)}")
     start = time.time()
     chunk_size = 8_000
     da = dask.array.from_array(a, chunks=chunk_size)
@@ -23,7 +27,7 @@ def _dask_tanimito_similarity(a, b):
     ab = dask.array.matmul(da, db.T)
     td = dask.array.true_divide(ab, aa + bb.T - ab)
     td_computed = td.compute()
-    print(f"Computed tanimoto similarity in {time.time() - start:.2f}s for array lengths {len(a)} and {len(b)}")
+    logger.info(f"Computed tanimoto similarity in {time.time() - start:.2f}s for array lengths {len(a)} and {len(b)}")
     return td_computed
 
 
