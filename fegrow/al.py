@@ -4,7 +4,7 @@ from typing import Callable
 
 import dask
 import numpy as np
-from sklearn import gaussian_process
+from sklearn import linear_model, neural_network, ensemble, gaussian_process
 from modAL.acquisition import max_UCB, max_EI, max_PI
 
 
@@ -82,6 +82,7 @@ class Query:
             return np.argpartition(optimizer.predict(features), n_instances)[:n_instances]
         return functools.partial(greedy, fegrow_label="greedy")
 
+    @staticmethod
     def PI(tradeoff: float = 0) -> Callable:
         """
         Maximum PI query strategy. Selects the instance with highest probability of improvement.
@@ -94,6 +95,7 @@ class Query:
         """
         return functools.partial(max_PI, tradeoff=tradeoff, fegrow_label="PI")
 
+    @staticmethod
     def EI(tradeoff: float = 0) -> Callable:
         """
         Maximum EI query strategy. Selects the instance with highest expected improvement.
@@ -106,8 +108,7 @@ class Query:
         """
         return functools.partial(max_EI, tradeoff=tradeoff, fegrow_label="EI")
 
-
-
+    @staticmethod
     def UCB(beta: float = 1) -> Callable:
         """
             Maximum UCB query strategy. Selects the instance with highest upper confidence bound.
@@ -124,6 +125,30 @@ class Query:
 class Model:
 
     @staticmethod
-    def get_gaussian_process_estimator(**model_params):
-        estimator = gaussian_process.GaussianProcessRegressor(kernel=TanimotoKernel(), **model_params)
-        return estimator
+    def linear(**model_params):
+        return linear_model.LinearRegression(**model_params)
+
+    @staticmethod
+    def elastic_net(**model_params):
+        return linear_model.ElasticNetCV(**model_params)
+
+    @staticmethod
+    def random_forest(**model_params):
+        return ensemble.RandomForestRegressor(**model_params)
+
+    @staticmethod
+    def gradient_bossting_regressor(**model_params):
+        return ensemble.GradientBoostingRegressor(**model_params)
+
+    @staticmethod
+    def gaussian_process(**model_params):
+        return gaussian_process.GaussianProcessRegressor(kernel=TanimotoKernel(), **model_params)
+    @staticmethod
+    def mlp_regressor(**model_params):
+        return neural_network.MLPRegressor(**model_params)
+
+
+
+
+
+

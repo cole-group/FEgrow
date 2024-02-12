@@ -1147,7 +1147,7 @@ class ChemSpace: # RInterface
         import fegrow.al
 
         if self.model is None:
-            self.model = fegrow.al.Model.get_gaussian_process_estimator()
+            self.model = fegrow.al.Model.gaussian_process()
 
         if self.query is None:
             self.query = fegrow.al.Query.greedy
