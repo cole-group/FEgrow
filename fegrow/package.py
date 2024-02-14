@@ -945,6 +945,9 @@ class ChemSpace: # RInterface
 
         selected_rows = self.dataframe.loc[indices]
 
+        # discard computed rows
+        selected_rows = selected_rows[selected_rows.score.isna()]
+
         if len(self._scaffolds) == 0:
             print("Please add scaffolds to the system for the evaluation. ")
         elif len(self._scaffolds) > 1:
