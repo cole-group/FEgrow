@@ -1167,6 +1167,9 @@ class ChemSpace: # RInterface
         if self.query is None:
             self.query = fegrow.al.Query.UCB(beta=10)
 
+        # add information on how many
+        query = functools.partial(self.query, n_instances=n)
+
         target_multiplier = 1
         if score_higher_better is True:
             target_multiplier = -1
@@ -1183,19 +1186,19 @@ class ChemSpace: # RInterface
                 estimator=self.model,
                 X_training=train_features,
                 y_training=train_targets,
-                query_strategy=self.query)
+                query_strategy=query)
         elif isinstance(self.model, gaussian_process.GaussianProcessRegressor):
             learner = modAL.models.BayesianOptimizer(
                 estimator=self.model,
                 X_training=train_features,
                 y_training=train_targets,
-                query_strategy=self.query)
+                query_strategy=query)
         else:
             learner = modAL.models.ActiveLearner(
                 estimator=self.model,
                 X_training=train_features,
                 y_training=train_targets,
-                query_strategy=self.query)
+                query_strategy=query)
 
         inference = learner.predict(library_features) * target_multiplier
 

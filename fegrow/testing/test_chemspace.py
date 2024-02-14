@@ -240,6 +240,8 @@ def test_al_local(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     for i in range(2):
         picks = chemspace.active_learning(n=5)
         res = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+        assert len(res) == 5
+
         # filter out the penalties
         res = res[res.score != 0]
         print(f"AL cycle cnnaffinity. Mean: {res.score.mean():.2f}, Min: {res.score.min():.2f}, Max: {res.score.max():.2f}")
