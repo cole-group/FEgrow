@@ -76,6 +76,33 @@ def test_pipeline_rgroups(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path)
     assert chemspace.df.iloc[1].score > 2.0
 
 
+def test_access_mol_directly(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.item()
+
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
+    chemspace.add_rgroups([R_group_ethanol])
+
+    mol = chemspace[0]
+    assert chemspace.df.loc[0].Mol == mol
+
+
+def test_toxicity(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
+    chemspace.add_rgroups([RGroups[RGroups.Name == "*CCO"].Mol.item(),
+                           RGroups[RGroups.Name == "*C1CC1"].Mol.item()])
+
+    toxicity = chemspace.toxicity()
+    assert len(toxicity) == 2
+
+
 def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()

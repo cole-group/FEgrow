@@ -1241,6 +1241,22 @@ class ChemSpace: # RInterface
     def __len__(self):
         return len(self._dataframe)
 
+    def __getitem__(self, item):
+        return self.df.loc[item].Mol
+
+    def toxicity(self):
+        # return the toxicity of all of them
+        toxicities = []
+        for i, row in self.df.iterrows():
+            toxicity = row.Mol.toxicity()
+
+            # set the index to map the molecules back to the main dataframe
+            toxicity.index = [i]
+
+            toxicities.append(toxicity)
+
+        return pandas.concat(toxicities)
+
     @property
     def df(self):
         return self._dataframe
