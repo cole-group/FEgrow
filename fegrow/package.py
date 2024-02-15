@@ -1257,6 +1257,23 @@ class ChemSpace: # RInterface
 
         return pandas.concat(toxicities)
 
+    def to_sdf(self, filename):
+        """
+        Write every molecule and all its fields as properties, to an SDF file.
+
+        :return:
+        """
+        with Chem.SDWriter(filename) as SD:
+            for i, row in self.df.iterrows():
+                columns = self.df.columns.to_list()
+                columns.remove("Mol")
+
+                mol = row.Mol
+                for column in columns:
+                    value = getattr(row, column)
+                    mol.SetProp(column, str(value))
+                SD.write(mol)
+
     @property
     def df(self):
         return self._dataframe
