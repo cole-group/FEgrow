@@ -557,7 +557,7 @@ class ChemSpace: # RInterface
 
     def rep2D(self, subImgSize=(400, 400), **kwargs):
         return Draw.MolsToGridImage(
-            [row.Mol.rep2D(rdkit_mol=True, **kwargs) for i, row in self.dataframe.iterrows()], subImgSize=subImgSize
+            [row.Mol.rep2D(rdkit_mol=True, **kwargs) for i, row in self.df.iterrows()], subImgSize=subImgSize
         )
 
     # def __getitem__(self, item):
@@ -581,9 +581,8 @@ class ChemSpace: # RInterface
         if data is None:
             data = ChemSpace.DATAFRAME_DEFAULT_VALUES
 
-        self.dataframe = pandas.DataFrame(data)
+        self.df = pandas.DataFrame(data)
 
-        # PandasTools.ChangeMoleculeRendering(self)
         if ChemSpace._dask_cluster is None:
             logger.info("No Dask cluster configured. Creating a local cluster. ")
             import asyncio
@@ -591,12 +590,15 @@ class ChemSpace: # RInterface
             ChemSpace._dask_cluster = LocalCluster(n_workers=2,
                                                    processes=False, # turn off Nanny to avoid the problem
                                                    # with loading of the main file (ie executing it)
+                                                   dashboard_address=":8989"
                                                    )
             # ChemSpace._dask_cluster = Scheduler()
             # ChemSpace._dask_cluster = LocalCluster(preload_nanny=["print('Hi Nanny')"],
             #                                        preload=["pint"], n_workers=1
             #                                        ) #asynchronous=True)
             ChemSpace._dask_client = Client(ChemSpace._dask_cluster) #ChemSpace._dask_cluster, asynchronous=True)
+
+            print(f"Dask can be watched on {ChemSpace._dask_client.dashboard_link}")
 
             # prepare the functions for dask
             for name, function in \
@@ -657,7 +659,7 @@ class ChemSpace: # RInterface
 
         # create the dask jobs
         jobs = {}
-        for i, row in self.dataframe.iterrows():
+        for i, row in self.df.iterrows():
             jobs[row.Mol] = (
                 ChemSpace._rmol_functions['generate_conformers'](row.Mol, num_conf, minimum_conf_rms, **kwargs))
 
@@ -679,7 +681,7 @@ class ChemSpace: # RInterface
 
         # create the dask jobs
         jobs = {}
-        for i, row in self.dataframe.iterrows():
+        for i, row in self.df.iterrows():
             jobs[row.Mol] = ChemSpace._rmol_functions['remove_clashing_confs'](row.Mol, prot,
                                                                                min_dst_allowed=min_dst_allowed)
 
@@ -703,7 +705,7 @@ class ChemSpace: # RInterface
 
         # create the dask jobs
         jobs = {}
-        for i, row in self.dataframe.iterrows():
+        for i, row in self.df.iterrows():
             if row.Mol.GetNumConformers() == 0:
                 print(f"Warning: mol {i} has no conformers. Ignoring receptor optimisation.")
                 continue
@@ -739,7 +741,7 @@ class ChemSpace: # RInterface
 
     def sort_conformers(self, energy_range=5):
         dfs = []
-        for i, row in self.dataframe.iterrows():
+        for i, row in self.df.iterrows():
             print(f"RMol index {i}")
             dfs.append(row.Mol.sort_conformers(energy_range))
 
@@ -755,7 +757,7 @@ class ChemSpace: # RInterface
 
         # create the dask jobs
         jobs = {}
-        for i, row in self.dataframe.iterrows():
+        for i, row in self.df.iterrows():
             if row.Mol.GetNumConformers() == 0:
                 print(f"Warning: mol {i} has no conformers. Ignoring gnina.")
                 continue
@@ -769,7 +771,7 @@ class ChemSpace: # RInterface
         dfs = []
         for i, result in results.items():
             _, cnnaffinities = result.result()
-            df = RMol._parse_gnina_cnnaffinities(self.dataframe.Mol[i], cnnaffinities, mol_id=i)
+            df = RMol._parse_gnina_cnnaffinities(self.df.Mol[i], cnnaffinities, mol_id=i)
             dfs.append(df)
 
         df = pandas.concat(dfs)
@@ -781,14 +783,14 @@ class ChemSpace: # RInterface
         Remove from this list the molecules that have no conformers
         """
         ids_to_remove = []
-        for i, row in self.dataframe.iterrows():
+        for i, row in self.df.iterrows():
             if row.Mol.GetNumConformers() == 0:
                 print(
                     f"Discarding a molecule (id {i}) due to the lack of conformers. "
                 )
                 ids_to_remove.append(i)
 
-        self.dataframe = self.dataframe[~self.dataframe.index.isin(ids_to_remove)]
+        self.df = self.df[~self.df.index.isin(ids_to_remove)]
         return ids_to_remove
 
     # @property
@@ -845,7 +847,7 @@ class ChemSpace: # RInterface
 
         # update the internal dataframe
         rgroups = pandas.DataFrame({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
-        self.dataframe = pandas.concat([self.dataframe, rgroups])
+        self.df = pandas.concat([self.df, rgroups])
 
     def add_smiles(self, smiles_list, h=pandas.NA):
         """
@@ -860,7 +862,7 @@ class ChemSpace: # RInterface
         mols = [Chem.MolFromSmiles(smiles, params=params) for smiles in smiles_list]
 
         # ensure that the new indices start at the end
-        last_index = max(self.dataframe.index.max(), self.dataframe.index.max() + 1)
+        last_index = max(self.df.index.max(), self.df.index.max() + 1)
         if np.isnan(last_index):
             last_index = 0
 
@@ -868,7 +870,7 @@ class ChemSpace: # RInterface
         data = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
         data.update({"Smiles": smiles_list, "Mol": mols, "h":h})
         more_data = pandas.DataFrame(data, index=range(last_index, last_index + len(mols)))
-        self.dataframe = pandas.concat([self.dataframe, more_data])
+        self.df = pandas.concat([self.df, more_data])
 
     def _evaluate_experimental(self, indices=None, num_conf=10, minimum_conf_rms=0.5, min_dst_allowed=1):
         """
@@ -882,7 +884,7 @@ class ChemSpace: # RInterface
 
         if indices is None:
             # evaluate all molecules
-            rgroups = list(self.dataframe.Mol)
+            rgroups = list(self.df.Mol)
 
         if len(self._scaffolds) == 0:
             print("Please add scaffolds to the system for the evaluation. ")
@@ -905,7 +907,7 @@ class ChemSpace: # RInterface
 
         # create dask jobs
         jobs = {}
-        for i, row in self.dataframe.iterrows():
+        for i, row in self.df.iterrows():
             generated_confs = ChemSpace._rmol_functions['generate_conformers'](row.Mol, num_conf, minimum_conf_rms)
             removed_clashes = ChemSpace._rmol_functions['remove_clashing_confs'](generated_confs, protein,
                                                                                  min_dst_allowed=min_dst_allowed)
@@ -919,14 +921,14 @@ class ChemSpace: # RInterface
             mol, cnnaffinities = result.result()
 
             # extract the conformers
-            input_mol = self.dataframe.Mol[i]
+            input_mol = self.df.Mol[i]
             input_mol.RemoveAllConformers()
             [input_mol.AddConformer(c) for c in mol.GetConformers()]
 
             # save the affinities so that one can retrace which conformer has the best energy
             input_mol.SetProp("cnnaffinities", str(cnnaffinities))
 
-            self.dataframe.score[i] = max(cnnaffinities)
+            self.df.score[i] = max(cnnaffinities)
 
         logger.info(f"Evaluated {len(results)} cases")
 
@@ -943,7 +945,7 @@ class ChemSpace: # RInterface
         if isinstance(indices, pandas.DataFrame):
             indices = indices.index
 
-        selected_rows = self.dataframe.loc[indices]
+        selected_rows = self.df.loc[indices]
 
         # discard computed rows
         selected_rows = selected_rows[selected_rows.score.isna()]
@@ -988,7 +990,7 @@ class ChemSpace: # RInterface
             try:
                 mol, data = result.result()
 
-                original_mol = self.dataframe.Mol[i]
+                original_mol = self.df.Mol[i]
 
                 # copy the conformers
                 if mol is not None:
@@ -1004,10 +1006,10 @@ class ChemSpace: # RInterface
                 # failed to finish the protocol, set the penalty
                 score = 0
 
-            self.dataframe.loc[i, ["score", "Training"]] = score, True
+            self.df.loc[i, ["score", "Training"]] = score, True
 
         logger.info(f"Evaluated {len(results)} cases")
-        return self.dataframe.loc[indices]
+        return self.df.loc[indices]
 
     def add_enamine_molecules(self, results_per_search=100):
         """
@@ -1030,7 +1032,7 @@ class ChemSpace: # RInterface
         scaffold = self._scaffolds[0]
 
         # get the best performing molecules
-        vl = self.dataframe.sort_values(by="score")
+        vl = self.df.sort_values(by="score")
         best_vl_for_searching = vl[:100]
 
         # nothing to search for yet
@@ -1085,7 +1087,7 @@ class ChemSpace: # RInterface
         new_enamines = similar[~similar.id.isin(vl.enamine_id)]
 
         # fixme: automate creating empty dataframes. Allow to configure default values initially.
-        last_index = max(self.dataframe.index.max(), self.dataframe.index.max() + 1)
+        last_index = max(self.df.index.max(), self.df.index.max() + 1)
 
         data = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
         data.update({
@@ -1095,7 +1097,7 @@ class ChemSpace: # RInterface
         new_enamines_df = pandas.DataFrame(data, index=range(last_index, last_index + len(new_enamines)))
 
         print("Adding: ", len(new_enamines_df))
-        self.dataframe = pandas.concat([self.dataframe, new_enamines_df],
+        self.df = pandas.concat([self.df, new_enamines_df],
                                        ignore_index=False)
 
     @property
@@ -1138,8 +1140,8 @@ class ChemSpace: # RInterface
         :return:
         """
 
-        training = self.dataframe[self.dataframe.Training]
-        selection = self.dataframe[~self.dataframe.Training]
+        training = self.df[self.df.Training]
+        selection = self.df[~self.df.Training]
 
         if training.empty:
             if first_random:
@@ -1151,7 +1153,7 @@ class ChemSpace: # RInterface
         # fixme - multitarget?
         train_targets = training["score"].to_numpy(dtype=float)
 
-        library_features = self.compute_fps(tuple(self.dataframe.Smiles))
+        library_features = self.compute_fps(tuple(self.df.Smiles))
         train_features = library_features[training.index]
         selection_features = library_features[selection.index]
 
@@ -1202,7 +1204,7 @@ class ChemSpace: # RInterface
 
         inference = learner.predict(library_features) * target_multiplier
 
-        self.dataframe['regression'] = inference.T.tolist()
+        self.df['regression'] = inference.T.tolist()
 
         selection_idx, _ = learner.query(selection_features)
 
@@ -1225,20 +1227,32 @@ class ChemSpace: # RInterface
         return fps
 
     def __str__(self):
-        return f"Chemical Space with {len(self.dataframe)} smiles and {len(self._scaffolds)} scaffolds. "
+        return f"Chemical Space with {len(self._dataframe)} smiles and {len(self._scaffolds)} scaffolds. "
 
     def __repr__(self):
         return str(self)
 
     def __len__(self):
-        return len(self.dataframe)
+        return len(self._dataframe)
 
     @property
     def df(self):
-        return self.dataframe
+        return self._dataframe
+
+    @df.setter
+    def df(self, df):
+        self._dataframe = df
 
     def add_protein(self, protein_filename):
         self._protein_filename = protein_filename
+
+    def _ipython_display_(self):
+        from IPython.display import display_html
+
+        # exclude the 3D structures
+        df = self.df.loc[:, self.df.columns != 'Mol']
+        Chem.PandasTools.AddMoleculeColumnToFrame(df, smilesCol="Smiles", molCol="2D")
+        return display_html(df)
 
 class RGroups(pandas.DataFrame):
     """

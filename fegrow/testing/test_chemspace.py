@@ -73,7 +73,7 @@ def test_pipeline_rgroups(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path)
 
     chemspace.evaluate([1], skip_optimisation=True)
 
-    assert chemspace.dataframe.iloc[1].score > 2.0
+    assert chemspace.df.iloc[1].score > 2.0
 
 
 def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
@@ -89,7 +89,7 @@ def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.evaluate([1], skip_optimisation=True)
 
-    assert chemspace.dataframe.iloc[1].score > 2.0
+    assert chemspace.df.iloc[1].score > 2.0
 
 
 def test_evaluate_scoring_function_works(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
@@ -115,7 +115,7 @@ def test_evaluate_scoring_function_works(RGroups, sars_scaffold_chunk_sdf, rec_7
 
     chemspace.evaluate([0], scoring_function=scorer, skip_optimisation=True)
 
-    assert chemspace.dataframe.iloc[0].score == random_score
+    assert chemspace.df.iloc[0].score == random_score
 
 
 def test_evaluate_scoring_function_saves_data(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
@@ -142,7 +142,7 @@ def test_evaluate_scoring_function_saves_data(RGroups, sars_scaffold_chunk_sdf, 
 
     chemspace.evaluate([0], scoring_function=scorer, skip_optimisation=True)
 
-    assert chemspace.dataframe.iloc[0].Mol.GetProp("hello_world") == hello_world
+    assert chemspace.df.iloc[0].Mol.GetProp("hello_world") == hello_world
 
 
 def test_evaluate_full_hijack(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
@@ -173,7 +173,7 @@ def test_evaluate_full_hijack(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_p
 
     chemspace.evaluate([0], full_evaluation=full_evaluation)
 
-    assert chemspace.dataframe.iloc[0].score == 5
+    assert chemspace.df.iloc[0].score == 5
 
 
 def test_al(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
@@ -199,7 +199,7 @@ def test_al(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     chemspace.add_protein(rec_7l10_final_path)
 
     # set the results for the studied smiles
-    df = chemspace.dataframe
+    df = chemspace.df
     df.loc[df.index == 0, ['score', 'Training']] = [3.2475, True]
     df.loc[df.index == 1, ['score', 'Training']] = [3.57196, True]
 
@@ -274,12 +274,12 @@ def test_al_full(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     random_pics = chemspace.active_learning(n=3, first_random=True)
     chemspace.evaluate(random_pics, full_evaluation=oracle_look_up)
 
-    assert chemspace.dataframe.score.count() == 3
-    assert all(~chemspace.dataframe.loc[random_pics.index].score.isna())
+    assert chemspace.df.score.count() == 3
+    assert all(~chemspace.df.loc[random_pics.index].score.isna())
 
     # compute all
     chemspace.evaluate(full_evaluation=oracle_look_up)
-    assert chemspace.dataframe[chemspace.dataframe.score.isna()].count() == 0
+    assert chemspace.df.score[chemspace.df.score.isna()].count() == 0
 
 
 def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
