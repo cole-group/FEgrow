@@ -845,12 +845,27 @@ class ChemSpace: # RInterface
         # extract the H indices used for attaching the scaffold
         hs = [mol.GetProp('attachement_point') for mol in built_mols]
 
+        self.add_data({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
+
+    def add_data(self, data):
+        """
+
+        :param data: dictionary {"Smiles": [], "h": [], ... }
+        :return:
+        """
+
+        # ensure that the new indices start at the end
+        last_index = max([self.df.index.max() + 1])
+        if np.isnan(last_index):
+            last_index = 0
+
         # ensure correct default values in the new rows
-        data = self.DATAFRAME_DEFAULT_VALUES.copy()
-        data.update({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
+        data_with_defaults = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
+        data_with_defaults.update(data)
 
         # update the internal dataframe
-        prepared_data = pandas.DataFrame(data)
+        new_indices = range(last_index, last_index + len(data_with_defaults['Smiles']))
+        prepared_data = pandas.DataFrame(data_with_defaults, index=new_indices)
         self.df = pandas.concat([self.df, prepared_data])
 
     def add_smiles(self, smiles_list, h=pandas.NA):
@@ -865,16 +880,7 @@ class ChemSpace: # RInterface
         params.removeHs = False
         mols = [Chem.MolFromSmiles(smiles, params=params) for smiles in smiles_list]
 
-        # ensure that the new indices start at the end
-        last_index = max(self.df.index.max(), self.df.index.max() + 1)
-        if np.isnan(last_index):
-            last_index = 0
-
-        # update the internal dataframe
-        data = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
-        data.update({"Smiles": smiles_list, "Mol": mols, "h":h})
-        more_data = pandas.DataFrame(data, index=range(last_index, last_index + len(mols)))
-        self.df = pandas.concat([self.df, more_data])
+        self.add_data({"Smiles": smiles_list, "Mol": mols, "h":h})
 
     def _evaluate_experimental(self, indices=None, num_conf=10, minimum_conf_rms=0.5, min_dst_allowed=1):
         """
@@ -1090,19 +1096,15 @@ class ChemSpace: # RInterface
         # filter out Enamine molecules which were previously added
         new_enamines = similar[~similar.id.isin(vl.enamine_id)]
 
-        # fixme: automate creating empty dataframes. Allow to configure default values initially.
-        last_index = max(self.df.index.max(), self.df.index.max() + 1)
-
-        data = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
-        data.update({
+        warnings.warn(f"Only one H vector is assumed and used. Picking {vl.h[0]} hydrogen on the scaffold. ")
+        new_data = {
             'Smiles': list(new_enamines.hitSmiles.values),
             'h': vl.h[0], # fixme: for now assume that only one vector is used
-            'enamine_id': list(new_enamines.id.values)})
-        new_enamines_df = pandas.DataFrame(data, index=range(last_index, last_index + len(new_enamines)))
+            'enamine_id': list(new_enamines.id.values)
+        }
 
-        print("Adding: ", len(new_enamines_df))
-        self.df = pandas.concat([self.df, new_enamines_df],
-                                       ignore_index=False)
+        print("Adding: ", len(new_enamines.hitSmiles.values))
+        self.add_data(new_data)
 
     @property
     def model(self):
