@@ -845,9 +845,13 @@ class ChemSpace: # RInterface
         # extract the H indices used for attaching the scaffold
         hs = [mol.GetProp('attachement_point') for mol in built_mols]
 
+        # ensure correct default values in the new rows
+        data = self.DATAFRAME_DEFAULT_VALUES.copy()
+        data.update({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
+
         # update the internal dataframe
-        rgroups = pandas.DataFrame({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
-        self.df = pandas.concat([self.df, rgroups])
+        prepared_data = pandas.DataFrame(data)
+        self.df = pandas.concat([self.df, prepared_data])
 
     def add_smiles(self, smiles_list, h=pandas.NA):
         """
