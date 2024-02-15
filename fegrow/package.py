@@ -577,11 +577,11 @@ class ChemSpace: # RInterface
                                 "enamine_searched": False,
                                 "enamine_id": pandas.NA}
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, data_indices=None):
         if data is None:
             data = ChemSpace.DATAFRAME_DEFAULT_VALUES
 
-        self.df = pandas.DataFrame(data)
+        self.df = pandas.DataFrame(data, index=data_indices)
 
         if ChemSpace._dask_cluster is None:
             logger.info("No Dask cluster configured. Creating a local cluster. ")
@@ -1264,15 +1264,41 @@ class ChemSpace: # RInterface
         :return:
         """
         with Chem.SDWriter(filename) as SD:
+            columns = self.df.columns.to_list()
+            columns.remove("Mol")
+
             for i, row in self.df.iterrows():
-                columns = self.df.columns.to_list()
-                columns.remove("Mol")
 
                 mol = row.Mol
+                mol.SetIntProp("index", i)
                 for column in columns:
                     value = getattr(row, column)
                     mol.SetProp(column, str(value))
+
+                mol.ClearProp("attachement_point")
                 SD.write(mol)
+
+    @staticmethod
+    def from_sdf(filename):
+        items = []
+        keys = {}
+        for mol in Chem.SDMolSupplier(filename):
+            props = mol.GetPropsAsDict()
+            props['Mol'] = mol
+            items.append(props)
+            keys = set(props.keys()).union(keys)
+
+        # convert into {key: list, key: list}
+        data = {key: [] for key in keys}
+        for item in items:
+            for key in keys:
+                data[key].append(item[key])
+
+        indices = data.pop('index')
+
+        defaults = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
+        defaults.update(data)
+        return ChemSpace(data=defaults, data_indices=indices)
 
     @property
     def df(self):
