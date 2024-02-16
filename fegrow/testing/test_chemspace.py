@@ -268,7 +268,7 @@ def test_al(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     assert to_study.iloc[0].Smiles in not_studied_smiles
 
 
-def test_al_local(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+def test_al_local(sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
     Run a small active learning test.
     """
