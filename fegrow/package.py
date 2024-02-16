@@ -401,7 +401,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
             ["./gnina", "--help"], capture_output=True, check=True, cwd=RMol.gnina_dir
         )
 
-    def gnina(self, receptor_file):
+    def gnina(self, receptor_file, gnina_gpu=False):
         """
         Use GNINA to extract CNNaffinity, which we also recalculate to Kd (nM)
 
@@ -426,7 +426,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         if not receptor.exists():
             raise ValueError(f'Your receptor "{receptor_file}" does not seem to exist.')
 
-        _, CNNaffinities = gnina(self, receptor, gnina_path)
+        _, CNNaffinities = gnina(self, receptor, gnina_path, gnina_gpu=gnina_gpu)
 
         return RMol._parse_gnina_cnnaffinities(self, CNNaffinities)
 
@@ -972,6 +972,7 @@ class ChemSpace: # RInterface
     def evaluate(self, indices : Union[Sequence[int], pandas.DataFrame]=None,
                  scoring_function=None,
                  gnina_path=None,
+                 gnina_gpu=False,
                  num_conf=10,
                  minimum_conf_rms=0.5, **kwargs):
 
@@ -1016,6 +1017,7 @@ class ChemSpace: # RInterface
                                                             num_conf=num_conf,
                                                             minimum_conf_rms=minimum_conf_rms,
                                                             scoring_function=scoring_function,
+                                                            gnina_gpu=gnina_gpu,
                                                             **kwargs
                                                             )
 
@@ -1445,7 +1447,12 @@ class Linkers(pandas.DataFrame):
         return list(df["Mol"])
 
 
-def gnina(mol, receptor, gnina_path):
+def gnina(mol, receptor, gnina_path, gnina_gpu=False):
+
+    extras = []
+    if gnina_gpu is False:
+        extras.append("--no_gpu")
+
     # make a temporary sdf file for gnina
     with tempfile.NamedTemporaryFile(mode="w", suffix=".sdf") as TMP_SDF:
         with Chem.SDWriter(TMP_SDF.name) as w:
@@ -1465,7 +1472,8 @@ def gnina(mol, receptor, gnina_path):
                 "0",
                 "--stripH",
                 "False",
-            ],
+            ] + extras
+            ,
             capture_output=True,
             check=True,
         )
@@ -1528,8 +1536,10 @@ def _evaluate_atomic(scaffold,
                      num_conf=50,
                      minimum_conf_rms=0.5,
                      platform="CPU",
+                     gnina_gpu=False,
                      skip_optimisation=False,
-                     full_evaluation=None):
+                     full_evaluation=None
+                     ):
     """
 
     :param scaffold:
@@ -1583,7 +1593,7 @@ def _evaluate_atomic(scaffold,
 
     data = {}
     if scoring_function is None:
-        cnnaffinities = rmol.gnina(receptor_file=pdb_filename)
+        cnnaffinities = rmol.gnina(receptor_file=pdb_filename, gnina_gpu=gnina_gpu)
         data = {"cnnaffinities": [float(affinity) for affinity in cnnaffinities.CNNaffinity]}
         score = data["cnnaffinities"][0]
     else:
