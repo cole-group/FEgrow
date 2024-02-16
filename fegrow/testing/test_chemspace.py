@@ -78,6 +78,22 @@ def test_pipeline_rgroups(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path)
     assert chemspace.df.iloc[1].score > 2.0
 
 
+def test_pipeline_linker_rgroups(RGroups, RLinkers, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    chemspace = ChemSpace()
+
+    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.item()
+    R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.item()
+    linker = RLinkers[RLinkers.Name == "R1NC(R2)=O"].Mol.item()
+
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    chemspace.add_rgroups([R_group_ethanol, R_group_cyclopropane])
+    chemspace.add_link_rgroups(linker, [R_group_ethanol, R_group_cyclopropane])
+
+    df = chemspace.df
+    assert len(df.loc[2].Smiles) > len(df.loc[0].Smiles)
+    assert len(df.loc[3].Smiles) > len(df.loc[1].Smiles)
+
+
 def test_access_mol_directly(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()

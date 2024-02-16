@@ -816,6 +816,33 @@ class ChemSpace: # RInterface
 
         self._scaffolds.append(template)
 
+    def add_link_rgroups(self, linker: rdkit.Chem, rgroups):
+        """
+        Note that if they are Smiles:
+         - if they have an * atom (e.g. RDKit atom.SetAtomicNum(0)), this will be used for attachment to the scaffold
+         - if they don't have an * atom, the scaffold will be fitted as a substructure
+
+        First link the linker to the scaffold. Then add the rgroups.
+
+        :param rgroups: A list of Smiles. Molecules will be accepted and converted to Smiles.
+        :param linker: A molecule. Ideally it has 2 atatchement points.
+        :return:
+        """
+        scaffold = dask.delayed(self._scaffolds[0])
+
+        # create the dask jobs
+        scaffold_linked = ChemSpace._rmol_functions["build_molecule"](scaffold, linker)
+        jobs = [ChemSpace._rmol_functions["build_molecule"](scaffold_linked, rgroup) for rgroup in rgroups]
+        results = self.dask_client.compute(jobs)
+        built_mols = [r.result() for r in results]
+
+        # get Smiles
+        built_mols_smiles = [Chem.MolToSmiles(mol) for mol in built_mols]
+
+        # extract the H indices used for attaching the scaffold
+        hs = [mol.GetProp('attachement_point') for mol in built_mols]
+
+        self.add_data({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
     def add_rgroups(self, rgroups):
         """
         Note that if they are Smiles:
