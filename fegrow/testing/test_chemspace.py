@@ -120,6 +120,7 @@ def test_toxicity(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     toxicity = chemspace.toxicity()
     assert len(toxicity) == 2
 
+
 def test_writing(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
@@ -132,7 +133,7 @@ def test_writing(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     with tempfile.NamedTemporaryFile(suffix=".sdf") as TMP:
         chemspace.to_sdf(TMP.name)
         reimported_cs = ChemSpace.from_sdf(TMP.name)
-        assert chemspace.df.Smiles == reimported_cs.df.Smiles
+        assert (chemspace.df.Smiles == reimported_cs.df.Smiles).all()
 
 
 def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
