@@ -1039,6 +1039,9 @@ class ChemSpace: # RInterface
                     original_mol.SetProp(k, str(v))
                 # extract the score
                 score = data["score"]
+            except subprocess.CalledProcessError as E:
+                logger.error("Failed Process", E, E.cmd, E.output, E.stdout, E.stderr)
+                score = 0
             except Exception as E:
                 # failed to finish the protocol, set the penalty
                 score = 0
