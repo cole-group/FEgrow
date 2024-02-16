@@ -9,7 +9,7 @@ dependencies:
   - conda-forge::pip
   - conda-forge::rdkit
   - conda-forge::prody
-  - conda-forge::openff-toolkit>=0.11
+  - conda-forge::openff-toolkit>=0.13
   - conda-forge::parmed
   - conda-forge::openmm>=7.5.0
   - conda-forge::openmm-ml
