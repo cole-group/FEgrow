@@ -64,8 +64,8 @@ def test_pipeline_rgroups(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path)
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
 
-    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.values[0]
+    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.item()
+    R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.item()
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
