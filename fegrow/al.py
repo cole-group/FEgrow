@@ -141,7 +141,7 @@ class Model:
         return ensemble.RandomForestRegressor(**model_params)
 
     @staticmethod
-    def gradient_bossting_regressor(**model_params):
+    def gradient_boosting_regressor(**model_params):
         return ensemble.GradientBoostingRegressor(**model_params)
 
     @staticmethod
