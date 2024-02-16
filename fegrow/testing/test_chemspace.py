@@ -121,7 +121,7 @@ def test_toxicity(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     assert len(toxicity) == 2
 
 
-def test_writing(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+def test_io_write_load(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
 
