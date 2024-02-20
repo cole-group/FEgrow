@@ -99,6 +99,18 @@ def test_extend_mol_with_smiles_early_marking(sars_core_scaffold):
     stitched = fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7)
 
 
+def test_extend_mol_with_smiles_all_marked(sars_core_scaffold):
+    methyl_smiles = "[H]OC([H])([H])[H]"
+    params = Chem.SmilesParserParams()
+    params.removeHs = False
+    methyl = Chem.MolFromSmiles(methyl_smiles, params=params)
+    methyl.GetAtomWithIdx(5).SetAtomicNum(0)
+
+    sars_core_scaffold.GetAtomWithIdx(7).SetAtomicNum(0)
+
+    stitched = fegrow.build_molecule(sars_core_scaffold, methyl)
+
+
 def test_replace_methyl_keep_h(RGroups):
     """
 
