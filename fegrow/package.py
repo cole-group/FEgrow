@@ -1496,13 +1496,14 @@ def build_molecule(
     scaffolds: Chem.Mol,
     r_group: Union[Chem.Mol, str],
     attachment_point: Optional[int] = None,
+    rgroup_attachment_point: Optional[int] = None,
     keep_component: Optional[int] = None,
 ):
     """
 
     :param scaffolds:
     :param r_groups:
-    :param attachment_point:
+    :param attachment_point: attachement point on the scaffold
     :param keep_component: When the scaffold is grown from an internal atom that divides the molecules into separate
         submolecules, keep the submolecule with this atom index.
     :return:
@@ -1521,9 +1522,15 @@ def build_molecule(
 
     # convert smiles into a molecule
     if isinstance(r_group, str):
+        if '*' not in r_group and rgroup_attachment_point is None:
+            raise ValueError("The SMILES used for the R-Group has to have ")
         params = Chem.SmilesParserParams()
         params.removeHs = False
         r_group = Chem.MolFromSmiles(r_group, params=params)
+
+        # set the attachement point on the R-group
+        if rgroup_attachment_point is not None:
+            r_group.GetAtomWithIdx(rgroup_attachment_point).SetAtomicNum(0)
 
     built_mols = build_molecules_with_rdkit(
         scaffolds, r_group, attachment_point, keep_component
