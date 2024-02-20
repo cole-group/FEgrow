@@ -54,7 +54,7 @@ def test_growing_keep_cue_component(RGroups):
     keep_smaller_ring = 3
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
     rmol = fegrow.build_molecule(
-        scaffold, ethanol_rgroup, attachment_index, keep_smaller_ring
+        scaffold, ethanol_rgroup, attachment_index, keep=keep_smaller_ring
     )
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "OCCc1cccc(Cl)c1"
@@ -79,7 +79,27 @@ def test_replace_methyl(RGroups, sars_core_scaffold):
     assert Chem.MolToSmiles(rmol) == "[H]OC([H])([H])C([H])([H])C(=O)N([H])c1nc([H])c([H])c([H])c1[H]"
 
 
-def test_replace_methyl_keep_h(RGroups, sars_core_scaffold):
+def test_extend_mol_with_smiles_marked(sars_core_scaffold):
+    methyl = "*OC([H])([H])[H]"
+    stitched = fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7)
+
+
+def test_extend_mol_with_smiles_explicit(sars_core_scaffold):
+    methyl = "[H]OC([H])([H])[H]"
+    stitched = fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7, rgroup_point=5)
+
+
+def test_extend_mol_with_smiles_early_marking(sars_core_scaffold):
+    methyl_smiles = "[H]OC([H])([H])[H]"
+    params = Chem.SmilesParserParams()
+    params.removeHs = False
+    methyl = Chem.MolFromSmiles(methyl_smiles, params=params)
+    methyl.GetAtomWithIdx(5).SetAtomicNum(0)
+
+    stitched = fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7)
+
+
+def test_replace_methyl_keep_h(RGroups):
     """
 
     """
@@ -94,7 +114,7 @@ def test_replace_methyl_keep_h(RGroups, sars_core_scaffold):
     attachment_index = 8
     keep_only_h = 10
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmol = fegrow.build_molecule(scaffold, ethanol_rgroup, attachment_index, keep_only_h)
+    rmol = fegrow.build_molecule(scaffold, ethanol_rgroup, attachment_index, keep=keep_only_h)
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "CCO"
 
