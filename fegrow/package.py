@@ -809,7 +809,8 @@ class ChemSpace: # RInterface
         # check if any atom is marked for joining
         if atom_replacement_index is None:
             if not any(atom.GetAtomicNum() == 0 for atom in template.GetAtoms()):
-                raise ValueError("The template ")
+                raise ValueError("The template does not have an attachement (Atoms with index 0, "
+                                 "or in case of Smiles the * character. )")
         else:
             # mark the right atom for replacement by assigning it atomic number == 0
             template.GetAtomWithIdx(atom_replacement_index).SetAtomicNum(0)
@@ -1486,10 +1487,14 @@ def gnina(mol, receptor, gnina_path, gnina_gpu=False):
 
     return mol, CNNaffinities
 
+def build_molecules(*args, **kwargs):
+    raise NotImplementedError("This function was removed. "
+                              "Please use the new simple \"build_molecule\" instead, "
+                              "which now does not work with lists. ")
 
 def build_molecule(
     scaffolds: Chem.Mol,
-    r_group: Chem.Mol,
+    r_group: Union[Chem.Mol, str],
     attachment_point: Optional[int] = None,
     keep_component: Optional[int] = None,
 ):
@@ -1506,10 +1511,19 @@ def build_molecule(
     if isinstance(r_group, list) and len(r_group) == 0:
         raise ValueError("Empty list received. Please pass any R-groups or R-linkers. ")
 
+    if isinstance(attachment_point, list) or isinstance(scaffolds, list):
+        raise ValueError("Only one scaffold and rgroup at at time is permitted. ")
+
     # scaffolds were created earlier, they are most likely templates combined with linkers,
     if isinstance(scaffolds, ChemSpace):
         # fixme - these should become "the cores", it's simple with one mol, and tricky with more of them,
         scaffolds = [mol for idx, mol in scaffolds.dataframe.Mol.items()]
+
+    # convert smiles into a molecule
+    if isinstance(r_group, str):
+        params = Chem.SmilesParserParams()
+        params.removeHs = False
+        r_group = Chem.MolFromSmiles(r_group, params=params)
 
     built_mols = build_molecules_with_rdkit(
         scaffolds, r_group, attachment_point, keep_component
