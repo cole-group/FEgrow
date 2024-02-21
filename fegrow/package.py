@@ -1588,7 +1588,8 @@ def build_molecule(
     # convert smiles into a molecule
     if isinstance(r_group, str):
         if '*' not in r_group and rgroup_point is None:
-            raise ValueError("The SMILES used for the R-Group has to have ")
+            raise ValueError("The SMILES used for the R-Group has to have an R-group atom. "
+                             "That is the character * in Smiles, or you can use the RDKit function .SetAtomicNum(0) ")
         params = Chem.SmilesParserParams()
         params.removeHs = False
         r_group = Chem.MolFromSmiles(r_group, params=params)
