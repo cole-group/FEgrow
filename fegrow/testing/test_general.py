@@ -157,6 +157,17 @@ def test_added_ethanol_conformer_generation(RGroups, sars_scaffold_sdf):
     assert rmol.GetNumConformers() > 2
 
 
+def test_add_smiles_linker(sars_scaffold_chunk_sdf):
+    """
+    :return:
+    """
+    # Check if conformers are generated correctly.
+    attachment_index = 7
+
+    linker_rccr = Chem.AddHs(Chem.MolFromSmiles('*CC*'))
+    scaffold_with_linker = fegrow.build_molecule(sars_scaffold_chunk_sdf, linker_rccr, attachment_index)
+
+
 def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
     """
     1. load the core

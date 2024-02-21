@@ -1,6 +1,7 @@
 import copy
 import itertools
 import logging
+import warnings
 from typing import List, Optional, Union
 
 import networkx
@@ -198,19 +199,31 @@ def get_attachment_vector(R_group):
     """
 
     # find the R groups in the molecule
-    ratoms = [atom for atom in R_group.GetAtoms() if atom.GetAtomicNum() == 0]
-    if not len(ratoms):
+    r_atoms = [atom for atom in R_group.GetAtoms() if atom.GetAtomicNum() == 0]
+    if not len(r_atoms):
         raise Exception(
             "The R-group does not have R-atoms (Atoms with index == 0, visualised with a '*' character)"
         )
 
     # if it is a linker, it will have more than 1 R group, pick the one with index 1
-    if len(ratoms) == 1:
-        atom = ratoms[0]
+    if len(r_atoms) == 1:
+        atom = r_atoms[0]
     elif is_linker(R_group):
-        # find the attachable point
-        ratoms = [atom for atom in ratoms if atom.GetAtomMapNum() == 1]
-        atom = ratoms[0]
+        """
+        find the attachable points. 
+        We use the first attachment to be .GetAtomMapNum() == 1
+        and second to be .GetAtomMapNum() == 2,
+        or whichever is smaller. 
+        """
+        map_nums = {atom.GetAtomMapNum() for atom in r_atoms}
+        if len(map_nums) == 1:
+            warnings.warn("The linker has two conneting ends specified (* atom). However,"
+                          "they're not given priorities. Choosing a random one.  ")
+        smallest_map_num = min(map_nums)
+        for r_atom in r_atoms:
+            if r_atom.GetAtomMapNum() == smallest_map_num:
+                atom = r_atom
+                break
     else:
         raise Exception(
             "Either missing R-atoms, or more than two R-atoms. "
@@ -232,6 +245,9 @@ def is_linker(rmol):
     """
     Check if the molecule is a linker by checking if it has 2 R-group points
     """
+    if [a.GetAtomicNum() for a in rmol.GetAtoms()].count(0) == 2:
+        return True
+
     if len([atom for atom in rmol.GetAtoms() if atom.GetAtomMapNum() in (1, 2)]) == 2:
         return True
 
