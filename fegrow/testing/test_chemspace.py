@@ -307,6 +307,23 @@ def test_al_local(sars_scaffold_chunk_sdf, rec_7l10_final_path):
         print(f"AL cycle cnnaffinity. Mean: {res.score.mean():.2f}, Min: {res.score.min():.2f}, Max: {res.score.max():.2f}")
 
 
+def test_umap(sars_scaffold_chunk_sdf):
+    """
+    Make a map of chemistry
+    """
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    scaffold = Chem.SDMolSupplier(str(root / "data/5R83_core.sdf"), removeHs=False)[0]
+    chemspace.add_scaffold(scaffold, 6)
+
+    oracle = pandas.read_csv(root / "data/cs50k_scored49578_unique47710.csv.zip")
+    smiles_list = oracle.Smiles.to_list()[:20]
+    chemspace.add_smiles(smiles_list, h=6)
+
+    chemspace.umap()
+
+
 def test_al_full(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
     Run a small active learning test.

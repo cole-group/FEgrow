@@ -1054,6 +1054,69 @@ class ChemSpace: # RInterface
         logger.info(f"Evaluated {len(results)} cases")
         return self.df.loc[indices]
 
+    def umap(self, filename="umap_out.html"):
+        print("Please cite UMAP (umap-learn pacakge) if you're using it: https://arxiv.org/abs/1802.03426 , "
+              "https://umap-learn.readthedocs.io/en/latest/index.html")
+
+        from umap import UMAP
+        fps = self.compute_fps(tuple(self.df.Smiles))
+        # convert to a list of 1D arrays
+        fps = [fp.flatten() for fp in np.split(fps, len(fps))]
+        def tanimoto_dist(a, b):
+            dotprod = np.dot(a, b)
+            tc = dotprod / (np.sum(a) + np.sum(b) - dotprod)
+            return 1.0 - tc
+
+        reducer = UMAP(metric=tanimoto_dist)
+        res = reducer.fit_transform(fps)
+
+        df = self.df.copy()
+        df["x"] = res[:, 0]
+        df["y"] = res[:, 1]
+
+        # Bokeh visualization
+        # remove columns that bokeh cannot work with (and which are not needed)
+        # df = df.drop(columns=["ROMol", "fp"])
+
+        # Tooltip for hover functionality
+        TOOLTIP = """
+            <div>
+                @svg{safe}
+                sf1 Value: @sf1_values<br>
+                cycle: @cycle <br>
+                cnnaff: @cnnaffinity <br>
+                plip: @plip <br>
+                enamine id: @enamine_id <br>
+                al exp: @run <br>
+            </div>
+            """
+
+        # make the circles smaller for the noise (==0) in the cluster
+        # df["sizes"] = [2 if c == 0 else 10 for c in picked_df.cluster]
+
+        from bokeh.plotting import figure, output_file, show
+        fig = figure(width=1000, height=500, # tooltips=TOOLTIP
+                   title="UMAP Projection of Molecular Fingerprints")
+
+        # colors = df["cluster"].astype('float').values
+        from bokeh import palettes
+        from bokeh.transform import linear_cmap
+        # mapper = linear_cmap(field_name='cluster', palette=palettes.Turbo256, low=0, high=20)
+
+        fig.circle('x', 'y', source=df, alpha=0.9)
+
+        # Create a color bar based on sf1 values
+        # color_mapper = LinearColorMapper(palette=Viridis256, low=min(colors), high=max(colors))
+        # color_bar = ColorBar(color_mapper=color_mapper, label_standoff=12, location=(0,0), title='sf1 Value')
+
+        # Add the color bar to the plot
+        # p.add_layout(color_bar, 'right')
+        output_file(filename=filename)
+        show(fig)
+        # import matplotlib.pyplot as plt
+        # plt.show()
+
+
     def add_enamine_molecules(self, results_per_search=100):
         """
         For the best scoring molecules, find similar molecules in Enamine REAL database
