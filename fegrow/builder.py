@@ -221,7 +221,8 @@ def get_attachment_vector(R_group):
     neighbours = atom.GetNeighbors()
     if len(neighbours) > 1:
         raise NotImplementedError(
-            "The linking R atom in the R group has two or more attachment points. "
+            "The linking R atom (*) has two or more attachment points (meaning bonds). "
+            "Please make sure that only one bond is present for the linking 'atom'. "
         )
 
     return atom, neighbours[0]
