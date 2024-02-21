@@ -152,6 +152,23 @@ def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     assert chemspace.df.iloc[1].score > 2.0
 
 
+def test_pipeline_smiles_noh(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+    # check if two molecules were built with chemspace
+    chemspace = ChemSpace()
+
+    bare_scaffold_noh = Chem.RemoveHs(sars_scaffold_chunk_sdf)
+    chemspace.add_scaffold(bare_scaffold_noh)
+    # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
+    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]',
+                          '[H]c1nc([H])c(C2([H])C([H])([H])C2([H])[H])c([H])c1[H]'])
+
+    chemspace.add_protein(rec_7l10_final_path)
+
+    chemspace.evaluate([1], skip_optimisation=True)
+
+    assert chemspace.df.iloc[1].score > 2.0
+
+
 def test_evaluate_scoring_function_works(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
     Ensure that the passed functional form is used.

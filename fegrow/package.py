@@ -809,7 +809,7 @@ class ChemSpace: # RInterface
         # check if any atom is marked for joining
         if atom_replacement_index is None:
             if not any(atom.GetAtomicNum() == 0 for atom in template.GetAtoms()):
-                raise ValueError("The template does not have an attachement (Atoms with index 0, "
+                warnings.warn("The template does not have an attachement (Atoms with index 0, "
                                  "or in case of Smiles the * character. )")
         else:
             # mark the right atom for replacement by assigning it atomic number == 0
@@ -970,7 +970,8 @@ class ChemSpace: # RInterface
 
         logger.info(f"Evaluated {len(results)} cases")
 
-    def evaluate(self, indices : Union[Sequence[int], pandas.DataFrame]=None,
+    def evaluate(self,
+                 indices : Union[Sequence[int], pandas.DataFrame]=None,
                  scoring_function=None,
                  gnina_path=None,
                  gnina_gpu=False,
@@ -1009,12 +1010,19 @@ class ChemSpace: # RInterface
 
         scaffold = dask.delayed(self._scaffolds[0])
         # extract which hydrogen was used for the attachement
-        h_attachement_index = [a.GetIdx() for a in self._scaffolds[0].GetAtoms() if a.GetAtomicNum() == 0][0]
+        h_attachements = [a.GetIdx() for a in self._scaffolds[0].GetAtoms() if a.GetAtomicNum() == 0]
+
+        h_attachement_index = None
+        if len(h_attachements) > 0:
+            h_attachement_index = h_attachements[0]
 
         # create dask jobs
         jobs = {}
         for i, row in selected_rows.iterrows():
-            jobs[i] = ChemSpace._rmol_functions['evaluate'](scaffold, h_attachement_index, row.Smiles, protein_file,
+            jobs[i] = ChemSpace._rmol_functions['evaluate'](scaffold,
+                                                            row.Smiles,
+                                                            protein_file,
+                                                            h=h_attachement_index,
                                                             num_conf=num_conf,
                                                             minimum_conf_rms=minimum_conf_rms,
                                                             scoring_function=scoring_function,
@@ -1616,9 +1624,9 @@ def build_molecule(
 
 
 def _evaluate_atomic(scaffold,
-                     h,
                      smiles,
                      pdb_filename,
+                     h=None,
                      scoring_function=None,
                      num_conf=50,
                      minimum_conf_rms=0.5,
@@ -1654,10 +1662,13 @@ def _evaluate_atomic(scaffold,
     rmol = RMol(Chem.MolFromSmiles(smiles, params=params))
 
     # remove the h
-    scaffold = copy.deepcopy(scaffold)
-    scaffold_m = Chem.EditableMol(scaffold)
-    scaffold_m.RemoveAtom(int(h))
-    scaffold = scaffold_m.GetMol()
+    # this is to help the rdkit's HasSubstructMatch
+    if h is not None:
+        scaffold = copy.deepcopy(scaffold)
+        scaffold_m = Chem.EditableMol(scaffold)
+        scaffold_m.RemoveAtom(int(h))
+        scaffold = scaffold_m.GetMol()
+
     rmol._save_template(scaffold)
 
     rmol.generate_conformers(num_conf=num_conf, minimum_conf_rms=minimum_conf_rms)
