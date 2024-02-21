@@ -1205,10 +1205,12 @@ class ChemSpace: # RInterface
 
         if query is not None:
             self.query = query
-        if self.query is None:
-            self.query = fegrow.al.Query.UCB(beta=10)
 
-        # add information on how many
+        # employ Greedy query by default
+        if self.query is None:
+            self.query = fegrow.al.Query.Greedy()
+
+        # update on how many to querry
         query = functools.partial(self.query, n_instances=n)
 
         target_multiplier = 1

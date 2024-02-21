@@ -382,7 +382,7 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     # use every querrying strategy
-    chemspace.query = Query.greedy()
+    chemspace.query = Query.Greedy()
     picks = chemspace.active_learning(n=5)
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
@@ -395,7 +395,7 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.model = Model.linear()
-    chemspace.query = Query.greedy()
+    chemspace.query = Query.Greedy()
     picks = chemspace.active_learning(n=5)
     evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 

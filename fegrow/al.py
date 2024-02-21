@@ -63,7 +63,7 @@ class TanimotoKernel(gaussian_process.kernels.NormalizedKernelMixin,
 
 class Query:
     @staticmethod
-    def greedy() -> Callable:
+    def Greedy() -> Callable:
         """Takes the best instances by inference value sorted in ascending order.
 
         Returns:
