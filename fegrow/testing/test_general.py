@@ -29,7 +29,6 @@ def test_growing_keep_larger_component(RGroups):
     the largest component becomes the scaffold.
     """
     scaffold = Chem.MolFromSmiles("O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1")
-    Chem.AllChem.Compute2DCoords(scaffold)
 
     # use C on the chlorinated benzene
     attachment_index = 3
@@ -37,6 +36,21 @@ def test_growing_keep_larger_component(RGroups):
     rmol = fegrow.build_molecule(scaffold, ethanol_rgroup, attachment_index)
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "O=c1c(CCO)cccn1-c1cccnc1"
+
+
+def test_growing_keep_larger_component_implicit_index(RGroups):
+    """
+    When a growing vector is an internal atom that divides the molecule,
+    the largest component becomes the scaffold.
+    """
+    scaffold = Chem.MolFromSmiles("O=c1c(-c2cccc(Cl)c2)cccn1-c1cccnc1")
+    # use C on the chlorinated benzene
+    scaffold.GetAtomWithIdx(3).SetAtomicNum(0)
+
+    methanol = Chem.MolFromSmiles('*CO')
+    rmol = fegrow.build_molecule(scaffold, methanol)
+
+    assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "O=c1c(CO)cccn1-c1cccnc1"
 
 
 def test_growing_keep_cue_component(RGroups):

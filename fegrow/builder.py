@@ -16,7 +16,7 @@ def build_molecules_with_rdkit(
     scaffold: Chem.Mol,
     r_group: Chem.Mol,
     attachment_point: Optional[int] = None,
-    keep_components: Optional[int] = None,
+    keep_components: int = None,
 ):
     """
     For the given core molecule and list of attachment points
@@ -29,10 +29,6 @@ def build_molecules_with_rdkit(
     :param attachment_point: The list of atom index in the core ligand
       that the r groups should be attached to. If it is empty, connecting points are sought out and matched.
     """
-
-    if keep_components is None:
-        keep_components = []
-
     # make a deep copy of r_groups/linkers to ensure we don't modify the library
     scaffold = copy.deepcopy(scaffold)
     r_group = copy.deepcopy(r_group)
@@ -41,7 +37,8 @@ def build_molecules_with_rdkit(
     if not attachment_point:
         # attempt to generate the attachment points by picking the joining molecule
         # case: a list of templates previously joined with linkers requires iterating over them
-        attachment_point = get_attachment_vector(scaffold)[0].GetIdx()
+        atom, neighbours = get_attachment_atom(scaffold)
+        attachment_point = atom.GetIdx()
 
     if not attachment_point:
         raise Exception("Could not find attachement points. Either the atom index has to be specified,"
@@ -125,7 +122,7 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
 
     # the linking R atom on the R group
     # fixme: attempt to do the same on the template if replace index is not provided
-    rgroup_R_atom, R_atom_neighbour = get_attachment_vector(RGroup)
+    rgroup_R_atom, R_atom_neighbours = get_attachment_atom(RGroup)
 
     # atom to be replaced in the scaffold
     atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
@@ -147,7 +144,7 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
             RGroup,
             scaffold,
             atomMap=(
-                (R_atom_neighbour.GetIdx(), atom_to_replace.GetIdx()),
+                (R_atom_neighbours[0].GetIdx(), atom_to_replace.GetIdx()),
                 (rgroup_R_atom.GetIdx(), hook.GetIdx()),
             ),
         )
@@ -160,7 +157,7 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
     bond_order = rgroup_R_atom.GetBonds()[0].GetBondType()
     emol.AddBond(
         hook.GetIdx(),
-        R_atom_neighbour.GetIdx() + scaffold.GetNumAtoms(),
+        R_atom_neighbours[0].GetIdx() + scaffold.GetNumAtoms(),
         order=bond_order,
     )
     # -1 accounts for the removed linking atom on the template
@@ -191,12 +188,12 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
     return merged, scaffold_no_attachement
 
 
-def get_attachment_vector(R_group):
+def get_attachment_atom(R_group):
     """In the R-group or a linker, search for the position of the attachment point (R atom)
     and extract the atom (currently only single bond supported). In case of the linker,
     the R1 atom is selected.
     rgroup: fragment passed as rdkit molecule
-    return: tuple (ratom, ratom_neighbour)
+    return: tuple (ratom, ratom_neighbour), where the ratom_neighbour is the surviving atom
     """
 
     # find the R groups in the molecule
@@ -234,12 +231,12 @@ def get_attachment_vector(R_group):
 
     neighbours = atom.GetNeighbors()
     if len(neighbours) > 1:
-        raise NotImplementedError(
-            "The linking R atom (*) has two or more attachment points (meaning bonds). "
-            "Please make sure that only one bond is present for the linking 'atom'. "
+        warnings.warn(
+            "The linking R atom (*) has two or more attachment points (bonds). "
+            "The molecule might be modified. "
         )
 
-    return atom, neighbours[0]
+    return atom, neighbours
 
 
 def is_linker(rmol):
