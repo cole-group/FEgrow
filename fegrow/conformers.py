@@ -34,15 +34,22 @@ def conformer_exists(
 def generate_conformers(
     rmol: Chem.rdchem.Mol,
     num_conf: int,
-    minimum_conf_rms: float = 0.5,
-    flexible: Optional[List[int]] = [],
-    use_ties_mcs: bool = False,
+    minimum_conf_rms:float=0.5,
+    flexible:Optional[List[int]]=[],
+    scaffold_heavy_atoms=True,
+    use_ties_mcs:bool=False,
 ) -> List[Chem.rdchem.Mol]:
     """
     flexible:
             The list of atomic indices on the @core_ligand that should not be constrained during the conformer generation
+    :param scaffold_heavy_atoms: use only the heavy atoms in the scaffold
+        and in the molecule to generate the match.
     """
     scaffold_mol = deepcopy(rmol.template)
+
+    if scaffold_heavy_atoms:
+        scaffold_mol = Chem.RemoveHs(scaffold_mol)
+
     scaffold_conformer = scaffold_mol.GetConformer(0)
 
     # fixme - check if the conformer has H, it helps with conformer generation
