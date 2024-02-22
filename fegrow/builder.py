@@ -141,15 +141,16 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
         logger.warning("The R-Group lacks initial coordinates. Defaulting to Chem.rdDistGeom.EmbedMolecule.")
         Chem.rdDistGeom.EmbedMolecule(RGroup)
 
-    # align the Rgroup
-    AlignMol(
-        RGroup,
-        scaffold,
-        atomMap=(
-            (R_atom_neighbour.GetIdx(), atom_to_replace.GetIdx()),
-            (rgroup_R_atom.GetIdx(), hook.GetIdx()),
-        ),
-    )
+    # align the R-group only if there are any conformers to work with
+    if scaffold.GetNumConformers() > 0:
+        AlignMol(
+            RGroup,
+            scaffold,
+            atomMap=(
+                (R_atom_neighbour.GetIdx(), atom_to_replace.GetIdx()),
+                (rgroup_R_atom.GetIdx(), hook.GetIdx()),
+            ),
+        )
 
     # merge
     combined = Chem.CombineMols(scaffold, RGroup)
