@@ -182,6 +182,18 @@ def test_add_smiles_linker(sars_scaffold_chunk_sdf):
     scaffold_with_linker = fegrow.build_molecule(sars_scaffold_chunk_sdf, linker_rccr, attachment_index)
 
 
+def test_add_linker_rgroup_first():
+    """
+    :return:
+    """
+    # we can also link the linker and the R-group first
+    # before merging them into the main structure
+    linker_rccr = Chem.MolFromSmiles('*CC*')
+    methyl = Chem.MolFromSmiles('CO*')
+    prep = fegrow.build_molecule(linker_rccr, methyl)
+    assert Chem.MolToSmiles(prep) == '*CCOC'
+
+
 def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
     """
     1. load the core

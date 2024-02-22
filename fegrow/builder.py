@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def build_molecules_with_rdkit(
     scaffold: Chem.Mol,
     r_group: Chem.Mol,
-    attachment_point: Optional[int] = None,
+    attachment_point: int = None,
     keep_components: int = None,
 ):
     """
@@ -34,13 +34,13 @@ def build_molecules_with_rdkit(
     r_group = copy.deepcopy(r_group)
 
     # get attachment points for each template
-    if not attachment_point:
+    if attachment_point is None:
         # attempt to generate the attachment points by picking the joining molecule
         # case: a list of templates previously joined with linkers requires iterating over them
         atom, neighbours = get_attachment_atom(scaffold)
         attachment_point = atom.GetIdx()
 
-    if not attachment_point:
+    if attachment_point is None:
         raise Exception("Could not find attachement points. Either the atom index has to be specified,"
                         "or an atom needs to be marked rdkit.atom.SetAtomicNum(0). ")
 
