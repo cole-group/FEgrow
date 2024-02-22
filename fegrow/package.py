@@ -225,7 +225,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
 
         return df
 
-    def rep2D(self, idx=-1, rdkit_mol=False, **kwargs):
+    def rep2D(self, idx=-1, rdkit_mol=False, h=True, **kwargs):
         """
         Use RDKit and get a 2D diagram.
         Uses Compute2DCoords and Draw.MolToImage function
@@ -235,6 +235,10 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         :param **kwargs: are passed further to Draw.MolToImage function.
         """
         numbered = copy.deepcopy(self)
+
+        if not h:
+            numbered = Chem.RemoveHs(numbered)
+
         numbered.RemoveAllConformers()
         if idx:
             for atom in numbered.GetAtoms():
