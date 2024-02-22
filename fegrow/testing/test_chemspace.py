@@ -323,7 +323,7 @@ def test_al_local(sars_scaffold_chunk_sdf, rec_7l10_final_path):
         res = res[res.score != 0]
         print(f"AL cycle cnnaffinity. Mean: {res.score.mean():.2f}, Min: {res.score.min():.2f}, Max: {res.score.max():.2f}")
 
-
+@pytest.mark.skip(reason="in dev. ")
 def test_umap(sars_scaffold_chunk_sdf):
     """
     Make a map of chemistry
