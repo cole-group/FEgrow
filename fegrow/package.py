@@ -831,7 +831,7 @@ class ChemSpace: # RInterface
         built_mols_smiles = [Chem.MolToSmiles(mol) for mol in built_mols]
 
         # extract the H indices used for attaching the scaffold
-        hs = [mol.GetProp('attachement_point') for mol in built_mols]
+        hs = [mol.GetProp('attachment_point') for mol in built_mols]
 
         self.add_data({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
 

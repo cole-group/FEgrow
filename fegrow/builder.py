@@ -55,7 +55,7 @@ def build_molecules_with_rdkit(
         keep_cue_idx=keep_components,
     )
 
-    merged_mol.SetProp("attachement_point", str(attachment_point))
+    merged_mol.SetProp("attachment_point", str(attachment_point))
 
     return merged_mol, scaffold, scaffold_no_attachement
 
