@@ -1364,7 +1364,13 @@ class ChemSpace: # RInterface
         data = {key: [] for key in keys}
         for item in items:
             for key in keys:
-                data[key].append(item[key])
+                if key in item:
+                    data[key].append(item[key])
+                else:
+                    # some values might be missing
+                    # for example, "cnnaffinities" are not saved when an error occurs
+                    # in that case the value will be missing and the pentalty is assigned
+                    data[key].append(pandas.NA)
 
         indices = data.pop('index')
 
