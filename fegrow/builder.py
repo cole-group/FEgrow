@@ -55,7 +55,11 @@ def build_molecules_with_rdkit(
         keep_cue_idx=keep_components,
     )
 
-    merged_mol.SetProp("attachment_point", str(attachment_point))
+    # in case where multiple mergings take place (e.g. two mergings: (scaffold + linker) + rgroups)
+    # in this case, the attachment point from the original scaffold should be carried forward
+    # (as opposed to the attachment point on the linker)
+    if not merged_mol.HasProp('attachment_point'):
+        merged_mol.SetIntProp("attachment_point", attachment_point)
 
     return merged_mol, scaffold, scaffold_no_attachement
 

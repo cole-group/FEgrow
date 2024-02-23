@@ -113,6 +113,25 @@ def test_pipeline_2linkers_2rgroups(sars_scaffold_chunk_sdf):
     assert df.loc[1].Mol.HasSubstructMatch(Chem.MolFromSmiles('OC'))
 
 
+def test_pipeline_1linker_1rgroup_check_h_attachment(sars_scaffold_chunk_sdf):
+    """
+    During multiple mergings, we want to make sure that
+    it is the hydrogen on the scaffold that is returned back to the dataframe
+
+    :param sars_scaffold_chunk_sdf:
+    :return:
+    """
+    chemspace = ChemSpace()
+    hydrogen = 8
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, hydrogen)
+
+    r_methanol = Chem.MolFromSmiles("*CO")
+    linker = Chem.MolFromSmiles("[*:0]NC[*:1]")
+    chemspace.add_rgroups(linker, r_methanol)
+
+    assert chemspace.df.loc[0].h == hydrogen
+
+
 def test_access_mol_directly(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
