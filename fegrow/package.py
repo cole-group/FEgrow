@@ -564,14 +564,7 @@ class ChemSpace: # RInterface
             [row.Mol.rep2D(rdkit_mol=True, **kwargs) for i, row in self.df.iterrows()], subImgSize=subImgSize
         )
 
-    # def __getitem__(self, item):
-    #     """
-    #     Provide list like behaviour that returns the molecule.
-    #     ps. Mol column always has to be present.
-    #     """
-    #     return self.loc[item].Mol
     _dask_cluster = None
-    _rmol_functions = {}
 
     DATAFRAME_DEFAULT_VALUES = {"Smiles": [], # Smiles will always be replaced when inserting new data.
                                 "Mol": pandas.NA,
@@ -603,17 +596,6 @@ class ChemSpace: # RInterface
             ChemSpace._dask_client = Client(ChemSpace._dask_cluster) #ChemSpace._dask_cluster, asynchronous=True)
 
             print(f"Dask can be watched on {ChemSpace._dask_client.dashboard_link}")
-
-            # prepare the functions for dask
-            for name, function in \
-                    [("generate_conformers", generate_conformers),
-                     ("remove_clashing_confs", RMol.remove_clashing_confs),
-                     ("optimise_in_receptor", optimise_in_receptor),
-                     ("gnina", gnina),
-                     ("build_molecule", build_molecule),
-                     ("evaluate", _evaluate_atomic)
-                     ]:
-                ChemSpace._rmol_functions[name] = dask.delayed(function)
 
         # self._dask_client = None
         # self._dask_cluster = None
@@ -662,10 +644,10 @@ class ChemSpace: # RInterface
         minimum_conf_rms = dask.delayed(minimum_conf_rms)
 
         # create the dask jobs
+        delayed_generate_conformers = dask.delayed(generate_conformers)
         jobs = {}
         for i, row in self.df.iterrows():
-            jobs[row.Mol] = (
-                ChemSpace._rmol_functions['generate_conformers'](row.Mol, num_conf, minimum_conf_rms, **kwargs))
+            jobs[row.Mol] = (delayed_generate_conformers(row.Mol, num_conf, minimum_conf_rms, **kwargs))
 
         # dask batch compute
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -684,10 +666,10 @@ class ChemSpace: # RInterface
         min_dst_allowed = dask.delayed(min_dst_allowed)
 
         # create the dask jobs
+        delayed_remove_clashing_confs = dask.delayed(RMol.remove_clashing_confs)
         jobs = {}
         for i, row in self.df.iterrows():
-            jobs[row.Mol] = ChemSpace._rmol_functions['remove_clashing_confs'](row.Mol, prot,
-                                                                               min_dst_allowed=min_dst_allowed)
+            jobs[row.Mol] = delayed_remove_clashing_confs(row.Mol, prot, min_dst_allowed=min_dst_allowed)
 
         # dask batch compute
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -708,13 +690,14 @@ class ChemSpace: # RInterface
         kwargs = {k: dask.delayed(v) for k, v in kwargs.items()}
 
         # create the dask jobs
+        delayed_optimise_in_receptor = dask.delayed(optimise_in_receptor)
         jobs = {}
         for i, row in self.df.iterrows():
             if row.Mol.GetNumConformers() == 0:
                 print(f"Warning: mol {i} has no conformers. Ignoring receptor optimisation.")
                 continue
 
-            jobs[row.Mol] = ChemSpace._rmol_functions['optimise_in_receptor'](row.Mol, *args, **kwargs)
+            jobs[row.Mol] = delayed_optimise_in_receptor(row.Mol, *args, **kwargs)
 
         # dask batch compute
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -730,18 +713,6 @@ class ChemSpace: # RInterface
             mol.SetProp("energies", str(energies))
             dfs.append(pandas.DataFrame({}))
             mol._save_opt_energies(energies)
-
-        # build a dataframe with the molecules
-        # conformer_ids = [c.GetId() for c in self.GetConformers()]
-        # df = pandas.DataFrame(
-        #     {
-        #         "ID": [self.id] * len(energies),
-        #         "Conformer": conformer_ids,
-        #         "Energy": energies,
-        #     }
-        # )
-
-        # return df
 
     def sort_conformers(self, energy_range=5):
         dfs = []
@@ -760,13 +731,14 @@ class ChemSpace: # RInterface
         gnina_path = dask.delayed(os.path.join(RMol.gnina_dir, 'gnina'))
 
         # create the dask jobs
+        delayed_gnina = dask.delayed(gnina)
         jobs = {}
         for i, row in self.df.iterrows():
             if row.Mol.GetNumConformers() == 0:
                 print(f"Warning: mol {i} has no conformers. Ignoring gnina.")
                 continue
 
-            jobs[i] = ChemSpace._rmol_functions['gnina'](row.Mol, receptor_file, gnina_path)
+            jobs[i] = delayed_gnina(row.Mol, receptor_file, gnina_path)
 
         # dask batch compute
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -836,8 +808,9 @@ class ChemSpace: # RInterface
         scaffold = dask.delayed(self._scaffolds[0])
 
         # create the dask jobs
-        scaffold_linked = ChemSpace._rmol_functions["build_molecule"](scaffold, linker)
-        jobs = [ChemSpace._rmol_functions["build_molecule"](scaffold_linked, rgroup) for rgroup in rgroups]
+        delayed_build_molecule = dask.delayed(build_molecule)
+        scaffold_linked = delayed_build_molecule(scaffold, linker)
+        jobs = [delayed_build_molecule(scaffold_linked, rgroup) for rgroup in rgroups]
         results = self.dask_client.compute(jobs)
         built_mols = [r.result() for r in results]
 
@@ -867,7 +840,8 @@ class ChemSpace: # RInterface
         scaffold = dask.delayed(self._scaffolds[0])
 
         # create the dask jobs
-        jobs = [ChemSpace._rmol_functions["build_molecule"](scaffold, rgroup) for rgroup in rgroups]
+        delayed_build_molecules = dask.delayed(build_molecule)
+        jobs = [delayed_build_molecules(scaffold, rgroup) for rgroup in rgroups]
         results = self.dask_client.compute(jobs)
         built_mols = [r.result() for r in results]
 
@@ -947,13 +921,18 @@ class ChemSpace: # RInterface
         RMol._check_download_gnina()
         gnina_path = dask.delayed(os.path.join(RMol.gnina_dir, 'gnina'))
 
+        # functions
+        delayed_generate_conformers = dask.delayed(generate_conformers)
+        delayed_remove_clashing_confs = dask.delayed(RMol.remove_clashing_confs)
+        delayed_gnina = dask.delayed(gnina)
+
         # create dask jobs
         jobs = {}
         for i, row in self.df.iterrows():
-            generated_confs = ChemSpace._rmol_functions['generate_conformers'](row.Mol, num_conf, minimum_conf_rms)
-            removed_clashes = ChemSpace._rmol_functions['remove_clashing_confs'](generated_confs, protein,
+            generated_confs = delayed_generate_conformers(row.Mol, num_conf, minimum_conf_rms)
+            removed_clashes = delayed_remove_clashing_confs(generated_confs, protein,
                                                                                  min_dst_allowed=min_dst_allowed)
-            jobs[i] = ChemSpace._rmol_functions['gnina'](removed_clashes, protein_file, gnina_path)
+            jobs[i] = delayed_gnina(removed_clashes, protein_file, gnina_path)
 
         # run all jobs
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -1021,18 +1000,19 @@ class ChemSpace: # RInterface
             h_attachement_index = h_attachements[0]
 
         # create dask jobs
+        delayed_evaluate = dask.delayed(_evaluate_atomic)
         jobs = {}
         for i, row in selected_rows.iterrows():
-            jobs[i] = ChemSpace._rmol_functions['evaluate'](scaffold,
-                                                            row.Smiles,
-                                                            protein_file,
-                                                            h=h_attachement_index,
-                                                            num_conf=num_conf,
-                                                            minimum_conf_rms=minimum_conf_rms,
-                                                            scoring_function=scoring_function,
-                                                            gnina_gpu=gnina_gpu,
-                                                            **kwargs
-                                                            )
+            jobs[i] = delayed_evaluate(scaffold,
+                                        row.Smiles,
+                                        protein_file,
+                                        h=h_attachement_index,
+                                        num_conf=num_conf,
+                                        minimum_conf_rms=minimum_conf_rms,
+                                        scoring_function=scoring_function,
+                                        gnina_gpu=gnina_gpu,
+                                        **kwargs
+                                        )
 
         # run all
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
