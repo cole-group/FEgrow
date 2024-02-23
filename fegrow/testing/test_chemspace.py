@@ -78,20 +78,39 @@ def test_pipeline_rgroups(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path)
     assert chemspace.df.iloc[1].score > 2.0
 
 
-def test_pipeline_linker_rgroups(RGroups, RLinkers, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+def test_pipeline_1linker_2rgroups():
     chemspace = ChemSpace()
 
-    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.item()
-    R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.item()
-    linker = RLinkers[RLinkers.Name == "R1NC(R2)=O"].Mol.item()
+    r_ethanol = Chem.MolFromSmiles("*CCO")
+    r_cyclopropane =  Chem.MolFromSmiles("*C1CC1")
+    linker = Chem.MolFromSmiles("[*:0]NC[*:1]")
 
-    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
-    chemspace.add_rgroups([R_group_ethanol, R_group_cyclopropane])
-    chemspace.add_link_rgroups(linker, [R_group_ethanol, R_group_cyclopropane])
+    scaffold = Chem.MolFromSmiles("FC*")
+    chemspace.add_scaffold(scaffold)
+
+    chemspace.add_link_rgroups(linker, [r_ethanol, r_cyclopropane])
 
     df = chemspace.df
-    assert len(df.loc[2].Smiles) > len(df.loc[0].Smiles)
-    assert len(df.loc[3].Smiles) > len(df.loc[1].Smiles)
+    assert df.loc[0].Mol.HasSubstructMatch(Chem.MolFromSmiles('NC'))
+    assert df.loc[1].Mol.HasSubstructMatch(Chem.MolFromSmiles('NC'))
+
+
+def test_pipeline_2linkers_2rgroups(sars_scaffold_chunk_sdf):
+    chemspace = ChemSpace()
+
+    r_cyclopropane =  Chem.MolFromSmiles("*C1CC1")
+
+    link_nc = Chem.MolFromSmiles("[*:0]NC[*:1]")
+    link_oc = Chem.MolFromSmiles("[*:0]OC[*:1]")
+
+    scaffold = Chem.MolFromSmiles("FC*")
+    chemspace.add_scaffold(scaffold)
+
+    chemspace.add_link_rgroups([link_nc, link_oc], [r_cyclopropane, r_cyclopropane])
+
+    df = chemspace.df
+    assert df.loc[0].Mol.HasSubstructMatch(Chem.MolFromSmiles('NC'))
+    assert df.loc[1].Mol.HasSubstructMatch(Chem.MolFromSmiles('OC'))
 
 
 def test_access_mol_directly(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):

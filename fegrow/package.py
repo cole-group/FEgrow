@@ -1,8 +1,10 @@
 import abc
 import copy
 import functools
+import itertools
 import logging
 import os
+import typing
 import warnings
 from pathlib import Path
 import re
@@ -793,7 +795,7 @@ class ChemSpace: # RInterface
 
         self._scaffolds.append(template)
 
-    def add_link_rgroups(self, linker: rdkit.Chem, rgroups):
+    def add_link_rgroups(self, linkers, rgroups):
         """
         Note that if they are Smiles:
          - if they have an * atom (e.g. RDKit atom.SetAtomicNum(0)), this will be used for attachment to the scaffold
@@ -807,10 +809,15 @@ class ChemSpace: # RInterface
         """
         scaffold = dask.delayed(self._scaffolds[0])
 
+        if not isinstance(linkers, typing.Iterable):
+            linkers = [linkers]
+
         # create the dask jobs
         delayed_build_molecule = dask.delayed(build_molecule)
-        scaffold_linked = delayed_build_molecule(scaffold, linker)
-        jobs = [delayed_build_molecule(scaffold_linked, rgroup) for rgroup in rgroups]
+        scaffolds_linked = [delayed_build_molecule(scaffold, linker) for linker in linkers]
+        jobs = [delayed_build_molecule(scaffold_linked, rgroup)
+                for rgroup, scaffold_linked in
+                itertools.zip_longest(rgroups, scaffolds_linked, fillvalue=scaffolds_linked[0])]
         results = self.dask_client.compute(jobs)
         built_mols = [r.result() for r in results]
 
