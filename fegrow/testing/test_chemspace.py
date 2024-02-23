@@ -88,7 +88,7 @@ def test_pipeline_1linker_2rgroups():
     scaffold = Chem.MolFromSmiles("FC*")
     chemspace.add_scaffold(scaffold)
 
-    chemspace.add_link_rgroups(linker, [r_ethanol, r_cyclopropane])
+    chemspace.add_rgroups(linker, [r_ethanol, r_cyclopropane])
 
     df = chemspace.df
     assert df.loc[0].Mol.HasSubstructMatch(Chem.MolFromSmiles('NC'))
@@ -106,7 +106,7 @@ def test_pipeline_2linkers_2rgroups(sars_scaffold_chunk_sdf):
     scaffold = Chem.MolFromSmiles("FC*")
     chemspace.add_scaffold(scaffold)
 
-    chemspace.add_link_rgroups([link_nc, link_oc], [r_cyclopropane, r_cyclopropane])
+    chemspace.add_rgroups([link_nc, link_oc], [r_cyclopropane, r_cyclopropane])
 
     df = chemspace.df
     assert df.loc[0].Mol.HasSubstructMatch(Chem.MolFromSmiles('NC'))

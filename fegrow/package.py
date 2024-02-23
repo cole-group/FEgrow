@@ -795,7 +795,7 @@ class ChemSpace: # RInterface
 
         self._scaffolds.append(template)
 
-    def add_link_rgroups(self, linkers, rgroups):
+    def add_rgroups(self, rgroups_linkers, rgroups2=None):
         """
         Note that if they are Smiles:
          - if they have an * atom (e.g. RDKit atom.SetAtomicNum(0)), this will be used for attachment to the scaffold
@@ -803,52 +803,27 @@ class ChemSpace: # RInterface
 
         First link the linker to the scaffold. Then add the rgroups.
 
-        :param rgroups: A list of Smiles. Molecules will be accepted and converted to Smiles.
+        :param rgroups2: A list of Smiles. Molecules will be accepted and converted to Smiles.
         :param linker: A molecule. Ideally it has 2 atatchement points.
         :return:
         """
         scaffold = dask.delayed(self._scaffolds[0])
 
-        if not isinstance(linkers, typing.Iterable):
-            linkers = [linkers]
+        if not isinstance(rgroups_linkers, typing.Iterable):
+            rgroups_linkers = [rgroups_linkers]
+
+        if rgroups2 is not None and not isinstance(rgroups2, typing.Iterable):
+            rgroups2 = [rgroups2]
 
         # create the dask jobs
         delayed_build_molecule = dask.delayed(build_molecule)
-        scaffolds_linked = [delayed_build_molecule(scaffold, linker) for linker in linkers]
-        jobs = [delayed_build_molecule(scaffold_linked, rgroup)
-                for rgroup, scaffold_linked in
-                itertools.zip_longest(rgroups, scaffolds_linked, fillvalue=scaffolds_linked[0])]
-        results = self.dask_client.compute(jobs)
-        built_mols = [r.result() for r in results]
 
-        # get Smiles
-        built_mols_smiles = [Chem.MolToSmiles(mol) for mol in built_mols]
-
-        # extract the H indices used for attaching the scaffold
-        hs = [mol.GetProp('attachement_point') for mol in built_mols]
-
-        self.add_data({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
-    def add_rgroups(self, rgroups):
-        """
-        Note that if they are Smiles:
-         - if they have an * atom (e.g. RDKit atom.SetAtomicNum(0)), this will be used for attachment to the scaffold
-         - if they don't have an * atom, the scaffold will be fitted as a substructure
-
-        # fixme - add support for smiles
-
-        :param rgroups: A list of Smiles. Molecules will be accepted and converted to Smiles.
-        :return:
-        """
-
-        # convert molecules into smiles
-        # if isinstance(smi_list[0], Chem.Mol):
-        #     smi_list = [Chem.MolToSmiles(mol) for mol in smi_list]
-
-        scaffold = dask.delayed(self._scaffolds[0])
-
-        # create the dask jobs
-        delayed_build_molecules = dask.delayed(build_molecule)
-        jobs = [delayed_build_molecules(scaffold, rgroup) for rgroup in rgroups]
+        jobs = [delayed_build_molecule(scaffold, linker) for linker in rgroups_linkers]
+        # if more rgroups were attached
+        if rgroups2 is not None:
+            jobs = [delayed_build_molecule(scaffold_linked, rgroup)
+                    for rgroup, scaffold_linked in
+                    itertools.zip_longest(rgroups2, jobs, fillvalue=jobs[0])]
         results = self.dask_client.compute(jobs)
         built_mols = [r.result() for r in results]
 
