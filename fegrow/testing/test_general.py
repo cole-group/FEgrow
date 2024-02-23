@@ -194,6 +194,32 @@ def test_add_linker_rgroup_first():
     assert Chem.MolToSmiles(prep) == '*CCOC'
 
 
+def test_linker_c_first():
+    """
+    Mark the C as the first connecting point in the linker
+
+    :return:
+    """
+    linker_rccr = Chem.MolFromSmiles('[*:0]CO[*:1]')
+
+    carbon = Chem.MolFromSmiles('C*')
+    cco = fegrow.build_molecule(linker_rccr, carbon)
+    assert Chem.MolToSmiles(cco) == 'CCO[*:1]'
+
+
+def test_linker_o_first():
+    """
+    Mark the O as the first connecting point in the linker
+
+    :return:
+    """
+    linker_rccr = Chem.MolFromSmiles('[*:1]CO[*:0]')
+
+    carbon = Chem.MolFromSmiles('C*')
+    cco = fegrow.build_molecule(linker_rccr, carbon)
+    assert Chem.MolToSmiles(cco) == 'COC[*:1]'
+
+
 def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
     """
     1. load the core
