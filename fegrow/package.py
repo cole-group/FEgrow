@@ -1129,10 +1129,10 @@ class ChemSpace: # RInterface
 
         # filter out previously queried molecules
         new_searches = best_vl_for_searching[best_vl_for_searching.enamine_searched == False]
-        smiles_to_search = list(new_searches.Smiles)[:10]
+        smiles_to_search = list(new_searches.Smiles)
 
         start = time.time()
-        print('Querying Enamine REAL. ')
+        print(f'Querying Enamine REAL. Searching for {len(smiles_to_search)} smiles.')
         try:
             with Enamine() as DB:
                 results: pandas.DataFrame = DB.search_smiles(smiles_to_search, remove_duplicates=True,
@@ -1142,8 +1142,11 @@ class ChemSpace: # RInterface
             return
         print(f"Enamine returned with {len(results)} rows in {time.time() - start:.1f}s.")
 
+        # update the database that this molecule has been searched
+        self.df.loc[new_searches.index, 'enamine_searched'] = True
+
         if len(results) == 0:
-            print("Nothing found?!")
+            print("The server did not return a single Smiles!")
             return
 
         # prepare the scaffold for testing its presence
