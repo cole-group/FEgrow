@@ -857,6 +857,7 @@ class ChemSpace: # RInterface
         new_indices = range(last_index, last_index + len(data_with_defaults['Smiles']))
         prepared_data = pandas.DataFrame(data_with_defaults, index=new_indices)
         self.df = pandas.concat([self.df, prepared_data])
+        return prepared_data
 
     def add_smiles(self, smiles_list, h=pandas.NA):
         """
@@ -1095,7 +1096,7 @@ class ChemSpace: # RInterface
         # plt.show()
 
 
-    def add_enamine_molecules(self, results_per_search=100):
+    def add_enamine_molecules(self, n_best=1, results_per_search=100, remove_scaffold_h=False):
         """
         For the best scoring molecules, find similar molecules in Enamine REAL database
          and add them to the dataset.
@@ -1117,7 +1118,7 @@ class ChemSpace: # RInterface
 
         # get the best performing molecules
         vl = self.df.sort_values(by="score")
-        best_vl_for_searching = vl[:100]
+        best_vl_for_searching = vl[:n_best]
 
         # nothing to search for yet
         if len(best_vl_for_searching[~best_vl_for_searching.score.isna()]) == 0:
@@ -1141,12 +1142,19 @@ class ChemSpace: # RInterface
             return
         print(f"Enamine returned with {len(results)} rows in {time.time() - start:.1f}s.")
 
+        if len(results) == 0:
+            print("Nothing found?!")
+            return
+
         # prepare the scaffold for testing its presence
         # specifically, the hydrogen was replaced and has to be removed
         # for now we assume we only are growing one vector at a time - fixme
-        scaffold_noh = Chem.EditableMol(scaffold)
-        scaffold_noh.RemoveAtom(int(best_vl_for_searching.iloc[0].h))
-        dask_scaffold = dask.delayed(scaffold_noh.GetMol())
+        if remove_scaffold_h:
+            scaffold_noh = Chem.EditableMol(scaffold)
+            scaffold_noh.RemoveAtom(int(best_vl_for_searching.iloc[0].h))
+            scaffold = scaffold_noh.GetMol()
+
+        dask_scaffold = dask.delayed(scaffold)
 
         start = time.time()
         # protonate and check for scaffold
@@ -1178,7 +1186,7 @@ class ChemSpace: # RInterface
         }
 
         print("Adding: ", len(new_enamines.hitSmiles.values))
-        self.add_data(new_data)
+        return self.add_data(new_data)
 
     @property
     def model(self):
