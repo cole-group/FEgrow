@@ -1205,7 +1205,7 @@ class ChemSpace: # RInterface
 
     def active_learning(self,
                         n=1,
-                        first_random=False,
+                        first_random=True,
                         score_higher_better=None,
                         model=None,
                         query=None,
@@ -1225,6 +1225,7 @@ class ChemSpace: # RInterface
 
         if training.empty:
             if first_random:
+                warnings.warn("Selecting ")
                 return selection.sample(n)
             else:
                 raise ValueError("There is no scores for active learning. Please use the \"first_random\" property. ")
