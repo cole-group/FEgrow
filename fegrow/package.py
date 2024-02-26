@@ -16,6 +16,8 @@ import urllib
 import time
 
 import functools
+
+import pandas as pd
 import requests
 import numpy as np
 import mols2grid
@@ -941,7 +943,9 @@ class ChemSpace: # RInterface
                  gnina_path=None,
                  gnina_gpu=False,
                  num_conf=10,
-                 minimum_conf_rms=0.5, **kwargs):
+                 minimum_conf_rms=0.5,
+                 penalty=pd.NA,
+                 **kwargs):
 
         # evaluate all molecules if no indices are picked
         if indices is None:
@@ -1018,10 +1022,10 @@ class ChemSpace: # RInterface
                 score = data["score"]
             except subprocess.CalledProcessError as E:
                 logger.error("Failed Process", E, E.cmd, E.output, E.stdout, E.stderr)
-                score = 0
+                score = penalty
             except Exception as E:
                 # failed to finish the protocol, set the penalty
-                score = 0
+                score = penalty
 
             self.df.loc[i, ["score", "Training"]] = score, True
 
