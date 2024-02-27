@@ -1161,7 +1161,7 @@ class ChemSpace: # RInterface
         smiles_to_search = list(new_searches.Smiles)
 
         start = time.time()
-        print(f'Querying Enamine REAL. Searching for {len(smiles_to_search)} smiles.')
+        print(f'Querying Enamine REAL. Looking up {len(smiles_to_search)} smiles.')
         try:
             with Enamine() as DB:
                 results: pandas.DataFrame = DB.search_smiles(smiles_to_search, remove_duplicates=True,
