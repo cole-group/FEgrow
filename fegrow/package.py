@@ -574,7 +574,8 @@ class ChemSpace: # RInterface
                                 "Mol": pandas.NA,
                                 "score": pandas.NA, # any scoring function, by default cnnaffinity
                                 "h": pandas.NA,
-                                "Training": False,
+                                "Training": False, # will be used for AL
+                                "Success": pandas.NA, # true if built, false if built unsuccessfully
                                 "enamine_searched": False,
                                 "enamine_id": pandas.NA}
 
@@ -1028,6 +1029,7 @@ class ChemSpace: # RInterface
         # gather the results
         for i, result in results.items():
             Training = True
+            build_succeeded = True
 
             try:
                 mol, data = result.result()
@@ -1047,17 +1049,19 @@ class ChemSpace: # RInterface
             except subprocess.CalledProcessError as E:
                 logger.error("Failed Process", E, E.cmd, E.output, E.stdout, E.stderr)
                 score = penalty
+                build_succeeded = False
 
                 if al_ignore_penalty:
                     Training = False
             except Exception as E:
                 # failed to finish the protocol, set the penalty
                 score = penalty
+                build_succeeded = False
 
                 if al_ignore_penalty:
                     Training = False
 
-            self.df.loc[i, ["score", "Training"]] = score, Training
+            self.df.loc[i, ["score", "Training", "Success"]] = score, Training, build_succeeded
 
         logger.info(f"Evaluated {len(results)} cases")
         return self.df.loc[indices]
