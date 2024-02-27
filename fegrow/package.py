@@ -1269,7 +1269,7 @@ class ChemSpace: # RInterface
 
         if training.empty:
             if first_random:
-                warnings.warn("Selecting ")
+                warnings.warn("Selecting randomly the first samples to be studied (no score data yet). ")
                 return selection.sample(n)
             else:
                 raise ValueError("There is no scores for active learning. Please use the \"first_random\" property. ")
