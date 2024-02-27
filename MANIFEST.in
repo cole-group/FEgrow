@@ -4,3 +4,5 @@ include fegrow/data/fpscores.pkl.gz
 include fegrow/version.txt
 include LICENSE.txt
 include fegrow/testing/data/*sdf
+include fegrow/testing/data/cs50k_scored49578_unique47710.csv.zip
+include fegrow/testing/data/5R83_rec.pdb
