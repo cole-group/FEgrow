@@ -859,13 +859,20 @@ class ChemSpace: # RInterface
         self.df = pandas.concat([self.df, prepared_data])
         return prepared_data
 
-    def add_smiles(self, smiles_list, h=pandas.NA):
+    def add_smiles(self, smiles_list, h=pandas.NA, protonate=False):
         """
         Add a list of Smiles into this ChemicalSpace
 
         :param h: which h was used to connect to the
+        :param protonate: use openbabel to protonate each smile
         :return:
         """
+
+        if protonate:
+            delayed_protonations = [DaskTasks.obabel_protonate(smi) for smi in smiles_list]
+            jobs = self.dask_client.compute(delayed_protonations)
+            smiles_list = [job.result() for job in jobs]
+
         # convert the Smiles into molecules
         params = Chem.SmilesParserParams()
         params.removeHs = False
