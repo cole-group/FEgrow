@@ -1378,7 +1378,7 @@ class ChemSpace: # RInterface
 
         return pandas.concat(toxicities)
 
-    def to_sdf(self, filename):
+    def to_sdf(self, filename, failed=False, unbuilt=True):
         """
         Write every molecule and all its fields as properties, to an SDF file.
 
@@ -1389,6 +1389,14 @@ class ChemSpace: # RInterface
             columns.remove("Mol")
 
             for i, row in self.df.iterrows():
+
+                # ignore this molecule because it failed during the build
+                if failed is False and row.Success is False:
+                    continue
+
+                # ignore this molecule because it was not built yet
+                if unbuilt is False and row.Success is pandas.NA:
+                    continue
 
                 mol = row.Mol
                 mol.SetIntProp("index", i)
