@@ -28,3 +28,4 @@ dependencies:
   - conda-forge::pint-pandas
   - conda-forge::dask
   - conda-forge::modAL
+  - conda-forge::cachey
