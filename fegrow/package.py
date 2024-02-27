@@ -953,7 +953,21 @@ class ChemSpace: # RInterface
                  num_conf=10,
                  minimum_conf_rms=0.5,
                  penalty=pd.NA,
+                 al_ignore_penalty=True,
                  **kwargs):
+        """
+
+        :param indices:
+        :param scoring_function:
+        :param gnina_path:
+        :param gnina_gpu:
+        :param num_conf:
+        :param minimum_conf_rms:
+        :param penalty:
+        :param al_ignore_penalty:
+        :param kwargs:
+        :return:
+        """
 
         # evaluate all molecules if no indices are picked
         if indices is None:
@@ -1013,6 +1027,8 @@ class ChemSpace: # RInterface
 
         # gather the results
         for i, result in results.items():
+            Training = True
+
             try:
                 mol, data = result.result()
 
@@ -1031,11 +1047,17 @@ class ChemSpace: # RInterface
             except subprocess.CalledProcessError as E:
                 logger.error("Failed Process", E, E.cmd, E.output, E.stdout, E.stderr)
                 score = penalty
+
+                if al_ignore_penalty:
+                    Training = False
             except Exception as E:
                 # failed to finish the protocol, set the penalty
                 score = penalty
 
-            self.df.loc[i, ["score", "Training"]] = score, True
+                if al_ignore_penalty:
+                    Training = False
+
+            self.df.loc[i, ["score", "Training"]] = score, Training
 
         logger.info(f"Evaluated {len(results)} cases")
         return self.df.loc[indices]
