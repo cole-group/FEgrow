@@ -1299,7 +1299,8 @@ class ChemSpace: # RInterface
         # update on how many to querry
         query = functools.partial(self.query, n_instances=n)
 
-        target_multiplier = 1
+        # by default bigger values are better
+        target_multiplier = -1
         if score_higher_better is True:
             target_multiplier = -1
         elif score_higher_better is False:
