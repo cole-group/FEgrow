@@ -172,10 +172,11 @@ def optimise_in_receptor(
         potential = MLPotential("ani2x", platform_name=platform_name)
 
         # save the torch model animodel.pt to a temporary file to ensure this is thread safe
-        _, tmpfile = tempfile.mkstemp()
+        # note this file will be closed when garbage collected
+        tmpfile = tempfile.NamedTemporaryFile()
 
         complex_system = potential.createMixedSystem(
-            complex_structure.topology, system, ligand_idx, filename=tmpfile
+            complex_structure.topology, system, ligand_idx, filename=tmpfile.name
         )
     else:
         print("Using force field")
