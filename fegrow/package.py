@@ -951,7 +951,7 @@ class ChemSpace: # RInterface
                  scoring_function=None,
                  gnina_path=None,
                  gnina_gpu=False,
-                 num_conf=10,
+                 num_conf=50,
                  minimum_conf_rms=0.5,
                  penalty=pd.NA,
                  al_ignore_penalty=True,
