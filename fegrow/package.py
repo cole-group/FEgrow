@@ -579,7 +579,7 @@ class ChemSpace: # RInterface
                                 "enamine_searched": False,
                                 "enamine_id": pandas.NA}
 
-    def __init__(self, data=None, data_indices=None):
+    def __init__(self, data=None, data_indices=None, dask_n_workers=None):
         if data is None:
             data = ChemSpace.DATAFRAME_DEFAULT_VALUES
 
@@ -589,7 +589,7 @@ class ChemSpace: # RInterface
             logger.info("No Dask cluster configured. Creating a local cluster. ")
             import asyncio
             # silence_logs=logging.DEBUG
-            ChemSpace._dask_cluster = LocalCluster(n_workers=2,
+            ChemSpace._dask_cluster = LocalCluster(n_workers=dask_n_workers,
                                                    processes=False, # turn off Nanny to avoid the problem
                                                    # with loading of the main file (ie executing it)
                                                    dashboard_address=":8989"
