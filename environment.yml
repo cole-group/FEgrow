@@ -29,3 +29,4 @@ dependencies:
   - conda-forge::dask
   - conda-forge::modAL
   - conda-forge::cachey
+  - conda-forge::pyparsing<3.1.0 # temporary fix for prody
