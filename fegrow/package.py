@@ -569,6 +569,7 @@ class ChemSpace: # RInterface
         )
 
     _dask_cluster = None
+    _dask_client = None
 
     DATAFRAME_DEFAULT_VALUES = {"Smiles": [], # Smiles will always be replaced when inserting new data.
                                 "Mol": pandas.NA,
@@ -579,31 +580,34 @@ class ChemSpace: # RInterface
                                 "enamine_searched": False,
                                 "enamine_id": pandas.NA}
 
-    def __init__(self, data=None, data_indices=None, dask_n_workers=None):
+    def __init__(self, data=None, data_indices=None, dask_cluster=None, dask_local_cluster_kwargs={}):
         if data is None:
             data = ChemSpace.DATAFRAME_DEFAULT_VALUES
 
         self.df = pandas.DataFrame(data, index=data_indices)
 
+        ChemSpace._dask_cluster = dask_cluster
+
         if ChemSpace._dask_cluster is None:
-            logger.info("No Dask cluster configured. Creating a local cluster. ")
-            import asyncio
-            # silence_logs=logging.DEBUG
-            ChemSpace._dask_cluster = LocalCluster(n_workers=dask_n_workers,
-                                                   processes=False, # turn off Nanny to avoid the problem
-                                                   # with loading of the main file (ie executing it)
-                                                   dashboard_address=":8989"
-                                                   )
+            logger.info("No Dask cluster configured. Creating a local cluster of threads. ")
+            warnings.warn("ANI uses TORCHAni which is not threadsafe, leading to random SEGFAULTS. "
+                          "Use a Dask cluster with processes as a work around "
+                          "(see the documentation for an example of this workaround) .")
+
+            kwargs = {"n_workers": None,
+                      "processes": False,  # turn off Nanny to avoid the problem
+                                           # with loading of the main file (ie executing it)
+                      "dashboard_address": ":8989",
+                      **dask_local_cluster_kwargs
+                      }
+            ChemSpace._dask_cluster = LocalCluster(**kwargs)
             # ChemSpace._dask_cluster = Scheduler()
             # ChemSpace._dask_cluster = LocalCluster(preload_nanny=["print('Hi Nanny')"],
             #                                        preload=["pint"], n_workers=1
             #                                        ) #asynchronous=True)
-            ChemSpace._dask_client = Client(ChemSpace._dask_cluster) #ChemSpace._dask_cluster, asynchronous=True)
 
-            print(f"Dask can be watched on {ChemSpace._dask_client.dashboard_link}")
-
-        # self._dask_client = None
-        # self._dask_cluster = None
+        ChemSpace._dask_client = Client(ChemSpace._dask_cluster) #ChemSpace._dask_cluster, asynchronous=True)
+        print(f"Dask can be watched on {ChemSpace._dask_client.dashboard_link}")
 
         self._scaffolds = []
         self._model = None
