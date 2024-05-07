@@ -45,6 +45,8 @@ pandas.set_option("display.precision", 3)
 
 logger = logging.getLogger(__name__)
 
+Chem.SetDefaultPickleProperties(Chem.PropertyPickleOptions.AllProps)
+
 
 class RInterface:
     """
