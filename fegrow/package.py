@@ -1040,16 +1040,13 @@ class ChemSpace: # RInterface
             try:
                 mol, data = result.result()
 
-                original_mol = self.df.Mol[i]
-
-                # copy the conformers
-                if mol is not None:
-                    original_mol.RemoveAllConformers()
-                    [original_mol.AddConformer(c) for c in mol.GetConformers()]
-
                 # save all data generated
                 for k, v in data.items():
-                    original_mol.SetProp(k, str(v))
+                    mol.SetProp(k, str(v))
+
+                # replace the original molecule with the new one
+                self.df.at[i, "Mol"] = mol
+
                 # extract the score
                 score = data["score"]
             except subprocess.CalledProcessError as E:
