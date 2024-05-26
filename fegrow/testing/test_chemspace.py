@@ -1,3 +1,4 @@
+import copy
 import pathlib
 import tempfile
 
@@ -284,7 +285,8 @@ def test_evaluate_full_hijack(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_p
                      *args,
                      **kwargs):
         # return: mol, data
-        return None, {"score": 5}
+        mol = copy.deepcopy(scaffold)
+        return mol, {"score": 5}
 
     chemspace.evaluate([0], full_evaluation=full_evaluation)
 
@@ -400,7 +402,7 @@ def test_al_full(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     def oracle_look_up(scaffold, h, smiles, *args, **kwargs):
         # mol, data
-        return None, {"score": oracle[oracle.Smiles == smiles].iloc[0].cnnaffinity}
+        return Chem.MolFromSmiles(smiles), {"score": oracle[oracle.Smiles == smiles].iloc[0].cnnaffinity}
 
     # select random molecules
     random_pics = chemspace.active_learning(n=3, first_random=True)
