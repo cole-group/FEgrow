@@ -1153,7 +1153,7 @@ class ChemSpace: # RInterface
         scaffold = self._scaffolds[0]
 
         # get the best performing molecules
-        vl = self.df.sort_values(by="score")
+        vl = self.df.sort_values(by="score", ascending=False)
         best_vl_for_searching = vl[:n_best]
 
         # nothing to search for yet
