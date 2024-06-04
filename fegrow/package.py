@@ -1253,7 +1253,7 @@ class ChemSpace: # RInterface
     def active_learning(self,
                         n=1,
                         first_random=True,
-                        score_higher_better=None,
+                        score_higher_better=True,
                         model=None,
                         query=None,
                         learner_type=None,
@@ -1302,14 +1302,14 @@ class ChemSpace: # RInterface
         # update on how many to querry
         query = functools.partial(self.query, n_instances=n)
 
-        # by default bigger values are better
-        target_multiplier = -1
+        target_multiplier = 1
         if score_higher_better is True:
             target_multiplier = -1
-        elif score_higher_better is False:
-            target_multiplier = 1
-        elif self.query_label in ['thompson', 'EI', 'PI', 'UCB']:
-            target_multiplier = -1
+
+        if self.query_label in ['greedy', 'thompson', 'EI', 'PI']:
+            target_multiplier *= 1
+        elif self.query_label == 'UCB':
+            target_multiplier *= -1
 
         train_targets = train_targets * target_multiplier
 
