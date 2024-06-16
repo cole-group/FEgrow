@@ -1,4 +1,9 @@
-# FEgrow
+# FEgrow 2.0.0: Active Learning and acceleration (multi -cpu, -node, -cluster)
+
+A new release of FEgrow that adds active learning together with acceleration powered by Dask.  
+
+
+# FEgrow 
 An interactive workflow for building user-defined congeneric series of ligands in protein binding pockets for input to free energy calculations.
 
 ![CI](https://github.com/cole-group/FEgrow/actions/workflows/CI.yml/badge.svg)![Anaconda-Server Badge](https://anaconda.org/conda-forge/fegrow/badges/downloads.svg)
