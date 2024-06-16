@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ubuntu-latest" ]
-        python-version: [ "3.8", "3.9", "3.10"]
+        python-version: ["3.9", "3.10"]
       max-parallel: 5
 
     steps:
@@ -19,7 +19,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2.1.1
       with:
         activate-environment: fegrow
-        environment-file: env.yml
+        environment-file: environment.yml
         python-version: ${{ matrix.python-version }}
         auto-update-conda: true
         auto-activate-base: false

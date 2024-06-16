@@ -1,6 +1,7 @@
 import copy
 import itertools
 import logging
+import warnings
 from typing import List, Optional, Union
 
 import networkx
@@ -12,91 +13,55 @@ logger = logging.getLogger(__name__)
 
 
 def build_molecules_with_rdkit(
-    templates: Union[Chem.Mol, List[Chem.Mol]],
-    r_groups: Union[Chem.Mol, List[Chem.Mol], int],
-    attachment_points: Optional[List[int]] = None,
-    keep_components: Optional[List[int]] = None,
+    scaffold: Chem.Mol,
+    r_group: Chem.Mol,
+    attachment_point: int = None,
+    keep_components: int = None,
 ):
     """
     For the given core molecule and list of attachment points
      and r groups enumerate the possible molecules and
      return a list of them.
 
-    :param template: The core scaffold molecule to attach the r groups to, or a list of them.
+    :param scaffold: The core scaffold molecule to attach the r groups to, or a list of them.
     :param r_group: The list of rdkit molecules which should be considered
       r groups or the RGroup Grid with highlighted molecules.
-    :param attachment_points: The list of atom index in the core ligand
+    :param attachment_point: The list of atom index in the core ligand
       that the r groups should be attached to. If it is empty, connecting points are sought out and matched.
     """
-
-    if keep_components is None:
-        keep_components = []
-
-    # fixme - special case after changing the API: remove in the future
-    # This is a temporary warning about the change in the interface.
-    # This change is because there are situations where the attachment_points do not need to be passed to the function.
-    if (
-        isinstance(r_groups, list)
-        and len(r_groups) > 0
-        and isinstance(r_groups[0], int)
-    ):
-        print(
-            'Warning: second argument is detected to be an integer. It is now "r_groups" '
-            "whereas attachement_points are provided as the 3rd argument. "
-        )
-        raise Exception(
-            "Please note that after adding the linker to FEgrow (version 1.1), "
-            'the "build_molecules" function interface has changed to'
-            ' "build_molecules(core_ligand, r_groups, attachment_points)". '
-        )
-
-    # ensure template and r_group are lists
-    if not issubclass(templates.__class__, List):
-        templates = [templates]
-    if not issubclass(r_groups.__class__, List):
-        r_groups = [r_groups]
-
     # make a deep copy of r_groups/linkers to ensure we don't modify the library
-    templates = [copy.deepcopy(mol) for mol in templates]
-    r_groups = [copy.deepcopy(mol) for mol in r_groups]
+    scaffold = copy.deepcopy(scaffold)
+    r_group = copy.deepcopy(r_group)
 
     # get attachment points for each template
-    if not attachment_points:
+    if attachment_point is None:
         # attempt to generate the attachment points by picking the joining molecule
         # case: a list of templates previously joined with linkers requires iterating over them
-        attachment_points = [
-            get_attachment_vector(lig)[0].GetIdx() for lig in templates
-        ]
+        atom, neighbours = get_attachment_atom(scaffold)
+        attachment_point = atom.GetIdx()
 
-    if not attachment_points:
-        raise Exception("Could not find attachement points. ")
+    if attachment_point is None:
+        raise Exception("Could not find attachement points. Either the atom index has to be specified,"
+                        "or an atom needs to be marked rdkit.atom.SetAtomicNum(0). ")
 
-    if len(attachment_points) != len(templates):
-        raise Exception(
-            f"There must be one attachment point for each template. "
-            f"Provided attachement points = {len(attachment_points)} "
-            f"with templates number: {len(templates)}"
-        )
+    # for atom_idx, scaffold_ligand, keep_submolecule_cue in itertools.zip_longest(
+    #     attachment_points, template, keep_components, fillvalue=None
+    # ):
+    #     for r_mol in r_groups:
+    merged_mol, scaffold_no_attachement = merge_R_group(
+        scaffold=scaffold,
+        RGroup=r_group,
+        replace_index=attachment_point,
+        keep_cue_idx=keep_components,
+    )
 
-    combined_mols = []
-    id_counter = 0
-    for atom_idx, scaffold_ligand, keep_submolecule_cue in itertools.zip_longest(
-        attachment_points, templates, keep_components, fillvalue=None
-    ):
-        for r_mol in r_groups:
-            scaffold_mol = copy.deepcopy(scaffold_ligand)
-            merged_mol, scaffold_no_attachement = merge_R_group(
-                scaffold=scaffold_mol,
-                RGroup=r_mol,
-                replace_index=atom_idx,
-                keep_cue_idx=keep_submolecule_cue,
-            )
-            # assign the identifying index to the molecule
-            merged_mol.id = id_counter
-            combined_mols.append((merged_mol, scaffold_ligand, scaffold_no_attachement))
-            id_counter += 1
+    # in case where multiple mergings take place (e.g. two mergings: (scaffold + linker) + rgroups)
+    # in this case, the attachment point from the original scaffold should be carried forward
+    # (as opposed to the attachment point on the linker)
+    if not merged_mol.HasProp('attachment_point'):
+        merged_mol.SetIntProp("attachment_point", attachment_point)
 
-    return combined_mols
+    return merged_mol, scaffold, scaffold_no_attachement
 
 
 def split(molecule, splitting_atom, keep_neighbour_idx=None):
@@ -161,7 +126,7 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
 
     # the linking R atom on the R group
     # fixme: attempt to do the same on the template if replace index is not provided
-    rgroup_R_atom, R_atom_neighbour = get_attachment_vector(RGroup)
+    rgroup_R_atom, R_atom_neighbours = get_attachment_atom(RGroup)
 
     # atom to be replaced in the scaffold
     atom_to_replace = scaffold.GetAtomWithIdx(replace_index)
@@ -177,15 +142,16 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
         logger.warning("The R-Group lacks initial coordinates. Defaulting to Chem.rdDistGeom.EmbedMolecule.")
         Chem.rdDistGeom.EmbedMolecule(RGroup)
 
-    # align the Rgroup
-    AlignMol(
-        RGroup,
-        scaffold,
-        atomMap=(
-            (R_atom_neighbour.GetIdx(), atom_to_replace.GetIdx()),
-            (rgroup_R_atom.GetIdx(), hook.GetIdx()),
-        ),
-    )
+    # align the R-group only if there are any conformers to work with
+    if scaffold.GetNumConformers() > 0:
+        AlignMol(
+            RGroup,
+            scaffold,
+            atomMap=(
+                (R_atom_neighbours[0].GetIdx(), atom_to_replace.GetIdx()),
+                (rgroup_R_atom.GetIdx(), hook.GetIdx()),
+            ),
+        )
 
     # merge
     combined = Chem.CombineMols(scaffold, RGroup)
@@ -195,7 +161,7 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
     bond_order = rgroup_R_atom.GetBonds()[0].GetBondType()
     emol.AddBond(
         hook.GetIdx(),
-        R_atom_neighbour.GetIdx() + scaffold.GetNumAtoms(),
+        R_atom_neighbours[0].GetIdx() + scaffold.GetNumAtoms(),
         order=bond_order,
     )
     # -1 accounts for the removed linking atom on the template
@@ -226,28 +192,40 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
     return merged, scaffold_no_attachement
 
 
-def get_attachment_vector(R_group):
+def get_attachment_atom(R_group):
     """In the R-group or a linker, search for the position of the attachment point (R atom)
     and extract the atom (currently only single bond supported). In case of the linker,
     the R1 atom is selected.
     rgroup: fragment passed as rdkit molecule
-    return: tuple (ratom, ratom_neighbour)
+    return: tuple (ratom, ratom_neighbour), where the ratom_neighbour is the surviving atom
     """
 
     # find the R groups in the molecule
-    ratoms = [atom for atom in R_group.GetAtoms() if atom.GetAtomicNum() == 0]
-    if not len(ratoms):
+    r_atoms = [atom for atom in R_group.GetAtoms() if atom.GetAtomicNum() == 0]
+    if not len(r_atoms):
         raise Exception(
             "The R-group does not have R-atoms (Atoms with index == 0, visualised with a '*' character)"
         )
 
     # if it is a linker, it will have more than 1 R group, pick the one with index 1
-    if len(ratoms) == 1:
-        atom = ratoms[0]
+    if len(r_atoms) == 1:
+        atom = r_atoms[0]
     elif is_linker(R_group):
-        # find the attachable point
-        ratoms = [atom for atom in ratoms if atom.GetAtomMapNum() == 1]
-        atom = ratoms[0]
+        """
+        find the attachable points. 
+        We use the first attachment to be .GetAtomMapNum() == 1
+        and second to be .GetAtomMapNum() == 2,
+        or whichever is smaller. 
+        """
+        map_nums = {atom.GetAtomMapNum() for atom in r_atoms}
+        if len(map_nums) == 1:
+            warnings.warn("The linker has two conneting ends specified (* atom). However,"
+                          "they're not given priorities. Choosing a random one.  ")
+        smallest_map_num = min(map_nums)
+        for r_atom in r_atoms:
+            if r_atom.GetAtomMapNum() == smallest_map_num:
+                atom = r_atom
+                break
     else:
         raise Exception(
             "Either missing R-atoms, or more than two R-atoms. "
@@ -257,17 +235,21 @@ def get_attachment_vector(R_group):
 
     neighbours = atom.GetNeighbors()
     if len(neighbours) > 1:
-        raise NotImplementedError(
-            "The linking R atom in the R group has two or more attachment points. "
+        warnings.warn(
+            "The linking R atom (*) has two or more attachment points (bonds). "
+            "The molecule might be modified. "
         )
 
-    return atom, neighbours[0]
+    return atom, neighbours
 
 
 def is_linker(rmol):
     """
     Check if the molecule is a linker by checking if it has 2 R-group points
     """
+    if [a.GetAtomicNum() for a in rmol.GetAtoms()].count(0) == 2:
+        return True
+
     if len([atom for atom in rmol.GetAtoms() if atom.GetAtomMapNum() in (1, 2)]) == 2:
         return True
 

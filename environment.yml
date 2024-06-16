@@ -9,7 +9,7 @@ dependencies:
   - conda-forge::pip
   - conda-forge::rdkit
   - conda-forge::prody
-  - conda-forge::openff-toolkit>=0.11
+  - conda-forge::openff-toolkit>=0.13
   - conda-forge::parmed
   - conda-forge::openmm>=7.5.0
   - conda-forge::openmm-ml
@@ -21,8 +21,12 @@ dependencies:
   - conda-forge::torchani>2.2.0
   - conda-forge::pytorch-gpu>=1.10.0
   - conda-forge::openmm-torch>=0.8
-  - conda-forge::pint<0.20.0
+  - conda-forge::pint!=0.2
   - conda-forge::py3dmol>=1.8.0
   - conda-forge::mols2grid>=0.2.4
   - conda-forge::networkx
   - conda-forge::pint-pandas
+  - conda-forge::dask
+  - conda-forge::modAL
+  - conda-forge::cachey
+  - conda-forge::pyparsing<3.1.0 # temporary fix for prody
