@@ -14,13 +14,14 @@ jobs:
       max-parallel: 5
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Create Environment
       uses: conda-incubator/setup-miniconda@v2.1.1
       with:
         activate-environment: fegrow
         environment-file: environment.yml
         python-version: ${{ matrix.python-version }}
+        channels: conda-forge
         auto-update-conda: true
         auto-activate-base: false
         show-channel-urls: true
