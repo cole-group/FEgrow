@@ -10,19 +10,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ubuntu-latest" ]
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.10", "3.11"]
       max-parallel: 5
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Create Environment
-      uses: conda-incubator/setup-miniconda@v2.1.1
+      uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: fegrow
         environment-file: environment.yml
         python-version: ${{ matrix.python-version }}
-        auto-update-conda: true
-        auto-activate-base: false
+        channels: conda-forge
         show-channel-urls: true
         mamba-version: "*"
         miniforge-version: latest

@@ -18,8 +18,8 @@ dependencies:
   - conda-forge::pdbfixer>=1.8.0
   - conda-forge::tqdm
   - conda-forge::openbabel
-  - conda-forge::torchani>2.2.0
-  - conda-forge::pytorch-gpu>=1.10.0
+  - conda-forge::torchani>=2.2.4
+  - conda-forge::pytorch>=1.10.0
   - conda-forge::openmm-torch>=0.8
   - conda-forge::pint!=0.2
   - conda-forge::py3dmol>=1.8.0
