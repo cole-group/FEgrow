@@ -1,6 +1,8 @@
-# FEgrow 2.0.0: Active Learning and acceleration (multi -cpu, -node, -cluster)
+# FEgrow 2.0.0: Active Learning and acceleration 
 
-A new release of FEgrow that adds active learning together with acceleration powered by Dask.  
+A new release of FEgrow that adds active learning together with acceleration powered by Dask (multi -cpu, -node, -cluster).
+
+To get started with the new functionality, see the [tutorials](https://github.com/cole-group/FEgrow/tree/master/tutorials) folder, which contains examples of i) basic interactive molecular design, ii) an introduction to the chemspace functionality, and iii) an example of active learning for inhibitor design.
 
 
 # FEgrow 
@@ -16,4 +18,3 @@ Bieniek, Mateusz K., Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum
 
 Please see [cole-group.github.io/fegrow](https://cole-group.github.io/FEgrow) for full installation instructions, documentation and acknowledgements.
 
-To get started see the [online tutorial](https://cole-group.github.io/FEgrow/tutorial/tutorial/) for which the IPython Notebook is available [here](https://github.com/cole-group/FEgrow/tree/master/notebooks).
