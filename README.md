@@ -4,8 +4,12 @@ A new release of FEgrow that adds active learning together with acceleration pow
 
 To get started with the new functionality, see the [tutorials](https://github.com/cole-group/FEgrow/tree/master/tutorials) folder, which contains examples of i) basic interactive molecular design, ii) an introduction to the chemspace functionality, and iii) an example of active learning for inhibitor design.
 
+Cree B, Bieniek M, Amin S, Kawamura A, Cole D. Active learning driven prioritisation of compounds from on-demand libraries targeting the SARS-CoV-2 main protease. ChemRxiv. 2024; doi:10.26434/chemrxiv-2024-xczfb This content is a preprint and has not been peer-reviewed.
 
-# FEgrow 
+https://doi.org/10.26434/chemrxiv-2024-xczfb
+
+
+# FEgrow (1.*)
 An interactive workflow for building user-defined congeneric series of ligands in protein binding pockets for input to free energy calculations.
 
 ![CI](https://github.com/cole-group/FEgrow/actions/workflows/CI.yml/badge.svg)![Anaconda-Server Badge](https://anaconda.org/conda-forge/fegrow/badges/downloads.svg)
