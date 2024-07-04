@@ -114,6 +114,27 @@ def test_pipeline_2linkers_2rgroups(sars_scaffold_chunk_sdf):
     assert df.loc[1].Mol.HasSubstructMatch(Chem.MolFromSmiles('OC'))
 
 
+def test_pipeline_2linkers_2rgroups_alltoall():
+    chemspace = ChemSpace()
+
+    link_nc = Chem.MolFromSmiles("[*:0]N=C[*:1]")
+    link_s = Chem.MolFromSmiles("[*:0]S[*:1]")
+
+    r_methanol = Chem.MolFromSmiles("*CO")
+    r_bromium =  Chem.MolFromSmiles("*Br")
+
+    scaffold = Chem.MolFromSmiles("F*")
+    chemspace.add_scaffold(scaffold)
+
+    chemspace.add_rgroups([link_nc, link_s],
+                          [r_methanol, r_bromium],
+                          alltoall=True)
+
+    df = chemspace.df
+    assert len(df) == 4
+    assert set(df.Smiles.to_list()) == {'FN=CBr', 'FSBr', 'OCC=NF', 'OCSF'}
+
+
 def test_pipeline_1linker_1rgroup_check_h_attachment(sars_scaffold_chunk_sdf):
     """
     During multiple mergings, we want to make sure that
