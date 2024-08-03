@@ -804,7 +804,7 @@ class ChemSpace: # RInterface
 
         self._scaffolds.append(template)
 
-    def add_rgroups(self, rgroups_linkers, rgroups2=None):
+    def add_rgroups(self, rgroups_linkers, rgroups2=None, alltoall=False):
         """
         Note that if they are Smiles:
          - if they have an * atom (e.g. RDKit atom.SetAtomicNum(0)), this will be used for attachment to the scaffold
@@ -828,11 +828,18 @@ class ChemSpace: # RInterface
         delayed_build_molecule = dask.delayed(build_molecule)
 
         jobs = [delayed_build_molecule(scaffold, linker) for linker in rgroups_linkers]
-        # if more rgroups were attached
-        if rgroups2 is not None:
+
+        # if linkers and rgroups are attached, add them in two iterations
+        if rgroups2 is not None and not alltoall:
+            # for each attached linker, attach an rgroup with the same position
             jobs = [delayed_build_molecule(scaffold_linked, rgroup)
                     for rgroup, scaffold_linked in
                     itertools.zip_longest(rgroups2, jobs, fillvalue=jobs[0])]
+        elif rgroups2 is not None and alltoall:
+            jobs = [delayed_build_molecule(scaffold_linked, rgroup)
+                    for rgroup, scaffold_linked in
+                    itertools.product(rgroups2, jobs)]
+
         results = self.dask_client.compute(jobs)
         built_mols = [r.result() for r in results]
 
