@@ -58,12 +58,25 @@ def generate_conformers(
     # map scaffold atoms to the new molecules
     match = rmol.GetSubstructMatch(scaffold_mol)
     if match and not use_ties_mcs:
-        # remember the scaffold coordinates
+        # extract the scaffold coordinates
         coordinates_map = {}
         manmap = []
         for core_index, matched_index in enumerate(match):
             if matched_index in flexible:
                 continue
+
+            scaffold_atom = scaffold_mol.GetAtomWithIdx(core_index)
+
+            # ignore the R atom being matched
+            if scaffold_atom.GetAtomicNum() == 0:
+                continue
+
+            # verify that the appropriate atom types were matched
+            rmol_atom = rmol.GetAtomWithIdx(matched_index)
+            if (scaffold_atom.GetAtomicNum() != rmol_atom.GetAtomicNum()):
+                raise ValueError(f"Scaffold {core_index}:{scaffold_atom.GetSymbol()} "
+                                 f"does not match {matched_index}:{rmol_atom.GetSymbol()}. "
+                                 f"RDKit .GetSubstructMatch appears to have failed. Please report.  ")
 
             core_atom_coordinate = scaffold_conformer.GetAtomPosition(core_index)
             coordinates_map[matched_index] = core_atom_coordinate
