@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from .conformers import generate_conformers, WrongCoreForMolecule
-from .package import (
+from .chemspace import (
     ChemSpace,
     RMol,
     build_molecule,
