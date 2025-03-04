@@ -27,6 +27,6 @@ dependencies:
   - conda-forge::networkx
   - conda-forge::pint-pandas
   - conda-forge::dask
-  - conda-forge::modAL
+  - conda-forge::modal # modAL on pip
   - conda-forge::cachey
   - conda-forge::pyparsing<3.1.0 # temporary fix for prody
