@@ -26,8 +26,6 @@ jobs:
         environment-file: environment.yml
         create-args: >-
           python=${{ matrix.python-version }}
-        init-shell: >-
-          bash
 
     - name: env summary
       run: conda list
