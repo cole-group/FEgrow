@@ -26,6 +26,8 @@ jobs:
         environment-file: environment.yml
         create-args: >-
           python=${{ matrix.python-version }}
+        init-shell: >-
+          bash
 
     - name: env summary
       run: conda list
@@ -38,7 +40,6 @@ jobs:
 
     - name: install pytest
       run: mamba install pytest
-      shell: micromamba-shell {0}
 
     - name: pytest
       run: pytest fegrow/testing
