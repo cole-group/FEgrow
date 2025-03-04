@@ -39,7 +39,7 @@ jobs:
       run: pip install .
 
     - name: install pytest
-      run: mamba install pytest
+      run: $MAMBA_EXE install pytest
 
     - name: pytest
       run: pytest fegrow/testing
