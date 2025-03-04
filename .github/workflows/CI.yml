@@ -38,6 +38,7 @@ jobs:
 
     - name: install pytest
       run: mamba install pytest
+      shell: micromamba-shell {0}
 
     - name: pytest
       run: pytest fegrow/testing
