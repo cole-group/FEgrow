@@ -15,21 +15,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Create Environment
-      uses: conda-incubator/setup-miniconda@v3
+      uses: mamba-org/setup-micromamba@v2
       with:
-        activate-environment: fegrow
         environment-file: environment.yml
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-        show-channel-urls: true
-        mamba-version: "*"
-        miniforge-version: latest
-        miniforge-variant: Mambaforge
-        use-mamba: true
+        create-args: >-
+          python=${{ matrix.python-version }}
+
     - name: env summary
-      shell: bash -l {0}
       run: conda list
+
     - name: dry install fegrow
       shell: bash -l {0}
       run: pip install --dry-run .
