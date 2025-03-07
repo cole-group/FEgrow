@@ -1,0 +1,15 @@
+channels:
+  - conda-forge
+
+dependencies:
+  - mkdocs
+  - mkdocs-material
+  - mike
+  - mkdocstrings
+  - mkdocstrings-python
+  - mkdocs-gen-files
+  - griffe-pydantic
+  - mkdocs-literate-nav
+  - mkdocs-bibtex
+  - pydantic
+  - markdown-include

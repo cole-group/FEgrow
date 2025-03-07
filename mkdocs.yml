@@ -1,0 +1,110 @@
+site_name: "FEgrow"
+site_description: "An open-source molecular builder and free energy preparation workflow"
+site_url: "https://github.com/cole-group/FEgrow"
+repo_url: "https://github.com/cole-group/FEgrow"
+repo_name: "cole-group/FEgrow"
+site_dir: "site"
+watch: [mkdocs.yml, README.md, fegrow/, docs]
+copyright: Copyright &copy; 2025 Newcastle University
+edit_uri: edit/main/docs/
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+
+extra:
+  version:
+    provider: mike
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Notebooks: notebooks/notebook*/*
+  - API:
+    - RMol: api/rmol.md
+    - ChemSpace: api/chemspace.md
+    - Active Learning: api/al.md
+    - reference: reference/
+  - Acknowledgments: acknowledgments.md
+  - License: license.md
+
+theme:
+  name: material
+  features:
+  - announce.dismiss
+  - content.code.annotate
+  - content.code.copy
+  - content.tooltips
+  - navigation.footer
+  - navigation.indexes
+  - navigation.sections
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.top
+  - search.highlight
+  - search.suggest
+  - toc.follow
+  palette:
+    primary: light blue
+  #favicon: images/favicon-32x32.png
+  #logo: images/android-chrome-192x192.png
+
+markdown_extensions:
+- markdown_include.include:
+    base_path: .
+- attr_list
+- md_in_html
+- def_list
+- admonition
+#- footnotes
+#- pymdownx.highlight:
+#    anchor_linenums: true
+#    line_spans: __span
+#    pygments_lang_class: true
+#- pymdownx.inlinehilite
+- pymdownx.superfences
+#- pymdownx.magiclink
+#- pymdownx.snippets:
+#    check_paths: true
+- pymdownx.details
+- pymdownx.arithmatex:
+    generic: true
+- pymdownx.tabbed:
+    alternate_style: true
+- toc:
+    permalink: "#"
+
+plugins:
+- autorefs
+- search
+- bibtex:
+    bib_file: "docs/references.bib"
+- gen-files:
+    scripts:
+    - docs/scripts/gen_ref_pages.py
+- literate-nav:
+    nav_file: SUMMARY.md
+- mkdocstrings:
+    handlers:
+      python:
+        paths: [fegrow/]
+        options:
+          extensions: [ griffe_pydantic ]
+          docstring_options:
+            ignore_init_summary: true
+            returns_multiple_items: false
+            returns_named_value: false
+          docstring_section_style: list
+          heading_level: 1
+          inherited_members: true
+          merge_init_into_class: true
+          separate_signature: true
+          show_root_heading: true
+          show_root_full_path: false
+          show_signature_annotations: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          signature_crossrefs: true
+          summary: true
+          members_order: source

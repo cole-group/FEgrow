@@ -565,6 +565,8 @@ class ChemSpace: # RInterface
     in combination with Dask for parallellisation.
     """
 
+    fpgen = Chem.AllChem.GetMorganGenerator(radius=3, fpSize=2048)
+
     def rep2D(self, subImgSize=(400, 400), **kwargs):
         return Draw.MolsToGridImage(
             [row.Mol.rep2D(rdkit_mol=True, **kwargs) for i, row in self.df.iterrows()], subImgSize=subImgSize
@@ -988,6 +990,8 @@ class ChemSpace: # RInterface
             indices = slice(None)
 
         if isinstance(indices, pandas.DataFrame):
+            if len(indices) <= 2:
+                raise ValueError("Please provide at least 3 items")
             indices = indices.index
 
         selected_rows = self.df.loc[indices]
@@ -1048,11 +1052,12 @@ class ChemSpace: # RInterface
                 mol, data = result.result()
 
                 # save all data generated
-                for k, v in data.items():
-                    mol.SetProp(k, str(v))
+                if mol is not None:
+                    for k, v in data.items():
+                        mol.SetProp(k, str(v))
 
-                # replace the original molecule with the new one
-                self.df.at[i, "Mol"] = mol
+                    # replace the original molecule with the new one
+                    self.df.at[i, "Mol"] = mol
 
                 # extract the score
                 score = data["score"]
@@ -1349,9 +1354,9 @@ class ChemSpace: # RInterface
         return selection.iloc[selection_idx]
 
     @staticmethod
-    def _compute_fp_from_smiles(smiles, radius=3, size=2048):
+    def _compute_fp_from_smiles(smiles):
         mol = Chem.MolFromSmiles(smiles)
-        return np.array(Chem.AllChem.GetMorganFingerprintAsBitVect(mol, radius=radius, nBits=size))
+        return ChemSpace.fpgen.GetFingerprintAsNumPy(mol)
 
     @functools.cache
     def compute_fps(self, smiles_tuple):
@@ -1670,7 +1675,7 @@ def _evaluate_atomic(scaffold,
                      scoring_function=None,
                      num_conf=50,
                      minimum_conf_rms=0.5,
-                     use_ani=True,
+                     ani=True,
                      platform="CPU",
                      gnina_gpu=False,
                      skip_optimisation=False,
@@ -1695,7 +1700,7 @@ def _evaluate_atomic(scaffold,
                      scoring_function=None,
                      num_conf=50,
                      minimum_conf_rms=0.5,
-                     use_ani=use_ani,
+                     ani=ani,
                      platform="CPU",
                      skip_optimisation=False)
 
@@ -1719,7 +1724,7 @@ def _evaluate_atomic(scaffold,
         rmol.optimise_in_receptor(
             receptor_file=pdb_filename,
             ligand_force_field="openff",
-            use_ani=use_ani,
+            use_ani=ani,
             sigma_scale_factor=0.8,
             relative_permittivity=4,
             water_model=None,
