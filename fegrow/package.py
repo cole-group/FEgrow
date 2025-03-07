@@ -565,6 +565,8 @@ class ChemSpace: # RInterface
     in combination with Dask for parallellisation.
     """
 
+    fpgen = Chem.AllChem.GetMorganGenerator(radius=3, fpSize=2048)
+
     def rep2D(self, subImgSize=(400, 400), **kwargs):
         return Draw.MolsToGridImage(
             [row.Mol.rep2D(rdkit_mol=True, **kwargs) for i, row in self.df.iterrows()], subImgSize=subImgSize
@@ -1352,9 +1354,9 @@ class ChemSpace: # RInterface
         return selection.iloc[selection_idx]
 
     @staticmethod
-    def _compute_fp_from_smiles(smiles, radius=3, size=2048):
+    def _compute_fp_from_smiles(smiles):
         mol = Chem.MolFromSmiles(smiles)
-        return np.array(Chem.AllChem.GetMorganFingerprintAsBitVect(mol, radius=radius, nBits=size))
+        return ChemSpace.fpgen.GetFingerprintAsNumPy(mol)
 
     @functools.cache
     def compute_fps(self, smiles_tuple):
