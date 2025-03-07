@@ -988,6 +988,8 @@ class ChemSpace: # RInterface
             indices = slice(None)
 
         if isinstance(indices, pandas.DataFrame):
+            if len(indices) <= 2:
+                raise ValueError("Please provide at least 3 items")
             indices = indices.index
 
         selected_rows = self.df.loc[indices]
