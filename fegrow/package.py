@@ -1050,11 +1050,12 @@ class ChemSpace: # RInterface
                 mol, data = result.result()
 
                 # save all data generated
-                for k, v in data.items():
-                    mol.SetProp(k, str(v))
+                if mol is not None:
+                    for k, v in data.items():
+                        mol.SetProp(k, str(v))
 
-                # replace the original molecule with the new one
-                self.df.at[i, "Mol"] = mol
+                    # replace the original molecule with the new one
+                    self.df.at[i, "Mol"] = mol
 
                 # extract the score
                 score = data["score"]
