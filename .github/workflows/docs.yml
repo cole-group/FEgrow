@@ -17,8 +17,6 @@ jobs:
       uses: mamba-org/setup-micromamba@v2
       with:
         environment-file: environment.yml
-        create-args: >-
-          python='3.10'
 
     - name: Install FEgrow
       run: pip install --no-deps .
