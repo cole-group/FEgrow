@@ -28,6 +28,7 @@ from openff.toolkit.topology import Molecule as OFFMolecule
 
 logger = logging.getLogger(__name__)
 
+
 def fix_receptor(input_file: str, output_file: str, pH: float = 7.0):
     """
     Use PDBFixer to correct the input and add hydrogens with the given pH.
@@ -91,7 +92,7 @@ def optimise_in_receptor(
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
-    platform_name: str = "CPU"
+    platform_name: str = "CPU",
 ) -> Tuple[Chem.Mol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.

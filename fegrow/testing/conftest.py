@@ -49,6 +49,7 @@ def sars_scaffold_chunk_sdf():
     )[0]
     return template_mol
 
+
 @pytest.fixture
 def rec_7l10_final_path():
     return str(root / "data" / "7L10_final.pdb")

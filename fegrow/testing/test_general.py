@@ -7,18 +7,11 @@ import fegrow
 from rdkit import Chem
 
 
-
-
-
-
-
 def test_adding_ethanol_1mol(RGroups, sars_core_scaffold):
     # use a hydrogen bond N-H
     attachment_index = 7
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmol = fegrow.build_molecule(
-        sars_core_scaffold, ethanol_rgroup, attachment_index
-    )
+    rmol = fegrow.build_molecule(sars_core_scaffold, ethanol_rgroup, attachment_index)
 
     assert isinstance(rmol, Chem.Mol), "Did not generate a molecule"
 
@@ -47,7 +40,7 @@ def test_growing_keep_larger_component_implicit_index(RGroups):
     # use C on the chlorinated benzene
     scaffold.GetAtomWithIdx(3).SetAtomicNum(0)
 
-    methanol = Chem.MolFromSmiles('*CO')
+    methanol = Chem.MolFromSmiles("*CO")
     rmol = fegrow.build_molecule(scaffold, methanol)
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "O=c1c(CO)cccn1-c1cccnc1"
@@ -75,12 +68,12 @@ def test_growing_keep_cue_component(RGroups):
 
 
 def test_replace_methyl(RGroups, sars_core_scaffold):
-    """
-
-    """
+    """ """
     params = Chem.SmilesParserParams()
     params.removeHs = False  # keep the hydrogens
-    mol = Chem.MolFromSmiles('[H]c1nc(N([H])C(=O)C([H])([H])[H])c([H])c([H])c1[H]', params=params)
+    mol = Chem.MolFromSmiles(
+        "[H]c1nc(N([H])C(=O)C([H])([H])[H])c([H])c([H])c1[H]", params=params
+    )
     Chem.AllChem.Compute2DCoords(mol)
 
     scaffold = fegrow.RMol(mol)
@@ -90,7 +83,10 @@ def test_replace_methyl(RGroups, sars_core_scaffold):
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
     rmol = fegrow.build_molecule(scaffold, ethanol_rgroup, attachment_index)
 
-    assert Chem.MolToSmiles(rmol) == "[H]OC([H])([H])C([H])([H])C(=O)N([H])c1nc([H])c([H])c([H])c1[H]"
+    assert (
+        Chem.MolToSmiles(rmol)
+        == "[H]OC([H])([H])C([H])([H])C(=O)N([H])c1nc([H])c([H])c([H])c1[H]"
+    )
 
 
 def test_extend_mol_with_smiles_marked(sars_core_scaffold):
@@ -100,7 +96,9 @@ def test_extend_mol_with_smiles_marked(sars_core_scaffold):
 
 def test_extend_mol_with_smiles_explicit(sars_core_scaffold):
     methyl = "[H]OC([H])([H])[H]"
-    stitched = fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7, rgroup_point=5)
+    stitched = fegrow.build_molecule(
+        sars_core_scaffold, methyl, scaffold_point=7, rgroup_point=5
+    )
 
 
 def test_extend_mol_with_smiles_early_marking(sars_core_scaffold):
@@ -126,12 +124,12 @@ def test_extend_mol_with_smiles_all_marked(sars_core_scaffold):
 
 
 def test_replace_methyl_keep_h(RGroups):
-    """
-
-    """
+    """ """
     params = Chem.SmilesParserParams()
     params.removeHs = False  # keep the hydrogens
-    mol = Chem.MolFromSmiles('[H]c1nc(N([H])C(=O)C([H])([H])[H])c([H])c([H])c1[H]', params=params)
+    mol = Chem.MolFromSmiles(
+        "[H]c1nc(N([H])C(=O)C([H])([H])[H])c([H])c([H])c1[H]", params=params
+    )
     Chem.AllChem.Compute2DCoords(mol)
 
     scaffold = fegrow.RMol(mol)
@@ -140,9 +138,12 @@ def test_replace_methyl_keep_h(RGroups):
     attachment_index = 8
     keep_only_h = 10
     ethanol_rgroup = RGroups[RGroups.Name == "*CCO"].Mol.values[0]
-    rmol = fegrow.build_molecule(scaffold, ethanol_rgroup, attachment_index, keep=keep_only_h)
+    rmol = fegrow.build_molecule(
+        scaffold, ethanol_rgroup, attachment_index, keep=keep_only_h
+    )
 
     assert Chem.MolToSmiles(Chem.RemoveHs(rmol)) == "CCO"
+
 
 def test_adding_ethanol_number_of_atoms(RGroups, sars_scaffold_sdf):
     # Check if merging ethanol with a molecule yields the right number of atoms.
@@ -178,8 +179,10 @@ def test_add_smiles_linker(sars_scaffold_chunk_sdf):
     # Check if conformers are generated correctly.
     attachment_index = 7
 
-    linker_rccr = Chem.AddHs(Chem.MolFromSmiles('*CC*'))
-    scaffold_with_linker = fegrow.build_molecule(sars_scaffold_chunk_sdf, linker_rccr, attachment_index)
+    linker_rccr = Chem.AddHs(Chem.MolFromSmiles("*CC*"))
+    scaffold_with_linker = fegrow.build_molecule(
+        sars_scaffold_chunk_sdf, linker_rccr, attachment_index
+    )
 
 
 def test_add_linker_rgroup_first():
@@ -188,10 +191,10 @@ def test_add_linker_rgroup_first():
     """
     # we can also link the linker and the R-group first
     # before merging them into the main structure
-    linker_rccr = Chem.MolFromSmiles('*CC*')
-    methyl = Chem.MolFromSmiles('CO*')
+    linker_rccr = Chem.MolFromSmiles("*CC*")
+    methyl = Chem.MolFromSmiles("CO*")
     prep = fegrow.build_molecule(linker_rccr, methyl)
-    assert Chem.MolToSmiles(prep) == '*CCOC'
+    assert Chem.MolToSmiles(prep) == "*CCOC"
 
 
 def test_linker_c_first():
@@ -200,11 +203,11 @@ def test_linker_c_first():
 
     :return:
     """
-    linker_rccr = Chem.MolFromSmiles('[*:0]CO[*:1]')
+    linker_rccr = Chem.MolFromSmiles("[*:0]CO[*:1]")
 
-    carbon = Chem.MolFromSmiles('C*')
+    carbon = Chem.MolFromSmiles("C*")
     cco = fegrow.build_molecule(linker_rccr, carbon)
-    assert Chem.MolToSmiles(cco) == 'CCO[*:1]'
+    assert Chem.MolToSmiles(cco) == "CCO[*:1]"
 
 
 def test_linker_o_first():
@@ -213,11 +216,11 @@ def test_linker_o_first():
 
     :return:
     """
-    linker_rccr = Chem.MolFromSmiles('[*:1]CO[*:0]')
+    linker_rccr = Chem.MolFromSmiles("[*:1]CO[*:0]")
 
-    carbon = Chem.MolFromSmiles('C*')
+    carbon = Chem.MolFromSmiles("C*")
     cco = fegrow.build_molecule(linker_rccr, carbon)
-    assert Chem.MolToSmiles(cco) == 'COC[*:1]'
+    assert Chem.MolToSmiles(cco) == "COC[*:1]"
 
 
 def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
@@ -234,7 +237,9 @@ def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
     attachment_index = 40
     # Select a linker
     linker = RLinkers[RLinkers.Name == "R1NC(R2)=O"].Mol.values[0]
-    template_with_linker = fegrow.build_molecule(sars_scaffold_sdf, linker, attachment_index)
+    template_with_linker = fegrow.build_molecule(
+        sars_scaffold_sdf, linker, attachment_index
+    )
 
     for atom in template_with_linker.GetAtoms():
         if atom.GetAtomicNum() == 0:

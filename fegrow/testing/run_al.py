@@ -19,9 +19,11 @@ chemspace.add_smiles(smiles_list, h=6)
 # the protein here does not matter as we don't use it anyway
 chemspace.add_protein("data/7L10_final.pdb")
 
+
 def oracle_look_up(scaffold, h, smiles, *args, **kwargs):
     # mol, data
     return None, {"score": oracle[oracle.Smiles == smiles].iloc[0].cnnaffinity}
+
 
 # select random molecules
 random_pics = chemspace.active_learning(n=5, first_random=True)
@@ -33,5 +35,6 @@ for i in range(2):
     res = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
     # filter out the penalties
     res = res[res.score != 0]
-    print(f"AL cycle cnnaffinity. Mean: {res.score.mean():.2f}, Min: {res.score.min():.2f}, Max: {res.score.max():.2f}")
-
+    print(
+        f"AL cycle cnnaffinity. Mean: {res.score.mean():.2f}, Min: {res.score.min():.2f}, Max: {res.score.max():.2f}"
+    )
