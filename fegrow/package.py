@@ -1385,7 +1385,11 @@ class ChemSpace:  # RInterface
         train_targets = training["score"].to_numpy(dtype=float)
 
         library_features = self.compute_fps(tuple(self.df.Smiles))
+
         train_features = library_features[training.index]
+
+
+
         selection_features = library_features[selection.index]
 
         import fegrow.al
