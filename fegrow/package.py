@@ -1388,8 +1388,6 @@ class ChemSpace:  # RInterface
 
         train_features = library_features[training.index]
 
-
-
         selection_features = library_features[selection.index]
 
         import fegrow.al
