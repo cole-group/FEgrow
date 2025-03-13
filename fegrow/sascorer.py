@@ -17,14 +17,12 @@
 #
 
 
+import math
+import pickle
+from pathlib import Path
+
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
-import pickle
-
-import math
-from collections import defaultdict
-
-from pathlib import Path
 
 _fscores = None
 

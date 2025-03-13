@@ -1,13 +1,10 @@
 import copy
-import itertools
 import logging
 import warnings
-from typing import List, Optional, Union
 
 import networkx
 from rdkit import Chem
 from rdkit.Chem.rdMolAlign import AlignMol
-
 
 logger = logging.getLogger(__name__)
 

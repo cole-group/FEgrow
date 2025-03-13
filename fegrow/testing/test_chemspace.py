@@ -1,16 +1,14 @@
 import copy
 import pathlib
+import random
 import tempfile
 
-import pytest
-import random
-
 import pandas
-
-from rdkit import Chem
-import fegrow
-from fegrow import RGroups, Linkers, ChemSpace
 import prody
+import pytest
+from rdkit import Chem
+
+from fegrow import ChemSpace, Linkers, RGroups
 
 # instantiate the libraries
 RGroups = pandas.DataFrame(RGroups._load_data())

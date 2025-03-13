@@ -1,5 +1,6 @@
 import os
 import tempfile
+
 import requests
 from openbabel import openbabel
 from rdkit import Chem
@@ -9,7 +10,6 @@ path = "/tmp/"
 os.chdir(path)
 
 
-from rdkit import Chem
 
 smiles = ["Br", "CCCC"]
 CACTUS = "https://cactus.nci.nih.gov/chemical/structure/{0}/{1}"

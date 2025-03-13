@@ -1,6 +1,7 @@
 import pathlib
 
 import click
+
 from fegrow.cli.scoring import score
 from fegrow.cli.utils import Settings
 

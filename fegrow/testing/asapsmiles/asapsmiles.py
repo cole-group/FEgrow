@@ -1,7 +1,7 @@
-from fegrow import RList, RMol
-from rdkit import Chem
 import prody
+from rdkit import Chem
 
+from fegrow import RList, RMol
 
 # load the common core
 core = Chem.SDMolSupplier("core.sdf")[0]

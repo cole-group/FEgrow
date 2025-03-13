@@ -2,29 +2,25 @@ import logging
 import tempfile
 from copy import deepcopy
 from typing import List, Tuple, Union
-import warnings
 
+import numpy
 import parmed
 from openmmforcefields.generators import SystemGenerator
+from openmmml import MLPotential
 from pdbfixer import PDBFixer
 from rdkit import Chem
 from rdkit.Geometry.rdGeometry import Point3D
 from tqdm import tqdm
 from typing_extensions import Literal
 
-from openmmml import MLPotential
-
-import numpy
-
 # fix for new openmm versions
 try:
-    from openmm import app, openmm, unit, Platform
+    from openmm import Platform, app, openmm, unit
 except (ImportError, ModuleNotFoundError):
-    from simtk.openmm import app, openmm
     from simtk import unit
+    from simtk.openmm import app, openmm
 
 from openff.toolkit.topology import Molecule as OFFMolecule
-
 
 logger = logging.getLogger(__name__)
 

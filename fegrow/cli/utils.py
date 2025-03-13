@@ -1,12 +1,13 @@
-import dask
-from rdkit import Chem
-from pydantic import BaseModel, Field
-from typing import Optional
-from fegrow.receptor import ForceField
-from fegrow import RMol
 import pathlib
+from typing import Optional
+
+import dask
 import pandas as pd
-from rdkit.Chem import PandasTools
+from pydantic import BaseModel, Field
+from rdkit import Chem
+
+from fegrow import RMol
+from fegrow.receptor import ForceField
 
 
 class Settings(BaseModel):

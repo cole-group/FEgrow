@@ -4,35 +4,32 @@ import functools
 import itertools
 import logging
 import os
-import typing
-import warnings
-from pathlib import Path
 import re
 import stat
 import subprocess
 import tempfile
-from typing import List, Optional, Union, Sequence
-import urllib
 import time
+import typing
+import urllib
+import warnings
+from pathlib import Path
+from typing import List, Optional, Sequence, Union
 
-import functools
-
-import pandas as pd
-import requests
-import numpy as np
+import dask
+import modAL
 import mols2grid
+import numpy as np
 import openmm
 import openmm.app
 import pandas
-import pint_pandas
+import pandas as pd
 import prody as prody_package
 import py3Dmol
 import rdkit
+import requests
+from dask.distributed import Client, LocalCluster
 from rdkit import Chem
 from rdkit.Chem import Draw, PandasTools
-import dask
-from dask.distributed import LocalCluster, Client, Scheduler, Worker
-import modAL
 from sklearn import gaussian_process
 
 from .builder import build_molecules_with_rdkit
@@ -393,7 +390,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                 ["./gnina", "--help"], capture_output=True, cwd=RMol.gnina_dir
             )
             return
-        except FileNotFoundError as E:
+        except FileNotFoundError:
             pass
 
         # gnina is not found, try downloading it
@@ -1121,7 +1118,7 @@ class ChemSpace:  # RInterface
 
                 if al_ignore_penalty:
                     Training = False
-            except Exception as E:
+            except Exception:
                 # failed to finish the protocol, set the penalty
                 score = penalty
                 build_succeeded = False
@@ -1191,8 +1188,6 @@ class ChemSpace:  # RInterface
         )
 
         # colors = df["cluster"].astype('float').values
-        from bokeh import palettes
-        from bokeh.transform import linear_cmap
 
         # mapper = linear_cmap(field_name='cluster', palette=palettes.Turbo256, low=0, high=20)
 

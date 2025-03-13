@@ -1,10 +1,7 @@
-import pathlib
-import pytest
 
-import pandas
+from rdkit import Chem
 
 import fegrow
-from rdkit import Chem
 
 
 def test_adding_ethanol_1mol(RGroups, sars_core_scaffold):

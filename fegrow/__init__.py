@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from .conformers import generate_conformers, WrongCoreForMolecule
+from .conformers import WrongCoreForMolecule, generate_conformers
 from .package import (
     ChemSpace,
+    Linkers,
+    RGroups,
     RMol,
     build_molecule,
-    RGroups,
-    Linkers,
 )
 from .receptor import fix_receptor, optimise_in_receptor, sort_conformers
 from .toxicity import tox_props

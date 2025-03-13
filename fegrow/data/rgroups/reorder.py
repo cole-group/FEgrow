@@ -1,5 +1,5 @@
-from rdkit import Chem
 from bs4 import BeautifulSoup
+from rdkit import Chem
 
 soup = BeautifulSoup(open("top500_R_replacements.xml").read(), "html.parser")
 
