@@ -1,0 +1,23 @@
+name: Nice
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.10
+    - name: Install dependencies
+      run: |
+        pip install black
+    - name: Analysing the code with pylint
+      run: |
+        black --check $(git ls-files '*.py')
