@@ -1,4 +1,3 @@
-
 from rdkit import Chem
 
 import fegrow

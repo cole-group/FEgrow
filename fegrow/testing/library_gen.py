@@ -10,7 +10,6 @@ path = "/tmp/"
 os.chdir(path)
 
 
-
 smiles = ["Br", "CCCC"]
 CACTUS = "https://cactus.nci.nih.gov/chemical/structure/{0}/{1}"
 mols_list = []
