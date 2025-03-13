@@ -31,10 +31,11 @@ def test_chem_space(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     chemspace.add_rgroups([R_group_ethanol, R_group_cyclopropane])
     assert len(chemspace) == 2
 
-    chemspace.generate_conformers(num_conf=10,
-                                  minimum_conf_rms=0.5,
-                                  # flexible=[3, 18, 20])
-                                  )
+    chemspace.generate_conformers(
+        num_conf=10,
+        minimum_conf_rms=0.5,
+        # flexible=[3, 18, 20])
+    )
 
     rec_final = prody.parsePDB(rec_7l10_final_path)
     chemspace.remove_clashing_confs(rec_final)
@@ -83,7 +84,7 @@ def test_pipeline_1linker_2rgroups():
     chemspace = ChemSpace()
 
     r_ethanol = Chem.MolFromSmiles("*CCO")
-    r_cyclopropane =  Chem.MolFromSmiles("*C1CC1")
+    r_cyclopropane = Chem.MolFromSmiles("*C1CC1")
     linker = Chem.MolFromSmiles("[*:0]NC[*:1]")
 
     scaffold = Chem.MolFromSmiles("FC*")
@@ -92,14 +93,14 @@ def test_pipeline_1linker_2rgroups():
     chemspace.add_rgroups(linker, [r_ethanol, r_cyclopropane])
 
     df = chemspace.df
-    assert df.loc[0].Mol.HasSubstructMatch(Chem.MolFromSmiles('NC'))
-    assert df.loc[1].Mol.HasSubstructMatch(Chem.MolFromSmiles('NC'))
+    assert df.loc[0].Mol.HasSubstructMatch(Chem.MolFromSmiles("NC"))
+    assert df.loc[1].Mol.HasSubstructMatch(Chem.MolFromSmiles("NC"))
 
 
 def test_pipeline_2linkers_2rgroups(sars_scaffold_chunk_sdf):
     chemspace = ChemSpace()
 
-    r_cyclopropane =  Chem.MolFromSmiles("*C1CC1")
+    r_cyclopropane = Chem.MolFromSmiles("*C1CC1")
 
     link_nc = Chem.MolFromSmiles("[*:0]NC[*:1]")
     link_oc = Chem.MolFromSmiles("[*:0]OC[*:1]")
@@ -110,8 +111,8 @@ def test_pipeline_2linkers_2rgroups(sars_scaffold_chunk_sdf):
     chemspace.add_rgroups([link_nc, link_oc], [r_cyclopropane, r_cyclopropane])
 
     df = chemspace.df
-    assert df.loc[0].Mol.HasSubstructMatch(Chem.MolFromSmiles('NC'))
-    assert df.loc[1].Mol.HasSubstructMatch(Chem.MolFromSmiles('OC'))
+    assert df.loc[0].Mol.HasSubstructMatch(Chem.MolFromSmiles("NC"))
+    assert df.loc[1].Mol.HasSubstructMatch(Chem.MolFromSmiles("OC"))
 
 
 def test_pipeline_2linkers_2rgroups_alltoall():
@@ -121,18 +122,16 @@ def test_pipeline_2linkers_2rgroups_alltoall():
     link_s = Chem.MolFromSmiles("[*:0]S[*:1]")
 
     r_methanol = Chem.MolFromSmiles("*CO")
-    r_bromium =  Chem.MolFromSmiles("*Br")
+    r_bromium = Chem.MolFromSmiles("*Br")
 
     scaffold = Chem.MolFromSmiles("F*")
     chemspace.add_scaffold(scaffold)
 
-    chemspace.add_rgroups([link_nc, link_s],
-                          [r_methanol, r_bromium],
-                          alltoall=True)
+    chemspace.add_rgroups([link_nc, link_s], [r_methanol, r_bromium], alltoall=True)
 
     df = chemspace.df
     assert len(df) == 4
-    assert set(df.Smiles.to_list()) == {'FN=CBr', 'FSBr', 'OCC=NF', 'OCSF'}
+    assert set(df.Smiles.to_list()) == {"FN=CBr", "FSBr", "OCC=NF", "OCSF"}
 
 
 def test_pipeline_1linker_1rgroup_check_h_attachment(sars_scaffold_chunk_sdf):
@@ -174,8 +173,12 @@ def test_toxicity(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
-    chemspace.add_rgroups([RGroups[RGroups.Name == "*CCO"].Mol.item(),
-                           RGroups[RGroups.Name == "*C1CC1"].Mol.item()])
+    chemspace.add_rgroups(
+        [
+            RGroups[RGroups.Name == "*CCO"].Mol.item(),
+            RGroups[RGroups.Name == "*C1CC1"].Mol.item(),
+        ]
+    )
 
     toxicity = chemspace.toxicity()
     assert len(toxicity) == 2
@@ -187,8 +190,12 @@ def test_io_write_load(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
-    chemspace.add_rgroups([RGroups[RGroups.Name == "*CCO"].Mol.item(),
-                           RGroups[RGroups.Name == "*C1CC1"].Mol.item()])
+    chemspace.add_rgroups(
+        [
+            RGroups[RGroups.Name == "*CCO"].Mol.item(),
+            RGroups[RGroups.Name == "*C1CC1"].Mol.item(),
+        ]
+    )
 
     with tempfile.NamedTemporaryFile(suffix=".sdf") as TMP:
         chemspace.to_sdf(TMP.name)
@@ -202,8 +209,12 @@ def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
-    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]',
-                          '[H]c1nc([H])c(C2([H])C([H])([H])C2([H])[H])c([H])c1[H]'])
+    chemspace.add_smiles(
+        [
+            "[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]",
+            "[H]c1nc([H])c(C2([H])C([H])([H])C2([H])[H])c([H])c1[H]",
+        ]
+    )
 
     chemspace.add_protein(rec_7l10_final_path)
 
@@ -219,8 +230,12 @@ def test_pipeline_smiles_noh(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_pa
     bare_scaffold_noh = Chem.RemoveHs(sars_scaffold_chunk_sdf)
     chemspace.add_scaffold(bare_scaffold_noh)
     # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
-    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]',
-                          '[H]c1nc([H])c(C2([H])C([H])([H])C2([H])[H])c([H])c1[H]'])
+    chemspace.add_smiles(
+        [
+            "[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]",
+            "[H]c1nc([H])c(C2([H])C([H])([H])C2([H])[H])c([H])c1[H]",
+        ]
+    )
 
     chemspace.add_protein(rec_7l10_final_path)
 
@@ -229,7 +244,9 @@ def test_pipeline_smiles_noh(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_pa
     assert chemspace.df.iloc[1].score > 2.0
 
 
-def test_evaluate_scoring_function_works(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+def test_evaluate_scoring_function_works(
+    RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path
+):
     """
     Ensure that the passed functional form is used.
 
@@ -243,10 +260,11 @@ def test_evaluate_scoring_function_works(RGroups, sars_scaffold_chunk_sdf, rec_7
     chemspace = ChemSpace()
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
-    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]'])
+    chemspace.add_smiles(["[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]"])
     chemspace.add_protein(rec_7l10_final_path)
 
     random_score = random.random()
+
     def scorer(rmol, pdb_filename, data):
         return random_score
 
@@ -255,7 +273,9 @@ def test_evaluate_scoring_function_works(RGroups, sars_scaffold_chunk_sdf, rec_7
     assert chemspace.df.iloc[0].score == random_score
 
 
-def test_evaluate_scoring_function_saves_data(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
+def test_evaluate_scoring_function_saves_data(
+    RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path
+):
     """
     Ensure that the passed functional form is used.
 
@@ -269,10 +289,11 @@ def test_evaluate_scoring_function_saves_data(RGroups, sars_scaffold_chunk_sdf, 
     chemspace = ChemSpace()
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
-    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]'])
+    chemspace.add_smiles(["[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]"])
     chemspace.add_protein(rec_7l10_final_path)
 
     hello_world = "Hi Frank!"
+
     def scorer(rmol, pdb_filename, data):
         data["hello_world"] = hello_world
         return 5
@@ -296,15 +317,10 @@ def test_evaluate_full_hijack(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_p
     chemspace = ChemSpace()
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
-    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]'])
+    chemspace.add_smiles(["[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]"])
     chemspace.add_protein(rec_7l10_final_path)
 
-    def full_evaluation(scaffold,
-                     h,
-                     smiles,
-                     pdb_filename,
-                     *args,
-                     **kwargs):
+    def full_evaluation(scaffold, h, smiles, pdb_filename, *args, **kwargs):
         # return: mol, data
         mol = copy.deepcopy(scaffold)
         return mol, {"score": 5}
@@ -329,17 +345,21 @@ def test_al(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
 
-    not_studied_smiles = ['[H]OC(=O)N([H])c1c([H])nc([H])c([H])c1[H]',
-                          '[H]ON([H])c1c([H])nc([H])c([H])c1[H]']
-    studied_smiles = ['[H]OC([H])([H])c1c([H])nc([H])c([H])c1[H]',
-                      '[H]ON([H])C(=O)c1c([H])nc([H])c([H])c1[H]']
+    not_studied_smiles = [
+        "[H]OC(=O)N([H])c1c([H])nc([H])c([H])c1[H]",
+        "[H]ON([H])c1c([H])nc([H])c([H])c1[H]",
+    ]
+    studied_smiles = [
+        "[H]OC([H])([H])c1c([H])nc([H])c([H])c1[H]",
+        "[H]ON([H])C(=O)c1c([H])nc([H])c([H])c1[H]",
+    ]
     chemspace.add_smiles(studied_smiles + not_studied_smiles)
     chemspace.add_protein(rec_7l10_final_path)
 
     # set the results for the studied smiles
     df = chemspace.df
-    df.loc[df.index == 0, ['score', 'Training']] = [3.2475, True]
-    df.loc[df.index == 1, ['score', 'Training']] = [3.57196, True]
+    df.loc[df.index == 0, ["score", "Training"]] = [3.2475, True]
+    df.loc[df.index == 1, ["score", "Training"]] = [3.57196, True]
 
     to_study = chemspace.active_learning(n=1)
 
@@ -382,7 +402,10 @@ def test_al_local(sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
         # filter out the penalties
         res = res[res.score != 0]
-        print(f"AL cycle cnnaffinity. Mean: {res.score.mean():.2f}, Min: {res.score.min():.2f}, Max: {res.score.max():.2f}")
+        print(
+            f"AL cycle cnnaffinity. Mean: {res.score.mean():.2f}, Min: {res.score.min():.2f}, Max: {res.score.max():.2f}"
+        )
+
 
 @pytest.mark.skip(reason="in dev. ")
 def test_umap(sars_scaffold_chunk_sdf):
@@ -423,7 +446,9 @@ def test_al_full(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     def oracle_look_up(scaffold, h, smiles, *args, **kwargs):
         # mol, data
-        return Chem.MolFromSmiles(smiles), {"score": oracle[oracle.Smiles == smiles].iloc[0].cnnaffinity}
+        return Chem.MolFromSmiles(smiles), {
+            "score": oracle[oracle.Smiles == smiles].iloc[0].cnnaffinity
+        }
 
     # select random molecules
     random_pics = chemspace.active_learning(n=3, first_random=True)
@@ -438,9 +463,7 @@ def test_al_full(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
 
 def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
-    """
-
-    """
+    """ """
     # check if two molecules were built with chemspace
     chemspace = ChemSpace()
 
@@ -466,6 +489,7 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     # configure active learning
     from fegrow.al import Model, Query
+
     chemspace.model = Model.gaussian_process()
 
     chemspace.query = Query.UCB(beta=10)
@@ -510,8 +534,9 @@ def test_adding_enamines(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     chemspace = ChemSpace()
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
-    chemspace.add_smiles(['[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]'], h=8)
+    chemspace.add_smiles(["[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]"], h=8)
     chemspace.add_protein(rec_7l10_final_path)
+
     def scorer(rmol, pdb_filename, data):
         return 5
 

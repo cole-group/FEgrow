@@ -27,4 +27,3 @@ def settings(gnina_path: pathlib.Path):
     config = Settings(gnina_path=gnina_path)
     with open("settings.json") as output:
         output.write(config.json(indent=2))
-

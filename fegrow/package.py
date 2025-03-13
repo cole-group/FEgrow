@@ -56,8 +56,7 @@ class RInterface:
     """
 
     @abc.abstractmethod
-    def rep2D(self, **kwargs):
-        ...
+    def rep2D(self, **kwargs): ...
 
     @abc.abstractmethod
     def toxicity(self):
@@ -207,7 +206,6 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                 "Please run the optimise_in_receptor in order to generate the energies first. "
             )
 
-
         final_mol, final_energies = sort_conformers(
             self, self.opt_energies, energy_range=energy_range
         )
@@ -308,8 +306,9 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         view.zoomTo({"model": -1})
         return view
 
-    def remove_clashing_confs(self,
-                              protein: Union[str, openmm.app.PDBFile], min_dst_allowed=1.0):
+    def remove_clashing_confs(
+        self, protein: Union[str, openmm.app.PDBFile], min_dst_allowed=1.0
+    ):
         """
         Removing conformations that class with the protein.
         Note that the original conformer should be well docked into the protein,
@@ -327,7 +326,11 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
             protein = openmm.app.PDBFile(protein)
 
         if type(protein) is openmm.app.PDBFile:
-            protein_coords = protein.getPositions(asNumpy=True).in_units_of(openmm.unit.angstrom)._value
+            protein_coords = (
+                protein.getPositions(asNumpy=True)
+                .in_units_of(openmm.unit.angstrom)
+                ._value
+            )
         else:
             protein_coords = protein.getCoords()
 
@@ -353,7 +356,6 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
 
         # return self for Dask
         return self
-
 
     @staticmethod
     def set_gnina(loc):
@@ -426,10 +428,12 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         :type receptor_file: str
         """
         RMol._check_download_gnina()
-        gnina_path = os.path.join(RMol.gnina_dir, 'gnina')
+        gnina_path = os.path.join(RMol.gnina_dir, "gnina")
 
         if not isinstance(receptor_file, str) and not isinstance(receptor_file, Path):
-            raise ValueError(f"gnina function requires a file path to the receptor. Instead, was given: {type(receptor_file)}")
+            raise ValueError(
+                f"gnina function requires a file path to the receptor. Instead, was given: {type(receptor_file)}"
+            )
 
         # get the absolute path
         receptor = Path(receptor_file)
@@ -487,7 +491,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                 f"The file type {file_type} is not support please chose from {writers.keys()}"
             )
 
-        if file_type in ['.pdb', '.sdf']:
+        if file_type in [".pdb", ".sdf"]:
             # multi-frame writers
 
             with writers[file_type](filename) as WRITER:
@@ -496,7 +500,6 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
             return
 
         writers[file_type](self, filename)
-
 
     def df(self):
         """
@@ -535,8 +538,13 @@ class DaskTasks:
     @staticmethod
     @dask.delayed
     def obabel_protonate(smi):
-        return subprocess.run(['obabel', f'-:{smi}', '-osmi', '-p', '7', '-xh'],
-                              capture_output=True).stdout.decode().strip()
+        return (
+            subprocess.run(
+                ["obabel", f"-:{smi}", "-osmi", "-p", "7", "-xh"], capture_output=True
+            )
+            .stdout.decode()
+            .strip()
+        )
 
     @staticmethod
     @dask.delayed
@@ -559,7 +567,8 @@ class DaskTasks:
 
         return False, None
 
-class ChemSpace: # RInterface
+
+class ChemSpace:  # RInterface
     """
     Streamline working with many RMols or a specific chemical space by employing a pandas dataframe,
     in combination with Dask for parallellisation.
@@ -569,22 +578,31 @@ class ChemSpace: # RInterface
 
     def rep2D(self, subImgSize=(400, 400), **kwargs):
         return Draw.MolsToGridImage(
-            [row.Mol.rep2D(rdkit_mol=True, **kwargs) for i, row in self.df.iterrows()], subImgSize=subImgSize
+            [row.Mol.rep2D(rdkit_mol=True, **kwargs) for i, row in self.df.iterrows()],
+            subImgSize=subImgSize,
         )
 
     _dask_cluster = None
     _dask_client = None
 
-    DATAFRAME_DEFAULT_VALUES = {"Smiles": [], # Smiles will always be replaced when inserting new data.
-                                "Mol": pandas.NA,
-                                "score": pandas.NA, # any scoring function, by default cnnaffinity
-                                "h": pandas.NA,
-                                "Training": False, # will be used for AL
-                                "Success": pandas.NA, # true if built, false if built unsuccessfully
-                                "enamine_searched": False,
-                                "enamine_id": pandas.NA}
+    DATAFRAME_DEFAULT_VALUES = {
+        "Smiles": [],  # Smiles will always be replaced when inserting new data.
+        "Mol": pandas.NA,
+        "score": pandas.NA,  # any scoring function, by default cnnaffinity
+        "h": pandas.NA,
+        "Training": False,  # will be used for AL
+        "Success": pandas.NA,  # true if built, false if built unsuccessfully
+        "enamine_searched": False,
+        "enamine_id": pandas.NA,
+    }
 
-    def __init__(self, data=None, data_indices=None, dask_cluster=None, dask_local_cluster_kwargs={}):
+    def __init__(
+        self,
+        data=None,
+        data_indices=None,
+        dask_cluster=None,
+        dask_local_cluster_kwargs={},
+    ):
         if data is None:
             data = ChemSpace.DATAFRAME_DEFAULT_VALUES
 
@@ -593,24 +611,31 @@ class ChemSpace: # RInterface
         ChemSpace._dask_cluster = dask_cluster
 
         if ChemSpace._dask_cluster is None:
-            logger.info("No Dask cluster configured. Creating a local cluster of threads. ")
-            warnings.warn("ANI uses TORCHAni which is not threadsafe, leading to random SEGFAULTS. "
-                          "Use a Dask cluster with processes as a work around "
-                          "(see the documentation for an example of this workaround) .")
+            logger.info(
+                "No Dask cluster configured. Creating a local cluster of threads. "
+            )
+            warnings.warn(
+                "ANI uses TORCHAni which is not threadsafe, leading to random SEGFAULTS. "
+                "Use a Dask cluster with processes as a work around "
+                "(see the documentation for an example of this workaround) ."
+            )
 
-            kwargs = {"n_workers": None,
-                      "processes": False,  # turn off Nanny to avoid the problem
-                                           # with loading of the main file (ie executing it)
-                      "dashboard_address": ":8989",
-                      **dask_local_cluster_kwargs
-                      }
+            kwargs = {
+                "n_workers": None,
+                "processes": False,  # turn off Nanny to avoid the problem
+                # with loading of the main file (ie executing it)
+                "dashboard_address": ":8989",
+                **dask_local_cluster_kwargs,
+            }
             ChemSpace._dask_cluster = LocalCluster(**kwargs)
             # ChemSpace._dask_cluster = Scheduler()
             # ChemSpace._dask_cluster = LocalCluster(preload_nanny=["print('Hi Nanny')"],
             #                                        preload=["pint"], n_workers=1
             #                                        ) #asynchronous=True)
 
-        ChemSpace._dask_client = Client(ChemSpace._dask_cluster) #ChemSpace._dask_cluster, asynchronous=True)
+        ChemSpace._dask_client = Client(
+            ChemSpace._dask_cluster
+        )  # ChemSpace._dask_cluster, asynchronous=True)
         print(f"Dask can be watched on {ChemSpace._dask_client.dashboard_link}")
 
         self._scaffolds = []
@@ -621,6 +646,7 @@ class ChemSpace: # RInterface
     def set_dask_caching(self, bytes_num=4e9):
         # Leverage 4 gigabytes of memory
         from dask.cache import Cache
+
         self.cache = Cache(bytes_num)
         self.cache.register()
 
@@ -632,7 +658,6 @@ class ChemSpace: # RInterface
             self._dask_client = Client(ChemSpace._dask_cluster)
 
         return self._dask_client
-
 
     @staticmethod
     def _add_smiles_2D_visualisation(df):
@@ -650,7 +675,7 @@ class ChemSpace: # RInterface
         return df
 
     def generate_conformers(
-            self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
+        self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
     ):
         # prepare the dask parameters to be send
         num_conf = dask.delayed(num_conf)
@@ -660,7 +685,9 @@ class ChemSpace: # RInterface
         delayed_generate_conformers = dask.delayed(generate_conformers)
         jobs = {}
         for i, row in self.df.iterrows():
-            jobs[row.Mol] = (delayed_generate_conformers(row.Mol, num_conf, minimum_conf_rms, **kwargs))
+            jobs[row.Mol] = delayed_generate_conformers(
+                row.Mol, num_conf, minimum_conf_rms, **kwargs
+            )
 
         # dask batch compute
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -682,7 +709,9 @@ class ChemSpace: # RInterface
         delayed_remove_clashing_confs = dask.delayed(RMol.remove_clashing_confs)
         jobs = {}
         for i, row in self.df.iterrows():
-            jobs[row.Mol] = delayed_remove_clashing_confs(row.Mol, prot, min_dst_allowed=min_dst_allowed)
+            jobs[row.Mol] = delayed_remove_clashing_confs(
+                row.Mol, prot, min_dst_allowed=min_dst_allowed
+            )
 
         # dask batch compute
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -707,7 +736,9 @@ class ChemSpace: # RInterface
         jobs = {}
         for i, row in self.df.iterrows():
             if row.Mol.GetNumConformers() == 0:
-                print(f"Warning: mol {i} has no conformers. Ignoring receptor optimisation.")
+                print(
+                    f"Warning: mol {i} has no conformers. Ignoring receptor optimisation."
+                )
                 continue
 
             jobs[row.Mol] = delayed_optimise_in_receptor(row.Mol, *args, **kwargs)
@@ -741,7 +772,7 @@ class ChemSpace: # RInterface
         # daskify objects
         receptor_file = dask.delayed(receptor_file)
         RMol._check_download_gnina()
-        gnina_path = dask.delayed(os.path.join(RMol.gnina_dir, 'gnina'))
+        gnina_path = dask.delayed(os.path.join(RMol.gnina_dir, "gnina"))
 
         # create the dask jobs
         delayed_gnina = dask.delayed(gnina)
@@ -760,7 +791,9 @@ class ChemSpace: # RInterface
         dfs = []
         for i, result in results.items():
             _, cnnaffinities = result.result()
-            df = RMol._parse_gnina_cnnaffinities(self.df.Mol[i], cnnaffinities, mol_id=i)
+            df = RMol._parse_gnina_cnnaffinities(
+                self.df.Mol[i], cnnaffinities, mol_id=i
+            )
             dfs.append(df)
 
         df = pandas.concat(dfs)
@@ -774,9 +807,7 @@ class ChemSpace: # RInterface
         ids_to_remove = []
         for i, row in self.df.iterrows():
             if row.Mol.GetNumConformers() == 0:
-                print(
-                    f"Discarding a molecule (id {i}) due to the lack of conformers. "
-                )
+                print(f"Discarding a molecule (id {i}) due to the lack of conformers. ")
                 ids_to_remove.append(i)
 
         self.df = self.df[~self.df.index.isin(ids_to_remove)]
@@ -798,8 +829,10 @@ class ChemSpace: # RInterface
         # check if any atom is marked for joining
         if atom_replacement_index is None:
             if not any(atom.GetAtomicNum() == 0 for atom in template.GetAtoms()):
-                warnings.warn("The template does not have an attachement (Atoms with index 0, "
-                                 "or in case of Smiles the * character. )")
+                warnings.warn(
+                    "The template does not have an attachement (Atoms with index 0, "
+                    "or in case of Smiles the * character. )"
+                )
         else:
             # mark the right atom for replacement by assigning it atomic number == 0
             template.GetAtomWithIdx(atom_replacement_index).SetAtomicNum(0)
@@ -834,13 +867,17 @@ class ChemSpace: # RInterface
         # if linkers and rgroups are attached, add them in two iterations
         if rgroups2 is not None and not alltoall:
             # for each attached linker, attach an rgroup with the same position
-            jobs = [delayed_build_molecule(scaffold_linked, rgroup)
-                    for rgroup, scaffold_linked in
-                    itertools.zip_longest(rgroups2, jobs, fillvalue=jobs[0])]
+            jobs = [
+                delayed_build_molecule(scaffold_linked, rgroup)
+                for rgroup, scaffold_linked in itertools.zip_longest(
+                    rgroups2, jobs, fillvalue=jobs[0]
+                )
+            ]
         elif rgroups2 is not None and alltoall:
-            jobs = [delayed_build_molecule(scaffold_linked, rgroup)
-                    for rgroup, scaffold_linked in
-                    itertools.product(rgroups2, jobs)]
+            jobs = [
+                delayed_build_molecule(scaffold_linked, rgroup)
+                for rgroup, scaffold_linked in itertools.product(rgroups2, jobs)
+            ]
 
         results = self.dask_client.compute(jobs)
         built_mols = [r.result() for r in results]
@@ -849,7 +886,7 @@ class ChemSpace: # RInterface
         built_mols_smiles = [Chem.MolToSmiles(mol) for mol in built_mols]
 
         # extract the H indices used for attaching the scaffold
-        hs = [mol.GetIntProp('attachment_point') for mol in built_mols]
+        hs = [mol.GetIntProp("attachment_point") for mol in built_mols]
 
         self.add_data({"Smiles": built_mols_smiles, "Mol": built_mols, "h": hs})
 
@@ -870,7 +907,7 @@ class ChemSpace: # RInterface
         data_with_defaults.update(data)
 
         # update the internal dataframe
-        new_indices = range(last_index, last_index + len(data_with_defaults['Smiles']))
+        new_indices = range(last_index, last_index + len(data_with_defaults["Smiles"]))
         prepared_data = pandas.DataFrame(data_with_defaults, index=new_indices)
         self.df = pandas.concat([self.df, prepared_data])
         return prepared_data
@@ -885,7 +922,9 @@ class ChemSpace: # RInterface
         """
 
         if protonate:
-            delayed_protonations = [DaskTasks.obabel_protonate(smi) for smi in smiles_list]
+            delayed_protonations = [
+                DaskTasks.obabel_protonate(smi) for smi in smiles_list
+            ]
             jobs = self.dask_client.compute(delayed_protonations)
             smiles_list = [job.result() for job in jobs]
 
@@ -894,9 +933,11 @@ class ChemSpace: # RInterface
         params.removeHs = False
         mols = [Chem.MolFromSmiles(smiles, params=params) for smiles in smiles_list]
 
-        self.add_data({"Smiles": smiles_list, "Mol": mols, "h":h})
+        self.add_data({"Smiles": smiles_list, "Mol": mols, "h": h})
 
-    def _evaluate_experimental(self, indices=None, num_conf=10, minimum_conf_rms=0.5, min_dst_allowed=1):
+    def _evaluate_experimental(
+        self, indices=None, num_conf=10, minimum_conf_rms=0.5, min_dst_allowed=1
+    ):
         """
         Generate the conformers and score the subset of molecules.
 
@@ -913,7 +954,9 @@ class ChemSpace: # RInterface
         if len(self._scaffolds) == 0:
             print("Please add scaffolds to the system for the evaluation. ")
         elif len(self._scaffolds) > 1:
-            raise NotImplementedError("For now we only allow working with one scaffold. ")
+            raise NotImplementedError(
+                "For now we only allow working with one scaffold. "
+            )
 
         # carry out the full pipeline, generate conformers, etc.
         # note that we have to find a way to pass all the molecules
@@ -927,7 +970,7 @@ class ChemSpace: # RInterface
         protein_file = dask.delayed(self._protein_filename)
         min_dst_allowed = dask.delayed(min_dst_allowed)
         RMol._check_download_gnina()
-        gnina_path = dask.delayed(os.path.join(RMol.gnina_dir, 'gnina'))
+        gnina_path = dask.delayed(os.path.join(RMol.gnina_dir, "gnina"))
 
         # functions
         delayed_generate_conformers = dask.delayed(generate_conformers)
@@ -937,9 +980,12 @@ class ChemSpace: # RInterface
         # create dask jobs
         jobs = {}
         for i, row in self.df.iterrows():
-            generated_confs = delayed_generate_conformers(row.Mol, num_conf, minimum_conf_rms)
-            removed_clashes = delayed_remove_clashing_confs(generated_confs, protein,
-                                                                                 min_dst_allowed=min_dst_allowed)
+            generated_confs = delayed_generate_conformers(
+                row.Mol, num_conf, minimum_conf_rms
+            )
+            removed_clashes = delayed_remove_clashing_confs(
+                generated_confs, protein, min_dst_allowed=min_dst_allowed
+            )
             jobs[i] = delayed_gnina(removed_clashes, protein_file, gnina_path)
 
         # run all jobs
@@ -961,16 +1007,18 @@ class ChemSpace: # RInterface
 
         logger.info(f"Evaluated {len(results)} cases")
 
-    def evaluate(self,
-                 indices : Union[Sequence[int], pandas.DataFrame]=None,
-                 scoring_function=None,
-                 gnina_path=None,
-                 gnina_gpu=False,
-                 num_conf=50,
-                 minimum_conf_rms=0.5,
-                 penalty=pd.NA,
-                 al_ignore_penalty=True,
-                 **kwargs):
+    def evaluate(
+        self,
+        indices: Union[Sequence[int], pandas.DataFrame] = None,
+        scoring_function=None,
+        gnina_path=None,
+        gnina_gpu=False,
+        num_conf=50,
+        minimum_conf_rms=0.5,
+        penalty=pd.NA,
+        al_ignore_penalty=True,
+        **kwargs,
+    ):
         """
 
         :param indices:
@@ -1002,14 +1050,16 @@ class ChemSpace: # RInterface
         if len(self._scaffolds) == 0:
             print("Please add scaffolds to the system for the evaluation. ")
         elif len(self._scaffolds) > 1:
-            raise NotImplementedError("For now we only allow working with one scaffold. ")
+            raise NotImplementedError(
+                "For now we only allow working with one scaffold. "
+            )
 
         # should be enough to do it once, shared
         ## GENERATE CONFORMERS
 
         if gnina_path is not None:
             # gnina_path = delayed(os.path.join(RMol.gnina_dir, 'gnina'))
-            RMol.set_gnina(os.path.join(RMol.gnina_dir, 'gnina'))
+            RMol.set_gnina(os.path.join(RMol.gnina_dir, "gnina"))
         RMol._check_download_gnina()
 
         num_conf = dask.delayed(num_conf)
@@ -1019,7 +1069,9 @@ class ChemSpace: # RInterface
 
         scaffold = dask.delayed(self._scaffolds[0])
         # extract which hydrogen was used for the attachement
-        h_attachements = [a.GetIdx() for a in self._scaffolds[0].GetAtoms() if a.GetAtomicNum() == 0]
+        h_attachements = [
+            a.GetIdx() for a in self._scaffolds[0].GetAtoms() if a.GetAtomicNum() == 0
+        ]
 
         h_attachement_index = None
         if len(h_attachements) > 0:
@@ -1029,16 +1081,17 @@ class ChemSpace: # RInterface
         delayed_evaluate = dask.delayed(_evaluate_atomic)
         jobs = {}
         for i, row in selected_rows.iterrows():
-            jobs[i] = delayed_evaluate(scaffold,
-                                        row.Smiles,
-                                        protein_file,
-                                        h=h_attachement_index,
-                                        num_conf=num_conf,
-                                        minimum_conf_rms=minimum_conf_rms,
-                                        scoring_function=scoring_function,
-                                        gnina_gpu=gnina_gpu,
-                                        **kwargs
-                                        )
+            jobs[i] = delayed_evaluate(
+                scaffold,
+                row.Smiles,
+                protein_file,
+                h=h_attachement_index,
+                num_conf=num_conf,
+                minimum_conf_rms=minimum_conf_rms,
+                scoring_function=scoring_function,
+                gnina_gpu=gnina_gpu,
+                **kwargs,
+            )
 
         # run all
         results = dict(zip(jobs.keys(), self.dask_client.compute(list(jobs.values()))))
@@ -1076,19 +1129,27 @@ class ChemSpace: # RInterface
                 if al_ignore_penalty:
                     Training = False
 
-            self.df.loc[i, ["score", "Training", "Success"]] = score, Training, build_succeeded
+            self.df.loc[i, ["score", "Training", "Success"]] = (
+                score,
+                Training,
+                build_succeeded,
+            )
 
         logger.info(f"Evaluated {len(results)} cases")
         return self.df.loc[indices]
 
     def umap(self, filename="umap_out.html"):
-        print("Please cite UMAP (umap-learn pacakge) if you're using it: https://arxiv.org/abs/1802.03426 , "
-              "https://umap-learn.readthedocs.io/en/latest/index.html")
+        print(
+            "Please cite UMAP (umap-learn pacakge) if you're using it: https://arxiv.org/abs/1802.03426 , "
+            "https://umap-learn.readthedocs.io/en/latest/index.html"
+        )
 
         from umap import UMAP
+
         fps = self.compute_fps(tuple(self.df.Smiles))
         # convert to a list of 1D arrays
         fps = [fp.flatten() for fp in np.split(fps, len(fps))]
+
         def tanimoto_dist(a, b):
             dotprod = np.dot(a, b)
             tc = dotprod / (np.sum(a) + np.sum(b) - dotprod)
@@ -1122,15 +1183,20 @@ class ChemSpace: # RInterface
         # df["sizes"] = [2 if c == 0 else 10 for c in picked_df.cluster]
 
         from bokeh.plotting import figure, output_file, show
-        fig = figure(width=1000, height=500, # tooltips=TOOLTIP
-                   title="UMAP Projection of Molecular Fingerprints")
+
+        fig = figure(
+            width=1000,
+            height=500,  # tooltips=TOOLTIP
+            title="UMAP Projection of Molecular Fingerprints",
+        )
 
         # colors = df["cluster"].astype('float').values
         from bokeh import palettes
         from bokeh.transform import linear_cmap
+
         # mapper = linear_cmap(field_name='cluster', palette=palettes.Turbo256, low=0, high=20)
 
-        fig.circle('x', 'y', source=df, alpha=0.9)
+        fig.circle("x", "y", source=df, alpha=0.9)
 
         # Create a color bar based on sf1 values
         # color_mapper = LinearColorMapper(palette=Viridis256, low=min(colors), high=max(colors))
@@ -1143,8 +1209,9 @@ class ChemSpace: # RInterface
         # import matplotlib.pyplot as plt
         # plt.show()
 
-
-    def add_enamine_molecules(self, n_best=1, results_per_search=100, remove_scaffold_h=False):
+    def add_enamine_molecules(
+        self, n_best=1, results_per_search=100, remove_scaffold_h=False
+    ):
         """
         For the best scoring molecules, find similar molecules in Enamine REAL database
          and add them to the dataset.
@@ -1173,25 +1240,32 @@ class ChemSpace: # RInterface
             return
 
         if len(set(best_vl_for_searching.h)) > 1:
-            raise NotImplementedError('Multiple growth vectors are used. ')
+            raise NotImplementedError("Multiple growth vectors are used. ")
 
         # filter out previously queried molecules
-        new_searches = best_vl_for_searching[best_vl_for_searching.enamine_searched == False]
+        new_searches = best_vl_for_searching[
+            best_vl_for_searching.enamine_searched == False
+        ]
         smiles_to_search = list(new_searches.Smiles)
 
         start = time.time()
-        print(f'Querying Enamine REAL. Looking up {len(smiles_to_search)} smiles.')
+        print(f"Querying Enamine REAL. Looking up {len(smiles_to_search)} smiles.")
         try:
             with Enamine() as DB:
-                results: pandas.DataFrame = DB.search_smiles(smiles_to_search, remove_duplicates=True,
-                                                             results_per_search=results_per_search)
+                results: pandas.DataFrame = DB.search_smiles(
+                    smiles_to_search,
+                    remove_duplicates=True,
+                    results_per_search=results_per_search,
+                )
         except requests.exceptions.HTTPError as HTTPError:
             print("Enamine API call failed. ", HTTPError)
             return
-        print(f"Enamine returned with {len(results)} rows in {time.time() - start:.1f}s.")
+        print(
+            f"Enamine returned with {len(results)} rows in {time.time() - start:.1f}s."
+        )
 
         # update the database that this molecule has been searched
-        self.df.loc[new_searches.index, 'enamine_searched'] = True
+        self.df.loc[new_searches.index, "enamine_searched"] = True
 
         if len(results) == 0:
             print("The server did not return a single Smiles!")
@@ -1209,16 +1283,26 @@ class ChemSpace: # RInterface
 
         start = time.time()
         # protonate and check for scaffold
-        delayed_protonations = [DaskTasks.obabel_protonate(smi.rsplit(maxsplit=1)[0])
-                                for smi in results.hitSmiles.values]
-        jobs = self.dask_client.compute([DaskTasks.scaffold_check(smih, dask_scaffold)
-                                         for smih in delayed_protonations])
+        delayed_protonations = [
+            DaskTasks.obabel_protonate(smi.rsplit(maxsplit=1)[0])
+            for smi in results.hitSmiles.values
+        ]
+        jobs = self.dask_client.compute(
+            [
+                DaskTasks.scaffold_check(smih, dask_scaffold)
+                for smih in delayed_protonations
+            ]
+        )
         scaffold_test_results = [job.result() for job in jobs]
         scaffold_mask = [r[0] for r in scaffold_test_results]
         # smiles None means that the molecule did not have our scaffold
         protonated_smiles = [r[1] for r in scaffold_test_results if r[1] is not None]
-        print(f"Dask obabel protonation + scaffold test finished in {time.time() - start:.2f}s.")
-        print(f"Tested scaffold presence. Kept {sum(scaffold_mask)}/{len(scaffold_mask)}.")
+        print(
+            f"Dask obabel protonation + scaffold test finished in {time.time() - start:.2f}s."
+        )
+        print(
+            f"Tested scaffold presence. Kept {sum(scaffold_mask)}/{len(scaffold_mask)}."
+        )
 
         if len(scaffold_mask) > 0:
             similar = results[scaffold_mask]
@@ -1229,11 +1313,13 @@ class ChemSpace: # RInterface
         # filter out Enamine molecules which were previously added
         new_enamines = similar[~similar.id.isin(vl.enamine_id)]
 
-        warnings.warn(f"Only one H vector is assumed and used. Picking {vl.h[0]} hydrogen on the scaffold. ")
+        warnings.warn(
+            f"Only one H vector is assumed and used. Picking {vl.h[0]} hydrogen on the scaffold. "
+        )
         new_data = {
-            'Smiles': list(new_enamines.hitSmiles.values),
-            'h': vl.h[0], # fixme: for now assume that only one vector is used
-            'enamine_id': list(new_enamines.id.values)
+            "Smiles": list(new_enamines.hitSmiles.values),
+            "h": vl.h[0],  # fixme: for now assume that only one vector is used
+            "enamine_id": list(new_enamines.id.values),
         }
 
         print("Adding: ", len(new_enamines.hitSmiles.values))
@@ -1255,21 +1341,22 @@ class ChemSpace: # RInterface
     def query(self, query):
         self._query = query
 
-        if 'fegrow_label' in query.keywords:
-            self._query_label = query.keywords.pop('fegrow_label')
+        if "fegrow_label" in query.keywords:
+            self._query_label = query.keywords.pop("fegrow_label")
 
     @property
     def query_label(self):
         return self._query_label
 
-    def active_learning(self,
-                        n=1,
-                        first_random=True,
-                        score_higher_better=True,
-                        model=None,
-                        query=None,
-                        learner_type=None,
-                        ):
+    def active_learning(
+        self,
+        n=1,
+        first_random=True,
+        score_higher_better=True,
+        model=None,
+        query=None,
+        learner_type=None,
+    ):
         """
         Model the data using the Training subset. Then use the active learning query method.
 
@@ -1284,10 +1371,14 @@ class ChemSpace: # RInterface
 
         if training.empty:
             if first_random:
-                warnings.warn("Selecting randomly the first samples to be studied (no score data yet). ")
+                warnings.warn(
+                    "Selecting randomly the first samples to be studied (no score data yet). "
+                )
                 return selection.sample(n)
             else:
-                raise ValueError("There is no scores for active learning. Please use the \"first_random\" property. ")
+                raise ValueError(
+                    'There is no scores for active learning. Please use the "first_random" property. '
+                )
 
         # get the scored subset
         # fixme - multitarget?
@@ -1318,9 +1409,9 @@ class ChemSpace: # RInterface
         if score_higher_better is True:
             target_multiplier = -1
 
-        if self.query_label in ['greedy', 'thompson', 'EI', 'PI']:
+        if self.query_label in ["greedy", "thompson", "EI", "PI"]:
             target_multiplier *= 1
-        elif self.query_label == 'UCB':
+        elif self.query_label == "UCB":
             target_multiplier *= -1
 
         train_targets = train_targets * target_multiplier
@@ -1331,23 +1422,26 @@ class ChemSpace: # RInterface
                 estimator=self.model,
                 X_training=train_features,
                 y_training=train_targets,
-                query_strategy=query)
+                query_strategy=query,
+            )
         elif isinstance(self.model, gaussian_process.GaussianProcessRegressor):
             learner = modAL.models.BayesianOptimizer(
                 estimator=self.model,
                 X_training=train_features,
                 y_training=train_targets,
-                query_strategy=query)
+                query_strategy=query,
+            )
         else:
             learner = modAL.models.ActiveLearner(
                 estimator=self.model,
                 X_training=train_features,
                 y_training=train_targets,
-                query_strategy=query)
+                query_strategy=query,
+            )
 
         inference = learner.predict(library_features) * target_multiplier
 
-        self.df['regression'] = inference.T.tolist()
+        self.df["regression"] = inference.T.tolist()
 
         selection_idx, _ = learner.query(selection_features)
 
@@ -1429,7 +1523,7 @@ class ChemSpace: # RInterface
         keys = {}
         for mol in Chem.SDMolSupplier(filename):
             props = mol.GetPropsAsDict()
-            props['Mol'] = mol
+            props["Mol"] = mol
             items.append(props)
             keys = set(props.keys()).union(keys)
 
@@ -1445,7 +1539,7 @@ class ChemSpace: # RInterface
                     # in that case the value will be missing and the pentalty is assigned
                     data[key].append(pandas.NA)
 
-        indices = data.pop('index')
+        indices = data.pop("index")
 
         defaults = ChemSpace.DATAFRAME_DEFAULT_VALUES.copy()
         defaults.update(data)
@@ -1466,9 +1560,10 @@ class ChemSpace: # RInterface
         from IPython.display import display_html
 
         # exclude the 3D structures
-        df = self.df.loc[:, self.df.columns != 'Mol']
+        df = self.df.loc[:, self.df.columns != "Mol"]
         Chem.PandasTools.AddMoleculeColumnToFrame(df, smilesCol="Smiles", molCol="2D")
         return display_html(df)
+
 
 class RGroups(pandas.DataFrame):
     """
@@ -1479,7 +1574,9 @@ class RGroups(pandas.DataFrame):
         data = RGroups._load_data()
         super().__init__(data)
 
-        self._fegrow_grid = mols2grid.MolGrid(self, removeHs=True, mol_col="Mol", use_coords=False, name="m2")
+        self._fegrow_grid = mols2grid.MolGrid(
+            self, removeHs=True, mol_col="Mol", use_coords=False, name="m2"
+        )
 
     @staticmethod
     def _load_data() -> pandas.DataFrame:
@@ -1559,7 +1656,9 @@ class Linkers(pandas.DataFrame):
         from IPython.display import display
 
         subset = ["img", "Name", "mols2grid-id"]
-        return display(self._fegrow_grid.display(subset=subset, substruct_highlight=True))
+        return display(
+            self._fegrow_grid.display(subset=subset, substruct_highlight=True)
+        )
 
     def get_selected(self):
         df = self._fegrow_grid.get_selection()
@@ -1591,8 +1690,8 @@ def gnina(mol, receptor, gnina_path, gnina_gpu=False):
                 "0",
                 "--stripH",
                 "False",
-            ] + extras
-            ,
+            ]
+            + extras,
             capture_output=True,
             check=True,
         )
@@ -1605,10 +1704,14 @@ def gnina(mol, receptor, gnina_path, gnina_gpu=False):
 
     return mol, CNNaffinities
 
+
 def build_molecules(*args, **kwargs):
-    raise NotImplementedError("This function was removed. "
-                              "Please use the new simple \"build_molecule\" instead, "
-                              "which now does not work with lists. ")
+    raise NotImplementedError(
+        "This function was removed. "
+        'Please use the new simple "build_molecule" instead, '
+        "which now does not work with lists. "
+    )
+
 
 def build_molecule(
     scaffolds: Chem.Mol,
@@ -1640,9 +1743,11 @@ def build_molecule(
 
     # convert smiles into a molecule
     if isinstance(r_group, str):
-        if '*' not in r_group and rgroup_point is None:
-            raise ValueError("The SMILES used for the R-Group has to have an R-group atom. "
-                             "That is the character * in Smiles, or you can use the RDKit function .SetAtomicNum(0) ")
+        if "*" not in r_group and rgroup_point is None:
+            raise ValueError(
+                "The SMILES used for the R-Group has to have an R-group atom. "
+                "That is the character * in Smiles, or you can use the RDKit function .SetAtomicNum(0) "
+            )
         params = Chem.SmilesParserParams()
         params.removeHs = False
         r_group = Chem.MolFromSmiles(r_group, params=params)
@@ -1651,14 +1756,12 @@ def build_molecule(
         if rgroup_point is not None:
             r_group.GetAtomWithIdx(rgroup_point).SetAtomicNum(0)
 
-    built_mols = build_molecules_with_rdkit(
-        scaffolds, r_group, scaffold_point, keep
-    )
+    built_mols = build_molecules_with_rdkit(scaffolds, r_group, scaffold_point, keep)
 
     mol, scaffold, scaffold_no_attachement = built_mols
     rmol = RMol(mol)
 
-    if hasattr(scaffold, 'template') and isinstance(scaffold.template, rdkit.Chem.Mol):
+    if hasattr(scaffold, "template") and isinstance(scaffold.template, rdkit.Chem.Mol):
         # save the original scaffold (e.g. before the linker was added)
         # this means that conformer generation will always have to regenerate the previously added R-groups/linkers
         rmol._save_template(scaffold.template)
@@ -1668,19 +1771,20 @@ def build_molecule(
     return rmol
 
 
-def _evaluate_atomic(scaffold,
-                     smiles,
-                     pdb_filename,
-                     h=None,
-                     scoring_function=None,
-                     num_conf=50,
-                     minimum_conf_rms=0.5,
-                     ani=True,
-                     platform="CPU",
-                     gnina_gpu=False,
-                     skip_optimisation=False,
-                     full_evaluation=None
-                     ):
+def _evaluate_atomic(
+    scaffold,
+    smiles,
+    pdb_filename,
+    h=None,
+    scoring_function=None,
+    num_conf=50,
+    minimum_conf_rms=0.5,
+    ani=True,
+    platform="CPU",
+    gnina_gpu=False,
+    skip_optimisation=False,
+    full_evaluation=None,
+):
     """
 
     :param scaffold:
@@ -1693,16 +1797,18 @@ def _evaluate_atomic(scaffold,
     """
 
     if full_evaluation is not None:
-        return full_evaluation(scaffold,
-                     h,
-                     smiles,
-                     pdb_filename,
-                     scoring_function=None,
-                     num_conf=50,
-                     minimum_conf_rms=0.5,
-                     ani=ani,
-                     platform="CPU",
-                     skip_optimisation=False)
+        return full_evaluation(
+            scaffold,
+            h,
+            smiles,
+            pdb_filename,
+            scoring_function=None,
+            num_conf=50,
+            minimum_conf_rms=0.5,
+            ani=ani,
+            platform="CPU",
+            skip_optimisation=False,
+        )
 
     params = Chem.SmilesParserParams()
     params.removeHs = False  # keep the hydrogens
@@ -1739,7 +1845,9 @@ def _evaluate_atomic(scaffold,
     data = {}
     if scoring_function is None:
         cnnaffinities = rmol.gnina(receptor_file=pdb_filename, gnina_gpu=gnina_gpu)
-        data = {"cnnaffinities": [float(affinity) for affinity in cnnaffinities.CNNaffinity]}
+        data = {
+            "cnnaffinities": [float(affinity) for affinity in cnnaffinities.CNNaffinity]
+        }
         score = data["cnnaffinities"][0]
     else:
         score = scoring_function(rmol, pdb_filename, data)

@@ -41,8 +41,10 @@ def build_molecules_with_rdkit(
         attachment_point = atom.GetIdx()
 
     if attachment_point is None:
-        raise Exception("Could not find attachement points. Either the atom index has to be specified,"
-                        "or an atom needs to be marked rdkit.atom.SetAtomicNum(0). ")
+        raise Exception(
+            "Could not find attachement points. Either the atom index has to be specified,"
+            "or an atom needs to be marked rdkit.atom.SetAtomicNum(0). "
+        )
 
     # for atom_idx, scaffold_ligand, keep_submolecule_cue in itertools.zip_longest(
     #     attachment_points, template, keep_components, fillvalue=None
@@ -58,7 +60,7 @@ def build_molecules_with_rdkit(
     # in case where multiple mergings take place (e.g. two mergings: (scaffold + linker) + rgroups)
     # in this case, the attachment point from the original scaffold should be carried forward
     # (as opposed to the attachment point on the linker)
-    if not merged_mol.HasProp('attachment_point'):
+    if not merged_mol.HasProp("attachment_point"):
         merged_mol.SetIntProp("attachment_point", attachment_point)
 
     return merged_mol, scaffold, scaffold_no_attachement
@@ -86,13 +88,19 @@ def split(molecule, splitting_atom, keep_neighbour_idx=None):
 
     if keep_neighbour_idx:
         # select the user specifid component
-        component_to_keep = [c for c in connected_components if keep_neighbour_idx in c][0]
+        component_to_keep = [
+            c for c in connected_components if keep_neighbour_idx in c
+        ][0]
     else:
         # keep the largest component
         largest_component_size = max(map(len, connected_components))
-        component_to_keep = [c for c in connected_components if len(c) == largest_component_size][0]
+        component_to_keep = [
+            c for c in connected_components if len(c) == largest_component_size
+        ][0]
 
-    atom_ids_for_removal = {item for sublist in connected_components for item in sublist} - component_to_keep
+    atom_ids_for_removal = {
+        item for sublist in connected_components for item in sublist
+    } - component_to_keep
 
     # remove the unwanted component
     edit_scaffold = Chem.EditableMol(molecule)
@@ -139,7 +147,9 @@ def merge_R_group(scaffold, RGroup, replace_index, keep_cue_idx=None):
         hook = atom_to_replace.GetNeighbors()[0]
 
     if RGroup.GetNumConformers() == 0:
-        logger.warning("The R-Group lacks initial coordinates. Defaulting to Chem.rdDistGeom.EmbedMolecule.")
+        logger.warning(
+            "The R-Group lacks initial coordinates. Defaulting to Chem.rdDistGeom.EmbedMolecule."
+        )
         Chem.rdDistGeom.EmbedMolecule(RGroup)
 
     # align the R-group only if there are any conformers to work with
@@ -212,15 +222,17 @@ def get_attachment_atom(R_group):
         atom = r_atoms[0]
     elif is_linker(R_group):
         """
-        find the attachable points. 
+        find the attachable points.
         We use the first attachment to be .GetAtomMapNum() == 1
         and second to be .GetAtomMapNum() == 2,
-        or whichever is smaller. 
+        or whichever is smaller.
         """
         map_nums = {atom.GetAtomMapNum() for atom in r_atoms}
         if len(map_nums) == 1:
-            warnings.warn("The linker has two conneting ends specified (* atom). However,"
-                          "they're not given priorities. Choosing a random one.  ")
+            warnings.warn(
+                "The linker has two conneting ends specified (* atom). However,"
+                "they're not given priorities. Choosing a random one.  "
+            )
         smallest_map_num = min(map_nums)
         for r_atom in r_atoms:
             if r_atom.GetAtomMapNum() == smallest_map_num:
