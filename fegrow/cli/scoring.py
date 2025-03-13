@@ -13,7 +13,7 @@ import click
     help="The path to the SDF file of the core ligand which will be used to restrain the geometries of the scored ligands this should be a substructure of the ligands to be scored.",
 )
 @click.option(
-    "-l" "--ligands",
+    "-l--ligands",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
     help="The path to the ligands to be scored can be in any supported format by RDKit such as csv. smiles or SDF.",
 )

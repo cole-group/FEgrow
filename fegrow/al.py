@@ -131,7 +131,6 @@ class Query:
 
 
 class Model:
-
     @staticmethod
     def linear(**model_params):
         return linear_model.LinearRegression(**model_params)

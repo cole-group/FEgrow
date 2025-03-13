@@ -822,7 +822,6 @@ class ChemSpace:  # RInterface
     #     return display(df)
 
     def add_scaffold(self, template, atom_replacement_index=None):
-
         # check if any atom is marked for joining
         if atom_replacement_index is None:
             if not any(atom.GetAtomicNum() == 0 for atom in template.GetAtoms()):
@@ -1496,7 +1495,6 @@ class ChemSpace:  # RInterface
             columns.remove("Mol")
 
             for i, row in self.df.iterrows():
-
                 # ignore this molecule because it failed during the build
                 if failed is False and row.Success is False:
                     continue
@@ -1663,7 +1661,6 @@ class Linkers(pandas.DataFrame):
 
 
 def gnina(mol, receptor, gnina_path, gnina_gpu=False):
-
     extras = []
     if gnina_gpu is False:
         extras.append("--no_gpu")
