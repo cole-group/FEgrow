@@ -1667,38 +1667,39 @@
 
 
 
+
 <p><span class="doc-section-title">Functions:</span></p>
     <ul>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;build_molecules_with_rdkit (&lt;code&gt;fegrow.builder.build_molecules_with_rdkit&lt;/code&gt;)" href="#fegrow.builder.build_molecules_with_rdkit">build_molecules_with_rdkit</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;build_molecules_with_rdkit&lt;/span&gt; (&lt;code&gt;fegrow.builder.build_molecules_with_rdkit&lt;/code&gt;)" href="#fegrow.builder.build_molecules_with_rdkit">build_molecules_with_rdkit</a></code></b>
             –
             <div class="doc-md-description">
               <p>For the given core molecule and list of attachment points</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;split (&lt;code&gt;fegrow.builder.split&lt;/code&gt;)" href="#fegrow.builder.split">split</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;split&lt;/span&gt; (&lt;code&gt;fegrow.builder.split&lt;/code&gt;)" href="#fegrow.builder.split">split</a></code></b>
             –
             <div class="doc-md-description">
               <p>Return the smaller part of the molecule or one that that contains the prespecified atom.</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;merge_R_group (&lt;code&gt;fegrow.builder.merge_R_group&lt;/code&gt;)" href="#fegrow.builder.merge_R_group">merge_R_group</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;merge_R_group&lt;/span&gt; (&lt;code&gt;fegrow.builder.merge_R_group&lt;/code&gt;)" href="#fegrow.builder.merge_R_group">merge_R_group</a></code></b>
             –
             <div class="doc-md-description">
               <p>function originally copied from</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;get_attachment_atom (&lt;code&gt;fegrow.builder.get_attachment_atom&lt;/code&gt;)" href="#fegrow.builder.get_attachment_atom">get_attachment_atom</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;get_attachment_atom&lt;/span&gt; (&lt;code&gt;fegrow.builder.get_attachment_atom&lt;/code&gt;)" href="#fegrow.builder.get_attachment_atom">get_attachment_atom</a></code></b>
             –
             <div class="doc-md-description">
               <p>In the R-group or a linker, search for the position of the attachment point (R atom)</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;is_linker (&lt;code&gt;fegrow.builder.is_linker&lt;/code&gt;)" href="#fegrow.builder.is_linker">is_linker</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;is_linker&lt;/span&gt; (&lt;code&gt;fegrow.builder.is_linker&lt;/code&gt;)" href="#fegrow.builder.is_linker">is_linker</a></code></b>
             –
             <div class="doc-md-description">
               <p>Check if the molecule is a linker by checking if it has 2 R-group points</p>
@@ -1741,6 +1742,7 @@
   r groups or the RGroup Grid with highlighted molecules.
 :param attachment_point: The list of atom index in the core ligand
   that the r groups should be attached to. If it is empty, connecting points are sought out and matched.</p>
+
 
             <details class="quote">
               <summary>Source code in <code>fegrow/builder.py</code></summary>
@@ -1793,7 +1795,9 @@
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
-<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_molecules_with_rdkit</span><span class="p">(</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_molecules_with_rdkit</span><span class="p">(</span>
     <span class="n">scaffold</span><span class="p">:</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
     <span class="n">r_group</span><span class="p">:</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
     <span class="n">attachment_point</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1822,8 +1826,10 @@
         <span class="n">attachment_point</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">attachment_point</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not find attachement points. Either the atom index has to be specified,&quot;</span>
-                        <span class="s2">&quot;or an atom needs to be marked rdkit.atom.SetAtomicNum(0). &quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s2">&quot;Could not find attachement points. Either the atom index has to be specified,&quot;</span>
+            <span class="s2">&quot;or an atom needs to be marked rdkit.atom.SetAtomicNum(0). &quot;</span>
+        <span class="p">)</span>
 
     <span class="c1"># for atom_idx, scaffold_ligand, keep_submolecule_cue in itertools.zip_longest(</span>
     <span class="c1">#     attachment_points, template, keep_components, fillvalue=None</span>
@@ -1839,7 +1845,7 @@
     <span class="c1"># in case where multiple mergings take place (e.g. two mergings: (scaffold + linker) + rgroups)</span>
     <span class="c1"># in this case, the attachment point from the original scaffold should be carried forward</span>
     <span class="c1"># (as opposed to the attachment point on the linker)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">merged_mol</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;attachment_point&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">merged_mol</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s2">&quot;attachment_point&quot;</span><span class="p">):</span>
         <span class="n">merged_mol</span><span class="o">.</span><span class="n">SetIntProp</span><span class="p">(</span><span class="s2">&quot;attachment_point&quot;</span><span class="p">,</span> <span class="n">attachment_point</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">merged_mol</span><span class="p">,</span> <span class="n">scaffold</span><span class="p">,</span> <span class="n">scaffold_no_attachement</span>
@@ -1869,11 +1875,10 @@
     as the scaffold.
 :return:</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 69</span>
 <span class="normal"> 70</span>
 <span class="normal"> 71</span>
 <span class="normal"> 72</span>
@@ -1923,7 +1928,15 @@
 <span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
-<span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">splitting_atom</span><span class="p">,</span> <span class="n">keep_neighbour_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">splitting_atom</span><span class="p">,</span> <span class="n">keep_neighbour_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the smaller part of the molecule or one that that contains the prespecified atom.</span>
 
@@ -1945,13 +1958,19 @@
 
     <span class="k">if</span> <span class="n">keep_neighbour_idx</span><span class="p">:</span>
         <span class="c1"># select the user specifid component</span>
-        <span class="n">component_to_keep</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">connected_components</span> <span class="k">if</span> <span class="n">keep_neighbour_idx</span> <span class="ow">in</span> <span class="n">c</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">component_to_keep</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">connected_components</span> <span class="k">if</span> <span class="n">keep_neighbour_idx</span> <span class="ow">in</span> <span class="n">c</span>
+        <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># keep the largest component</span>
         <span class="n">largest_component_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">connected_components</span><span class="p">))</span>
-        <span class="n">component_to_keep</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">connected_components</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">largest_component_size</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">component_to_keep</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">connected_components</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">largest_component_size</span>
+        <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">atom_ids_for_removal</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">connected_components</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">}</span> <span class="o">-</span> <span class="n">component_to_keep</span>
+    <span class="n">atom_ids_for_removal</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">connected_components</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span>
+    <span class="p">}</span> <span class="o">-</span> <span class="n">component_to_keep</span>
 
     <span class="c1"># remove the unwanted component</span>
     <span class="n">edit_scaffold</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">molecule</span><span class="p">)</span>
@@ -1998,17 +2017,10 @@
         <p>function originally copied from
 https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">130</span>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
@@ -2070,7 +2082,17 @@ https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial
 <span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
-<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">merge_R_group</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span> <span class="n">RGroup</span><span class="p">,</span> <span class="n">replace_index</span><span class="p">,</span> <span class="n">keep_cue_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">merge_R_group</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span> <span class="n">RGroup</span><span class="p">,</span> <span class="n">replace_index</span><span class="p">,</span> <span class="n">keep_cue_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;function originally copied from</span>
 <span class="sd">    https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial.py</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2090,7 +2112,9 @@ https://github.com/molecularsets/moses/blob/master/moses/baselines/combinatorial
         <span class="n">hook</span> <span class="o">=</span> <span class="n">atom_to_replace</span><span class="o">.</span><span class="n">GetNeighbors</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">RGroup</span><span class="o">.</span><span class="n">GetNumConformers</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The R-Group lacks initial coordinates. Defaulting to Chem.rdDistGeom.EmbedMolecule.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;The R-Group lacks initial coordinates. Defaulting to Chem.rdDistGeom.EmbedMolecule.&quot;</span>
+        <span class="p">)</span>
         <span class="n">Chem</span><span class="o">.</span><span class="n">rdDistGeom</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">RGroup</span><span class="p">)</span>
 
     <span class="c1"># align the R-group only if there are any conformers to work with</span>
@@ -2166,19 +2190,10 @@ the R1 atom is selected.
 rgroup: fragment passed as rdkit molecule
 return: tuple (ratom, ratom_neighbour), where the ratom_neighbour is the surviving atom</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">205</span>
 <span class="normal">206</span>
 <span class="normal">207</span>
 <span class="normal">208</span>
@@ -2216,7 +2231,19 @@ return: tuple (ratom, ratom_neighbour), where the ratom_neighbour is the survivi
 <span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
-<span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_attachment_atom</span><span class="p">(</span><span class="n">R_group</span><span class="p">):</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_attachment_atom</span><span class="p">(</span><span class="n">R_group</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;In the R-group or a linker, search for the position of the attachment point (R atom)</span>
 <span class="sd">    and extract the atom (currently only single bond supported). In case of the linker,</span>
 <span class="sd">    the R1 atom is selected.</span>
@@ -2236,15 +2263,17 @@ return: tuple (ratom, ratom_neighbour), where the ratom_neighbour is the survivi
         <span class="n">atom</span> <span class="o">=</span> <span class="n">r_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">is_linker</span><span class="p">(</span><span class="n">R_group</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        find the attachable points. </span>
+<span class="sd">        find the attachable points.</span>
 <span class="sd">        We use the first attachment to be .GetAtomMapNum() == 1</span>
 <span class="sd">        and second to be .GetAtomMapNum() == 2,</span>
-<span class="sd">        or whichever is smaller. </span>
+<span class="sd">        or whichever is smaller.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">map_nums</span> <span class="o">=</span> <span class="p">{</span><span class="n">atom</span><span class="o">.</span><span class="n">GetAtomMapNum</span><span class="p">()</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">r_atoms</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">map_nums</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The linker has two conneting ends specified (* atom). However,&quot;</span>
-                          <span class="s2">&quot;they&#39;re not given priorities. Choosing a random one.  &quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The linker has two conneting ends specified (* atom). However,&quot;</span>
+                <span class="s2">&quot;they&#39;re not given priorities. Choosing a random one.  &quot;</span>
+            <span class="p">)</span>
         <span class="n">smallest_map_num</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">map_nums</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">r_atom</span> <span class="ow">in</span> <span class="n">r_atoms</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">r_atom</span><span class="o">.</span><span class="n">GetAtomMapNum</span><span class="p">()</span> <span class="o">==</span> <span class="n">smallest_map_num</span><span class="p">:</span>
@@ -2286,19 +2315,20 @@ return: tuple (ratom, ratom_neighbour), where the ratom_neighbour is the survivi
 
         <p>Check if the molecule is a linker by checking if it has 2 R-group points</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_linker</span><span class="p">(</span><span class="n">rmol</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_linker</span><span class="p">(</span><span class="n">rmol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if the molecule is a linker by checking if it has 2 R-group points</span>
 <span class="sd">    &quot;&quot;&quot;</span>

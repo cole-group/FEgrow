@@ -1667,24 +1667,25 @@
 
 
 
+
 <p><span class="doc-section-title">Functions:</span></p>
     <ul>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;fix_receptor (&lt;code&gt;fegrow.receptor.fix_receptor&lt;/code&gt;)" href="#fegrow.receptor.fix_receptor">fix_receptor</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;fix_receptor&lt;/span&gt; (&lt;code&gt;fegrow.receptor.fix_receptor&lt;/code&gt;)" href="#fegrow.receptor.fix_receptor">fix_receptor</a></code></b>
             –
             <div class="doc-md-description">
               <p>Use PDBFixer to correct the input and add hydrogens with the given pH.</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;optimise_in_receptor (&lt;code&gt;fegrow.receptor.optimise_in_receptor&lt;/code&gt;)" href="#fegrow.receptor.optimise_in_receptor">optimise_in_receptor</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;optimise_in_receptor&lt;/span&gt; (&lt;code&gt;fegrow.receptor.optimise_in_receptor&lt;/code&gt;)" href="#fegrow.receptor.optimise_in_receptor">optimise_in_receptor</a></code></b>
             –
             <div class="doc-md-description">
               <p>For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;sort_conformers (&lt;code&gt;fegrow.receptor.sort_conformers&lt;/code&gt;)" href="#fegrow.receptor.sort_conformers">sort_conformers</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;sort_conformers&lt;/span&gt; (&lt;code&gt;fegrow.receptor.sort_conformers&lt;/code&gt;)" href="#fegrow.receptor.sort_conformers">sort_conformers</a></code></b>
             –
             <div class="doc-md-description">
               <p>For the given molecule and the conformer energies order the energies and only keep any conformers with in the energy</p>
@@ -1724,10 +1725,10 @@
 :param output_file: The name of the pdb file the fixed receptor should be wrote to.
 :param pH:The ph the pronation state should be fixed for.</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/receptor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
-<span class="normal">32</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">32</span>
 <span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
@@ -1739,7 +1740,8 @@
 <span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
-<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fix_receptor</span><span class="p">(</span><span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pH</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">):</span>
+<span class="normal">44</span>
+<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fix_receptor</span><span class="p">(</span><span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pH</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Use PDBFixer to correct the input and add hydrogens with the given pH.</span>
 
@@ -1774,10 +1776,10 @@
 
         <p>Check if ani2x can be used for this molecule by inspecting the elements.</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/receptor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">47</span>
-<span class="normal">48</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
@@ -1785,7 +1787,8 @@
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span>
-<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_can_use_ani2x</span><span class="p">(</span><span class="n">molecule</span><span class="p">:</span> <span class="n">OFFMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_can_use_ani2x</span><span class="p">(</span><span class="n">molecule</span><span class="p">:</span> <span class="n">OFFMolecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if ani2x can be used for this molecule by inspecting the elements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1816,10 +1819,10 @@
 
         <p>Scale the sigma and charges of the openMM system in place.</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/receptor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
-<span class="normal">60</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
@@ -1839,7 +1842,8 @@
 <span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
-<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_scale_system</span><span class="p">(</span>
+<span class="normal">80</span>
+<span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_scale_system</span><span class="p">(</span>
     <span class="n">system</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">System</span><span class="p">,</span> <span class="n">sigma_scale_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">relative_permittivity</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1975,10 +1979,10 @@ See the OpenMM documentation of Platform.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/receptor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 86</span>
-<span class="normal"> 87</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 87</span>
 <span class="normal"> 88</span>
 <span class="normal"> 89</span>
 <span class="normal"> 90</span>
@@ -2139,7 +2143,8 @@ See the OpenMM documentation of Platform.</p>
 <span class="normal">245</span>
 <span class="normal">246</span>
 <span class="normal">247</span>
-<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">optimise_in_receptor</span><span class="p">(</span>
+<span class="normal">248</span>
+<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">optimise_in_receptor</span><span class="p">(</span>
     <span class="n">ligand</span><span class="p">:</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
     <span class="n">receptor_file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">],</span>
     <span class="n">ligand_force_field</span><span class="p">:</span> <span class="n">ForceField</span><span class="p">,</span>
@@ -2147,7 +2152,7 @@ See the OpenMM documentation of Platform.</p>
     <span class="n">sigma_scale_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
     <span class="n">relative_permittivity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
     <span class="n">water_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tip3p.xml&quot;</span><span class="p">,</span>
-    <span class="n">platform_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CPU&quot;</span>
+    <span class="n">platform_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.</span>
@@ -2360,10 +2365,10 @@ range of the lowest energy conformer.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/receptor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">251</span>
-<span class="normal">252</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span>
 <span class="normal">255</span>
@@ -2395,7 +2400,8 @@ range of the lowest energy conformer.</p>
 <span class="normal">281</span>
 <span class="normal">282</span>
 <span class="normal">283</span>
-<span class="normal">284</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sort_conformers</span><span class="p">(</span>
+<span class="normal">284</span>
+<span class="normal">285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sort_conformers</span><span class="p">(</span>
     <span class="n">ligand</span><span class="p">:</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">energies</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">energy_range</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

@@ -1595,10 +1595,11 @@
 
 
 
+
 <p><span class="doc-section-title">Functions:</span></p>
     <ul>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-function&quot;&gt;&lt;/code&gt;&amp;nbsp;generate_conformers (&lt;code&gt;fegrow.conformers.generate_conformers&lt;/code&gt;)" href="#fegrow.conformers.generate_conformers">generate_conformers</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;generate_conformers&lt;/span&gt; (&lt;code&gt;fegrow.conformers.generate_conformers&lt;/code&gt;)" href="#fegrow.conformers.generate_conformers">generate_conformers</a></code></b>
             –
             <div class="doc-md-description">
               <p>flexible:</p>
@@ -1641,18 +1642,10 @@
 </details>        <p>:param scaffold_heavy_atoms: use only the heavy atoms in the scaffold
     and in the molecule to generate the match.</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/conformers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 34</span>
-<span class="normal"> 35</span>
-<span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
-<span class="normal"> 39</span>
-<span class="normal"> 40</span>
-<span class="normal"> 41</span>
-<span class="normal"> 42</span>
-<span class="normal"> 43</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 43</span>
 <span class="normal"> 44</span>
 <span class="normal"> 45</span>
 <span class="normal"> 46</span>
@@ -1754,13 +1747,44 @@
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span>
-<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_conformers</span><span class="p">(</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_conformers</span><span class="p">(</span>
     <span class="n">rmol</span><span class="p">:</span> <span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
     <span class="n">num_conf</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">minimum_conf_rms</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">flexible</span><span class="p">:</span><span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">minimum_conf_rms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">flexible</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
     <span class="n">scaffold_heavy_atoms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">use_ties_mcs</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_ties_mcs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    flexible:</span>
@@ -1796,40 +1820,58 @@
 
             <span class="c1"># verify that the appropriate atom types were matched</span>
             <span class="n">rmol_atom</span> <span class="o">=</span> <span class="n">rmol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">matched_index</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">scaffold_atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">!=</span> <span class="n">rmol_atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scaffold </span><span class="si">{</span><span class="n">core_index</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">scaffold_atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span><span class="si">}</span><span class="s2"> &quot;</span>
-                                 <span class="sa">f</span><span class="s2">&quot;does not match </span><span class="si">{</span><span class="n">matched_index</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">rmol_atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span><span class="si">}</span><span class="s2">. &quot;</span>
-                                 <span class="sa">f</span><span class="s2">&quot;RDKit .GetSubstructMatch appears to have failed. Please report.  &quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">scaffold_atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">!=</span> <span class="n">rmol_atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Scaffold </span><span class="si">{</span><span class="n">core_index</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">scaffold_atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;does not match </span><span class="si">{</span><span class="n">matched_index</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">rmol_atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;RDKit .GetSubstructMatch appears to have failed. Please report.  &quot;</span>
+                <span class="p">)</span>
 
             <span class="n">core_atom_coordinate</span> <span class="o">=</span> <span class="n">scaffold_conformer</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">core_index</span><span class="p">)</span>
             <span class="n">coordinates_map</span><span class="p">[</span><span class="n">matched_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">core_atom_coordinate</span>
             <span class="n">manmap</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">matched_index</span><span class="p">,</span> <span class="n">core_index</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">ties.topology_superimposer</span><span class="w"> </span><span class="kn">import</span> <span class="n">superimpose_topologies</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">get_starting_configurations</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ties.topology_superimposer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                <span class="n">superimpose_topologies</span><span class="p">,</span>
+                <span class="n">Atom</span><span class="p">,</span>
+                <span class="n">get_starting_configurations</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="ne">ModuleNotFoundError</span> <span class="k">as</span> <span class="n">NoTies</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">WrongCoreForMolecule</span><span class="p">(</span><span class="s2">&quot;Molecule doesn&#39;t match the core. &quot;</span>
-                                       <span class="s2">&quot;This can be caused by the order of SMILES, for example. &quot;</span>
-                                       <span class="s2">&quot;You can install the python package &#39;ties&#39; to use MCS instead. &quot;</span><span class="p">,</span> <span class="n">match</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">NoTies</span>
+            <span class="k">raise</span> <span class="n">WrongCoreForMolecule</span><span class="p">(</span>
+                <span class="s2">&quot;Molecule doesn&#39;t match the core. &quot;</span>
+                <span class="s2">&quot;This can be caused by the order of SMILES, for example. &quot;</span>
+                <span class="s2">&quot;You can install the python package &#39;ties&#39; to use MCS instead. &quot;</span><span class="p">,</span>
+                <span class="n">match</span><span class="p">,</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">NoTies</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">to_ties_atoms</span><span class="p">(</span><span class="n">rdkit_mol</span><span class="p">):</span>
             <span class="n">ties_atoms</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">rdkit_atom</span> <span class="ow">in</span> <span class="n">rdkit_mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
-                <span class="n">ties_atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">rdkit_atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">rdkit_atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()),</span> <span class="n">atom_type</span><span class="o">=</span><span class="n">rdkit_atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">())</span>
+                <span class="n">ties_atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">rdkit_atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">rdkit_atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()),</span>
+                    <span class="n">atom_type</span><span class="o">=</span><span class="n">rdkit_atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">(),</span>
+                <span class="p">)</span>
                 <span class="n">ties_atom</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">rdkit_atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
                 <span class="n">ties_atoms</span><span class="p">[</span><span class="n">rdkit_atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()]</span> <span class="o">=</span> <span class="n">ties_atom</span>
 
             <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">rdkit_mol</span><span class="o">.</span><span class="n">GetBonds</span><span class="p">():</span>
-                <span class="n">ties_atoms</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">GetBeginAtomIdx</span><span class="p">()]</span><span class="o">.</span><span class="n">bind_to</span><span class="p">(</span><span class="n">ties_atoms</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">GetEndAtomIdx</span><span class="p">()],</span> <span class="nb">str</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">GetBondType</span><span class="p">()))</span>
+                <span class="n">ties_atoms</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">GetBeginAtomIdx</span><span class="p">()]</span><span class="o">.</span><span class="n">bind_to</span><span class="p">(</span>
+                    <span class="n">ties_atoms</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">GetEndAtomIdx</span><span class="p">()],</span> <span class="nb">str</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">GetBondType</span><span class="p">())</span>
+                <span class="p">)</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">ties_atoms</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
         <span class="n">rmol_ties</span> <span class="o">=</span> <span class="n">to_ties_atoms</span><span class="p">(</span><span class="n">rmol</span><span class="p">)</span>
         <span class="n">scaffold_ties</span> <span class="o">=</span> <span class="n">to_ties_atoms</span><span class="p">(</span><span class="n">scaffold_mol</span><span class="p">)</span>
-        <span class="n">mapping</span> <span class="o">=</span> <span class="n">superimpose_topologies</span><span class="p">(</span><span class="n">scaffold_ties</span><span class="p">,</span> <span class="n">rmol_ties</span><span class="p">,</span> <span class="n">ignore_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ignore_charges_completely</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">superimpose_topologies</span><span class="p">(</span>
+            <span class="n">scaffold_ties</span><span class="p">,</span> <span class="n">rmol_ties</span><span class="p">,</span> <span class="n">ignore_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ignore_charges_completely</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
         <span class="n">coordinates_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">manmap</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">core_index</span><span class="p">,</span> <span class="n">matched_index</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">matched_pairs</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">core_index</span><span class="p">,</span> <span class="n">matched_index</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">mapping</span><span class="o">.</span><span class="n">matched_pairs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+        <span class="p">):</span>
             <span class="k">if</span> <span class="n">matched_index</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">flexible</span><span class="p">:</span>
                 <span class="k">continue</span>
 
@@ -1844,7 +1886,7 @@
 
     <span class="c1"># Generate conformers with constrained embed</span>
     <span class="n">mol_for_conformer_generation</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">rmol</span><span class="p">)</span>
-    <span class="n">mol_nonh_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">rmol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;H&#39;</span><span class="p">]</span>
+    <span class="n">mol_nonh_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">rmol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;H&quot;</span><span class="p">]</span>
     <span class="n">dup_count</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">core_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_conf</span><span class="p">):</span>
         <span class="n">temp_mol</span> <span class="o">=</span> <span class="n">ConstrainedEmbedR2</span><span class="p">(</span>
@@ -1856,13 +1898,17 @@
         <span class="p">)</span>
 
         <span class="k">assert</span> <span class="n">temp_mol</span><span class="o">.</span><span class="n">GetNumConformers</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">conformer_exists</span><span class="p">(</span><span class="n">rmol</span><span class="p">,</span> <span class="n">temp_mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(),</span> <span class="n">mol_nonh_indices</span><span class="p">,</span> <span class="n">rms_limit</span><span class="o">=</span><span class="n">minimum_conf_rms</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">conformer_exists</span><span class="p">(</span>
+            <span class="n">rmol</span><span class="p">,</span> <span class="n">temp_mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(),</span> <span class="n">mol_nonh_indices</span><span class="p">,</span> <span class="n">rms_limit</span><span class="o">=</span><span class="n">minimum_conf_rms</span>
+        <span class="p">):</span>
             <span class="n">dup_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">rmol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">temp_mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(),</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dup_count</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed </span><span class="si">{</span><span class="n">dup_count</span><span class="si">}</span><span class="s2"> duplicated conformations, leaving </span><span class="si">{</span><span class="n">rmol</span><span class="o">.</span><span class="n">GetNumConformers</span><span class="p">()</span><span class="si">}</span><span class="s2"> in total. &quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Removed </span><span class="si">{</span><span class="n">dup_count</span><span class="si">}</span><span class="s2"> duplicated conformations, leaving </span><span class="si">{</span><span class="n">rmol</span><span class="o">.</span><span class="n">GetNumConformers</span><span class="p">()</span><span class="si">}</span><span class="s2"> in total. &quot;</span>
+        <span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated </span><span class="si">{</span><span class="n">rmol</span><span class="o">.</span><span class="n">GetNumConformers</span><span class="p">()</span><span class="si">}</span><span class="s2"> conformers. &quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rmol</span>

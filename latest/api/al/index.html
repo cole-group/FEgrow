@@ -1739,17 +1739,18 @@
 
 
 
+
 <p><span class="doc-section-title">Classes:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-          <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-class&quot;&gt;&lt;/code&gt;&amp;nbsp;TanimotoKernel (&lt;code&gt;fegrow.al.TanimotoKernel&lt;/code&gt;)" href="#fegrow.al.TanimotoKernel">TanimotoKernel</a></code></b>
+          <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;TanimotoKernel&lt;/span&gt; (&lt;code&gt;fegrow.al.TanimotoKernel&lt;/code&gt;)" href="#fegrow.al.TanimotoKernel">TanimotoKernel</a></code></b>
           –
           <div class="doc-md-description">
             <p>Custom Gaussian process kernel that computes Tanimoto similarity.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-          <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-class&quot;&gt;&lt;/code&gt;&amp;nbsp;Query (&lt;code&gt;fegrow.al.Query&lt;/code&gt;)" href="#fegrow.al.Query">Query</a></code></b>
+          <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Query&lt;/span&gt; (&lt;code&gt;fegrow.al.Query&lt;/code&gt;)" href="#fegrow.al.Query">Query</a></code></b>
           –
           <div class="doc-md-description">
             
@@ -1799,10 +1800,11 @@
 
 
 
+
 <p><span class="doc-section-title">Methods:</span></p>
     <ul>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-method&quot;&gt;&lt;/code&gt;&amp;nbsp;__call__ (&lt;code&gt;fegrow.al.TanimotoKernel.__call__&lt;/code&gt;)" href="#fegrow.al.TanimotoKernel.__call__">__call__</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;__call__&lt;/span&gt; (&lt;code&gt;fegrow.al.TanimotoKernel.__call__&lt;/code&gt;)" href="#fegrow.al.TanimotoKernel.__call__">__call__</a></code></b>
             –
             <div class="doc-md-description">
               <p>Computes the pairwise Tanimoto similarity.</p>
@@ -1814,9 +1816,9 @@
 
                   <details class="quote">
                     <summary>Source code in <code>fegrow/al.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
-<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initializer.&quot;&quot;&quot;</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializer.&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -1897,13 +1899,10 @@ used.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/al.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
@@ -1918,26 +1917,30 @@ used.</p>
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span>
-<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pylint: disable=invalid-name</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Computes the pairwise Tanimoto similarity.</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pylint: disable=invalid-name</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the pairwise Tanimoto similarity.</span>
 
-<span class="sd">  Args:</span>
-<span class="sd">    X: Numpy array with shape [batch_size_a, num_features].</span>
-<span class="sd">    Y: Numpy array with shape [batch_size_b, num_features]. If None, X is</span>
-<span class="sd">      used.</span>
-<span class="sd">    eval_gradient: Whether to compute the gradient.</span>
+<span class="sd">    Args:</span>
+<span class="sd">      X: Numpy array with shape [batch_size_a, num_features].</span>
+<span class="sd">      Y: Numpy array with shape [batch_size_b, num_features]. If None, X is</span>
+<span class="sd">        used.</span>
+<span class="sd">      eval_gradient: Whether to compute the gradient.</span>
 
-<span class="sd">  Returns:</span>
-<span class="sd">    Numpy array with shape [batch_size_a, batch_size_b].</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      Numpy array with shape [batch_size_a, batch_size_b].</span>
 
-<span class="sd">  Raises:</span>
-<span class="sd">    NotImplementedError: If eval_gradient is True.</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-  <span class="k">if</span> <span class="n">Y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">Y</span> <span class="o">=</span> <span class="n">X</span>
-  <span class="k">return</span> <span class="n">_dask_tanimito_similarity</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="sd">    Raises:</span>
+<span class="sd">      NotImplementedError: If eval_gradient is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+    <span class="k">if</span> <span class="n">Y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="k">return</span> <span class="n">_dask_tanimito_similarity</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1974,31 +1977,52 @@ used.</p>
 
 
 
+
 <p><span class="doc-section-title">Methods:</span></p>
     <ul>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-method&quot;&gt;&lt;/code&gt;&amp;nbsp;Greedy (&lt;code&gt;fegrow.al.Query.Greedy&lt;/code&gt;)" href="#fegrow.al.Query.Greedy">Greedy</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;Greedy&lt;/span&gt;
+
+
+  &lt;span class=&quot;doc doc-labels&quot;&gt;
+      &lt;small class=&quot;doc doc-label doc-label-staticmethod&quot;&gt;&lt;code&gt;staticmethod&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;fegrow.al.Query.Greedy&lt;/code&gt;)" href="#fegrow.al.Query.Greedy">Greedy</a></code></b>
             –
             <div class="doc-md-description">
               <p>Takes the best instances by inference value sorted in ascending order.</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-method&quot;&gt;&lt;/code&gt;&amp;nbsp;PI (&lt;code&gt;fegrow.al.Query.PI&lt;/code&gt;)" href="#fegrow.al.Query.PI">PI</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;PI&lt;/span&gt;
+
+
+  &lt;span class=&quot;doc doc-labels&quot;&gt;
+      &lt;small class=&quot;doc doc-label doc-label-staticmethod&quot;&gt;&lt;code&gt;staticmethod&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;fegrow.al.Query.PI&lt;/code&gt;)" href="#fegrow.al.Query.PI">PI</a></code></b>
             –
             <div class="doc-md-description">
               <p>Maximum PI query strategy. Selects the instance with highest probability of improvement.</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-method&quot;&gt;&lt;/code&gt;&amp;nbsp;EI (&lt;code&gt;fegrow.al.Query.EI&lt;/code&gt;)" href="#fegrow.al.Query.EI">EI</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;EI&lt;/span&gt;
+
+
+  &lt;span class=&quot;doc doc-labels&quot;&gt;
+      &lt;small class=&quot;doc doc-label doc-label-staticmethod&quot;&gt;&lt;code&gt;staticmethod&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;fegrow.al.Query.EI&lt;/code&gt;)" href="#fegrow.al.Query.EI">EI</a></code></b>
             –
             <div class="doc-md-description">
               <p>Maximum EI query strategy. Selects the instance with highest expected improvement.</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-toc doc-symbol-method&quot;&gt;&lt;/code&gt;&amp;nbsp;UCB (&lt;code&gt;fegrow.al.Query.UCB&lt;/code&gt;)" href="#fegrow.al.Query.UCB">UCB</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;UCB&lt;/span&gt;
+
+
+  &lt;span class=&quot;doc doc-labels&quot;&gt;
+      &lt;small class=&quot;doc doc-label doc-label-staticmethod&quot;&gt;&lt;code&gt;staticmethod&lt;/code&gt;&lt;/small&gt;
+  &lt;/span&gt; (&lt;code&gt;fegrow.al.Query.UCB&lt;/code&gt;)" href="#fegrow.al.Query.UCB">UCB</a></code></b>
             –
             <div class="doc-md-description">
               <p>Maximum UCB query strategy. Selects the instance with highest upper confidence bound.</p>
@@ -2052,13 +2076,10 @@ used.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/al.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span>
@@ -2076,7 +2097,12 @@ used.</p>
 <span class="normal">84</span>
 <span class="normal">85</span>
 <span class="normal">86</span>
-<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">Greedy</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes the best instances by inference value sorted in ascending order.</span>
 
@@ -2084,9 +2110,7 @@ used.</p>
 <span class="sd">      The greedy function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">greedy</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span>
-               <span class="n">features</span><span class="p">,</span>
-               <span class="n">n_instances</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">greedy</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">n_instances</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Takes the best instances by inference value sorted in ascending order.</span>
 
 <span class="sd">        Args:</span>
@@ -2097,7 +2121,10 @@ used.</p>
 <span class="sd">        Returns:</span>
 <span class="sd">          Indices of the instances chosen.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argpartition</span><span class="p">(</span><span class="n">optimizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features</span><span class="p">),</span> <span class="n">n_instances</span><span class="p">)[:</span><span class="n">n_instances</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argpartition</span><span class="p">(</span><span class="n">optimizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features</span><span class="p">),</span> <span class="n">n_instances</span><span class="p">)[</span>
+            <span class="p">:</span><span class="n">n_instances</span>
+        <span class="p">]</span>
+
     <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">greedy</span><span class="p">,</span> <span class="n">fegrow_label</span><span class="o">=</span><span class="s2">&quot;greedy&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2151,20 +2178,21 @@ used.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/al.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
 <span class="normal"> 98</span>
 <span class="normal"> 99</span>
-<span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">PI</span><span class="p">(</span><span class="n">tradeoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maximum PI query strategy. Selects the instance with highest probability of improvement.</span>
@@ -2228,20 +2256,21 @@ used.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/al.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
-<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">EI</span><span class="p">(</span><span class="n">tradeoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maximum EI query strategy. Selects the instance with highest expected improvement.</span>
@@ -2305,29 +2334,30 @@ used.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/al.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">120</span>
 <span class="normal">121</span>
 <span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
-<span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">UCB</span><span class="p">(</span><span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Maximum UCB query strategy. Selects the instance with highest upper confidence bound.</span>
+<span class="sd">    Maximum UCB query strategy. Selects the instance with highest upper confidence bound.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            beta: Value controlling the beta parameter.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        beta: Value controlling the beta parameter.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            The function with pre-populated parameters.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The function with pre-populated parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">max_UCB</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">fegrow_label</span><span class="o">=</span><span class="s2">&quot;UCB&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -2361,6 +2391,7 @@ used.</p>
         <p>Fixme this does not need to use matmul anymore because it's not a single core.
 This can be transitioned to simple row by row dispatching.</p>
 
+
             <details class="quote">
               <summary>Source code in <code>fegrow/al.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
@@ -2379,7 +2410,9 @@ This can be transitioned to simple row by row dispatching.</p>
 <span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
-<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_dask_tanimito_similarity</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_dask_tanimito_similarity</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fixme this does not need to use matmul anymore because it&#39;s not a single core.</span>
 <span class="sd">    This can be transitioned to simple row by row dispatching.</span>
@@ -2394,7 +2427,9 @@ This can be transitioned to simple row by row dispatching.</p>
     <span class="n">ab</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="n">td</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">ab</span><span class="p">,</span> <span class="n">aa</span> <span class="o">+</span> <span class="n">bb</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">ab</span><span class="p">)</span>
     <span class="n">td_computed</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Computed tanimoto similarity in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s for array lengths </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Computed tanimoto similarity in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s for array lengths </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">td_computed</span>
 </code></pre></div></td></tr></table></div>
             </details>
