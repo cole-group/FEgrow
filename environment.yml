@@ -26,6 +26,7 @@ dependencies:
   - networkx
   - pint-pandas
   - dask
+  - dask-jobqueue
   - modal # modAL on pip
   - cachey
   - pyparsing<3.1.0 # temporary fix for prody
