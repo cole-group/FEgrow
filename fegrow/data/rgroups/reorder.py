@@ -15,7 +15,7 @@ for mol in lib:
             found = True
             mol.SetIntProp("rank", int(top.attrs["degree"]))
             break
-    if found == False:
+    if not found:
         print("Not found", sm)
         mol.SetIntProp("rank", -1)
 

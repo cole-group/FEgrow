@@ -47,8 +47,10 @@ def numBridgeheadsAndSpiro(mol, ri=None):
     nBridgehead = rdMolDescriptors.CalcNumBridgeheadAtoms(mol)
     return nBridgehead, nSpiro
 
+
 # 2 is the *radius* of the circular fingerprint
 mfpgen = AllChem.GetMorganGenerator(radius=2)
+
 
 def calculateScore(m):
     if _fscores is None:

@@ -132,5 +132,5 @@ for i, gen_mol in enumerate(mols):  # iterate over list
         Chem.SDWriter(smiles_to_iupac(flat_library[i])).write(
             back
         )  # lol @ using a webserver to go from smiles to iupac
-    except:
+    except Exception:
         Chem.SDWriter(flat_library[i]).write(back)

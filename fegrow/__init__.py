@@ -16,6 +16,7 @@ __version__ = open(Path(__file__).parent / "version.txt").read().strip()
 
 __all__ = [
     RMol,
+    ChemSpace,
     generate_conformers,
     fix_receptor,
     optimise_in_receptor,

@@ -955,10 +955,6 @@ class ChemSpace:  # RInterface
         :return:
         """
 
-        if indices is None:
-            # evaluate all molecules
-            rgroups = list(self.df.Mol)
-
         if len(self._scaffolds) == 0:
             print("Please add scaffolds to the system for the evaluation. ")
         elif len(self._scaffolds) > 1:
@@ -1185,7 +1181,7 @@ class ChemSpace:  # RInterface
                 enamine id: @enamine_id <br>
                 al exp: @run <br>
             </div>
-            """
+            """  # noqa: F841
 
         # make the circles smaller for the noise (==0) in the cluster
         # df["sizes"] = [2 if c == 0 else 10 for c in picked_df.cluster]
@@ -1249,9 +1245,7 @@ class ChemSpace:  # RInterface
             raise NotImplementedError("Multiple growth vectors are used. ")
 
         # filter out previously queried molecules
-        new_searches = best_vl_for_searching[
-            best_vl_for_searching.enamine_searched == False
-        ]
+        new_searches = best_vl_for_searching[not best_vl_for_searching.enamine_searched]
         smiles_to_search = list(new_searches.Smiles)
 
         start = time.time()

@@ -178,7 +178,7 @@ def test_toxicity(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
         ]
     )
 
-    toxicity = chemspace.toxicity()
+    toxicity = chemspace.toxicity2()
     assert len(toxicity) == 2
 
 
@@ -492,29 +492,29 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.query = Query.UCB(beta=10)
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     # another go without changing any settings
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     # use every querrying strategy
     chemspace.query = Query.Greedy()
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.query = Query.EI(tradeoff=0.1)
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.query = Query.PI(tradeoff=0.1)
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.model = Model.linear()
     chemspace.query = Query.Greedy()
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
 
 @pytest.mark.skip(reason="requires the pydockingorg interface. ")

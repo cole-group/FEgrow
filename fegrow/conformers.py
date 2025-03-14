@@ -95,7 +95,6 @@ def generate_conformers(
         try:
             from ties.topology_superimposer import (
                 Atom,
-                get_starting_configurations,
                 superimpose_topologies,
             )
         except ModuleNotFoundError as NoTies:

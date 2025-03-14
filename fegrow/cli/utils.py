@@ -101,7 +101,7 @@ def score_ligand(
         # score only the lowest energy conformer
         rmol.sort_conformers(energy_range=settings.energy_filter)  # kcal/mol
         # purge all but the lowest energy conformers
-        rmol = Rmol(rmol, confId=0)
+        rmol = RMol(rmol, confId=0)
         affinities = rmol.gnina(receptor_file=receptor.as_posix())
         cnnaffinity = -affinities.CNNaffinity.values[0]
         cnnaffinityIC50 = affinities["CNNaffinity->IC50s"].values[0]

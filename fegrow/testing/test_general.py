@@ -87,14 +87,12 @@ def test_replace_methyl(RGroups, sars_core_scaffold):
 
 def test_extend_mol_with_smiles_marked(sars_core_scaffold):
     methyl = "*OC([H])([H])[H]"
-    stitched = fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7)
+    fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7)
 
 
 def test_extend_mol_with_smiles_explicit(sars_core_scaffold):
     methyl = "[H]OC([H])([H])[H]"
-    stitched = fegrow.build_molecule(
-        sars_core_scaffold, methyl, scaffold_point=7, rgroup_point=5
-    )
+    fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7, rgroup_point=5)
 
 
 def test_extend_mol_with_smiles_early_marking(sars_core_scaffold):
@@ -104,7 +102,7 @@ def test_extend_mol_with_smiles_early_marking(sars_core_scaffold):
     methyl = Chem.MolFromSmiles(methyl_smiles, params=params)
     methyl.GetAtomWithIdx(5).SetAtomicNum(0)
 
-    stitched = fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7)
+    fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7)
 
 
 def test_extend_mol_with_smiles_all_marked(sars_core_scaffold):
@@ -116,7 +114,7 @@ def test_extend_mol_with_smiles_all_marked(sars_core_scaffold):
 
     sars_core_scaffold.GetAtomWithIdx(7).SetAtomicNum(0)
 
-    stitched = fegrow.build_molecule(sars_core_scaffold, methyl)
+    fegrow.build_molecule(sars_core_scaffold, methyl)
 
 
 def test_replace_methyl_keep_h(RGroups):
@@ -176,9 +174,7 @@ def test_add_smiles_linker(sars_scaffold_chunk_sdf):
     attachment_index = 7
 
     linker_rccr = Chem.AddHs(Chem.MolFromSmiles("*CC*"))
-    scaffold_with_linker = fegrow.build_molecule(
-        sars_scaffold_chunk_sdf, linker_rccr, attachment_index
-    )
+    fegrow.build_molecule(sars_scaffold_chunk_sdf, linker_rccr, attachment_index)
 
 
 def test_add_linker_rgroup_first():
