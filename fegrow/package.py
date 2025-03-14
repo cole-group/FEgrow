@@ -1246,8 +1246,8 @@ class ChemSpace:  # RInterface
 
         # filter out previously queried molecules
         new_searches = best_vl_for_searching[
-            best_vl_for_searching.enamine_searched == False
-        ]  # noqa: E712
+            best_vl_for_searching.enamine_searched == False  # noqa: E712
+        ]
         smiles_to_search = list(new_searches.Smiles)
 
         start = time.time()
