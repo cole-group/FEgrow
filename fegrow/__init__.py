@@ -1,5 +1,8 @@
 from pathlib import Path
 
+# activate nanomolar units in Pandas
+import pint_pandas  # noqa: F401
+
 from .conformers import WrongCoreForMolecule, generate_conformers
 from .package import (
     ChemSpace,
