@@ -1245,7 +1245,9 @@ class ChemSpace:  # RInterface
             raise NotImplementedError("Multiple growth vectors are used. ")
 
         # filter out previously queried molecules
-        new_searches = best_vl_for_searching[not best_vl_for_searching.enamine_searched]
+        new_searches = best_vl_for_searching[
+            best_vl_for_searching.enamine_searched == False
+        ]  # noqa: E712
         smiles_to_search = list(new_searches.Smiles)
 
         start = time.time()
