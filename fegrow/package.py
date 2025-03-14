@@ -667,8 +667,20 @@ class ChemSpace:  # RInterface
         )
 
     def toxicity(self):
-        df = pandas.concat([m.toxicity() for m in self] + [pandas.DataFrame()])
+        # return the toxicity of all of them
+        toxicities = []
+        for i, row in self.df.iterrows():
+            toxicity = row.Mol.toxicity()
+
+            # set the index to map the molecules back to the main dataframe
+            toxicity.index = [i]
+
+            toxicities.append(toxicity)
+
+        df = pandas.concat(toxicities)
+
         ChemSpace._add_smiles_2D_visualisation(df)
+
         return df
 
     def generate_conformers(
@@ -1470,19 +1482,6 @@ class ChemSpace:  # RInterface
 
     def __getitem__(self, item):
         return self.df.loc[item].Mol
-
-    def toxicity(self):
-        # return the toxicity of all of them
-        toxicities = []
-        for i, row in self.df.iterrows():
-            toxicity = row.Mol.toxicity()
-
-            # set the index to map the molecules back to the main dataframe
-            toxicity.index = [i]
-
-            toxicities.append(toxicity)
-
-        return pandas.concat(toxicities)
 
     def to_sdf(self, filename, failed=False, unbuilt=True):
         """
