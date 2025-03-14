@@ -22,7 +22,7 @@ import pickle
 from pathlib import Path
 
 from rdkit import Chem
-from rdkit.Chem import rdMolDescriptors
+from rdkit.Chem import rdMolDescriptors, AllChem
 
 _fscores = None
 
@@ -47,15 +47,15 @@ def numBridgeheadsAndSpiro(mol, ri=None):
     nBridgehead = rdMolDescriptors.CalcNumBridgeheadAtoms(mol)
     return nBridgehead, nSpiro
 
+# 2 is the *radius* of the circular fingerprint
+mfpgen = AllChem.GetMorganGenerator(radius=2)
 
 def calculateScore(m):
     if _fscores is None:
         readFragmentScores()
 
     # fragment score
-    fp = rdMolDescriptors.GetMorganFingerprint(
-        m, 2
-    )  # <- 2 is the *radius* of the circular fingerprint
+    fp = mfpgen.GetSparseCountFingerprint(m)
     fps = fp.GetNonzeroElements()
     score1 = 0.0
     nf = 0
