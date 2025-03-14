@@ -178,7 +178,7 @@ def test_toxicity(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
         ]
     )
 
-    toxicity = chemspace.toxicity2()
+    toxicity = chemspace.toxicity()
     assert len(toxicity) == 2
 
 
