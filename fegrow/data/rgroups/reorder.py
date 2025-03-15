@@ -1,5 +1,5 @@
-from rdkit import Chem
 from bs4 import BeautifulSoup
+from rdkit import Chem
 
 soup = BeautifulSoup(open("top500_R_replacements.xml").read(), "html.parser")
 
@@ -15,7 +15,7 @@ for mol in lib:
             found = True
             mol.SetIntProp("rank", int(top.attrs["degree"]))
             break
-    if found == False:
+    if not found:
         print("Not found", sm)
         mol.SetIntProp("rank", -1)
 

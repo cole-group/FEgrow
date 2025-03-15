@@ -1,12 +1,13 @@
-import dask
-from rdkit import Chem
-from pydantic import BaseModel, Field
-from typing import Optional
-from fegrow.receptor import ForceField
-from fegrow import RMol
 import pathlib
+from typing import Optional
+
+import dask
 import pandas as pd
-from rdkit.Chem import PandasTools
+from pydantic import BaseModel, Field
+from rdkit import Chem
+
+from fegrow import RMol
+from fegrow.receptor import ForceField
 
 
 class Settings(BaseModel):
@@ -100,7 +101,7 @@ def score_ligand(
         # score only the lowest energy conformer
         rmol.sort_conformers(energy_range=settings.energy_filter)  # kcal/mol
         # purge all but the lowest energy conformers
-        rmol = Rmol(rmol, confId=0)
+        rmol = RMol(rmol, confId=0)
         affinities = rmol.gnina(receptor_file=receptor.as_posix())
         cnnaffinity = -affinities.CNNaffinity.values[0]
         cnnaffinityIC50 = affinities["CNNaffinity->IC50s"].values[0]

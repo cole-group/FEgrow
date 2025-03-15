@@ -14,7 +14,8 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: |
-        pip install black
-    - name: Checking code formatting with black
-      run: |
-        black --check $(git ls-files '*.py')
+        pip install ruff
+    - name: Check formatting with ruff
+      run: ruff format --check
+    - name: Run ruff
+      run: ruff check

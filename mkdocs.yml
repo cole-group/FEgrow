@@ -18,16 +18,18 @@ extra:
     provider: mike
 
 nav:
-  - Home: index.md
+  - Home:
+    - index.md
+    - Acknowledgments: acknowledgments.md
+    - License: license.md
   - Installation: installation.md
+  - Tutorials: tutorials/*/*
   - Notebooks: notebooks/notebook*/*
   - API:
     - RMol: api/rmol.md
     - ChemSpace: api/chemspace.md
     - Active Learning: api/al.md
     - reference: reference/
-  - Acknowledgments: acknowledgments.md
-  - License: license.md
 
 theme:
   name: material

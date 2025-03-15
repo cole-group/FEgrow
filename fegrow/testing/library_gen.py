@@ -1,5 +1,6 @@
 import os
 import tempfile
+
 import requests
 from openbabel import openbabel
 from rdkit import Chem
@@ -8,8 +9,6 @@ from rdkit.Chem import AllChem
 path = "/tmp/"
 os.chdir(path)
 
-
-from rdkit import Chem
 
 smiles = ["Br", "CCCC"]
 CACTUS = "https://cactus.nci.nih.gov/chemical/structure/{0}/{1}"
@@ -133,5 +132,5 @@ for i, gen_mol in enumerate(mols):  # iterate over list
         Chem.SDWriter(smiles_to_iupac(flat_library[i])).write(
             back
         )  # lol @ using a webserver to go from smiles to iupac
-    except:
+    except Exception:
         Chem.SDWriter(flat_library[i]).write(back)

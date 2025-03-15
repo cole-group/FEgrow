@@ -1,8 +1,8 @@
 import pathlib
 import time
+from typing import Optional
 
 import click
-from typing import Optional
 
 
 @click.command()
@@ -13,7 +13,7 @@ from typing import Optional
     help="The path to the SDF file of the core ligand which will be used to restrain the geometries of the scored ligands this should be a substructure of the ligands to be scored.",
 )
 @click.option(
-    "-l" "--ligands",
+    "-l--ligands",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
     help="The path to the ligands to be scored can be in any supported format by RDKit such as csv. smiles or SDF.",
 )
@@ -52,13 +52,14 @@ def score(
     """
     Score the list of input ligands using Gnina after optimising in the receptor.
     """
-    from dask.distributed import Client
-    from rdkit import Chem
     import traceback
+
     import dask
     import tqdm
+    from dask.distributed import Client
+    from rdkit import Chem
 
-    from fegrow.cli.utils import score_ligand, Settings, load_target_ligands
+    from fegrow.cli.utils import Settings, load_target_ligands, score_ligand
 
     try:
         from mycluster import create_cluster
@@ -124,7 +125,7 @@ def score(
                     [rmol.SetProp(k, str(v)) for k, v in mol_data.items()]
                     # write the molecule out when they complete incase we crash
                     molecule_output.write(rmol)
-                except Exception as E:
+                except Exception:
                     print("error for index, ", index)
                     traceback.print_exc()
 

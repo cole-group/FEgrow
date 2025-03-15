@@ -1,16 +1,14 @@
 import copy
 import pathlib
+import random
 import tempfile
 
-import pytest
-import random
-
 import pandas
-
-from rdkit import Chem
-import fegrow
-from fegrow import RGroups, Linkers, ChemSpace
 import prody
+import pytest
+from rdkit import Chem
+
+from fegrow import ChemSpace, Linkers, RGroups
 
 # instantiate the libraries
 RGroups = pandas.DataFrame(RGroups._load_data())
@@ -494,29 +492,29 @@ def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     chemspace.query = Query.UCB(beta=10)
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     # another go without changing any settings
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     # use every querrying strategy
     chemspace.query = Query.Greedy()
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.query = Query.EI(tradeoff=0.1)
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.query = Query.PI(tradeoff=0.1)
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
     chemspace.model = Model.linear()
     chemspace.query = Query.Greedy()
     picks = chemspace.active_learning(n=5)
-    evaluated = chemspace.evaluate(picks, full_evaluation=oracle_look_up)
+    chemspace.evaluate(picks, full_evaluation=oracle_look_up)
 
 
 @pytest.mark.skip(reason="requires the pydockingorg interface. ")

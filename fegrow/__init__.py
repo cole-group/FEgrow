@@ -1,12 +1,15 @@
 from pathlib import Path
 
-from .conformers import generate_conformers, WrongCoreForMolecule
+# activate nanomolar units in Pandas
+import pint_pandas  # noqa: F401
+
+from .conformers import WrongCoreForMolecule, generate_conformers
 from .package import (
     ChemSpace,
+    Linkers,
+    RGroups,
     RMol,
     build_molecule,
-    RGroups,
-    Linkers,
 )
 from .receptor import fix_receptor, optimise_in_receptor, sort_conformers
 from .toxicity import tox_props
@@ -16,6 +19,7 @@ __version__ = open(Path(__file__).parent / "version.txt").read().strip()
 
 __all__ = [
     RMol,
+    ChemSpace,
     generate_conformers,
     fix_receptor,
     optimise_in_receptor,

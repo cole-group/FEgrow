@@ -28,7 +28,7 @@ import prody
 from rdkit import Chem
 
 import fegrow
-from fegrow import RGroups, Linkers
+from fegrow import Linkers, RGroups
 
 rgroups = RGroups()
 linkers = Linkers()
@@ -228,7 +228,7 @@ energies = rmol.optimise_in_receptor(
 )
 
 final_energies = rmol.sort_conformers(energy_range=5)
-rmol.to_file(f"best_conformers.pdb")
+rmol.to_file("best_conformers.pdb")
 print(final_energies)
 
 affinities = rmol.gnina(receptor_file="rec_final.pdb")

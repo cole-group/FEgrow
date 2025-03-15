@@ -1,13 +1,12 @@
 import functools
+import logging
 import time
 from typing import Callable
-import logging
 
 import dask
 import numpy as np
-from sklearn import linear_model, neural_network, ensemble, gaussian_process
-from modAL.acquisition import max_UCB, max_EI, max_PI
-
+from modAL.acquisition import max_EI, max_PI, max_UCB
+from sklearn import ensemble, gaussian_process, linear_model, neural_network
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +131,6 @@ class Query:
 
 
 class Model:
-
     @staticmethod
     def linear(**model_params):
         return linear_model.LinearRegression(**model_params)

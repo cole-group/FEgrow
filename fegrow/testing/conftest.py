@@ -4,8 +4,7 @@ import pandas
 import pytest
 from rdkit import Chem
 
-from fegrow import RGroups, Linkers
-
+from fegrow import Linkers, RGroups
 
 # instantiate the libraries
 

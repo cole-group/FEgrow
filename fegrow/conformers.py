@@ -4,7 +4,6 @@ from typing import List, Optional
 
 import numpy
 from rdkit import Chem
-from rdkit.Chem import AllChem
 from rdkit.Chem.rdDistGeom import EmbedMolecule
 from rdkit.Chem.rdForceFieldHelpers import UFFGetMoleculeForceField
 from rdkit.Chem.rdMolAlign import AlignMol
@@ -95,9 +94,8 @@ def generate_conformers(
     else:
         try:
             from ties.topology_superimposer import (
-                superimpose_topologies,
                 Atom,
-                get_starting_configurations,
+                superimpose_topologies,
             )
         except ModuleNotFoundError as NoTies:
             raise WrongCoreForMolecule(

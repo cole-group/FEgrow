@@ -1,8 +1,7 @@
 import pandas
-
 from rdkit import Chem
-from fegrow import ChemSpace
 
+from fegrow import ChemSpace
 
 # check if two molecules were built with chemspace
 chemspace = ChemSpace()

@@ -4,35 +4,32 @@ import functools
 import itertools
 import logging
 import os
-import typing
-import warnings
-from pathlib import Path
 import re
 import stat
 import subprocess
 import tempfile
-from typing import List, Optional, Union, Sequence
-import urllib
 import time
+import typing
+import urllib
+import warnings
+from pathlib import Path
+from typing import List, Optional, Sequence, Union
 
-import functools
-
-import pandas as pd
-import requests
-import numpy as np
+import dask
+import modAL
 import mols2grid
+import numpy as np
 import openmm
 import openmm.app
 import pandas
-import pint_pandas
+import pandas as pd
 import prody as prody_package
 import py3Dmol
 import rdkit
+import requests
+from dask.distributed import Client, LocalCluster
 from rdkit import Chem
 from rdkit.Chem import Draw, PandasTools
-import dask
-from dask.distributed import LocalCluster, Client, Scheduler, Worker
-import modAL
 from sklearn import gaussian_process
 
 from .builder import build_molecules_with_rdkit
@@ -393,7 +390,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
                 ["./gnina", "--help"], capture_output=True, cwd=RMol.gnina_dir
             )
             return
-        except FileNotFoundError as E:
+        except FileNotFoundError:
             pass
 
         # gnina is not found, try downloading it
@@ -670,8 +667,20 @@ class ChemSpace:  # RInterface
         )
 
     def toxicity(self):
-        df = pandas.concat([m.toxicity() for m in self] + [pandas.DataFrame()])
+        # return the toxicity of all of them
+        toxicities = []
+        for i, row in self.df.iterrows():
+            toxicity = row.Mol.toxicity()
+
+            # set the index to map the molecules back to the main dataframe
+            toxicity.index = [i]
+
+            toxicities.append(toxicity)
+
+        df = pandas.concat(toxicities)
+
         ChemSpace._add_smiles_2D_visualisation(df)
+
         return df
 
     def generate_conformers(
@@ -825,7 +834,6 @@ class ChemSpace:  # RInterface
     #     return display(df)
 
     def add_scaffold(self, template, atom_replacement_index=None):
-
         # check if any atom is marked for joining
         if atom_replacement_index is None:
             if not any(atom.GetAtomicNum() == 0 for atom in template.GetAtoms()):
@@ -946,10 +954,6 @@ class ChemSpace:  # RInterface
             If None, all molecules are evaluated.
         :return:
         """
-
-        if indices is None:
-            # evaluate all molecules
-            rgroups = list(self.df.Mol)
 
         if len(self._scaffolds) == 0:
             print("Please add scaffolds to the system for the evaluation. ")
@@ -1121,7 +1125,7 @@ class ChemSpace:  # RInterface
 
                 if al_ignore_penalty:
                     Training = False
-            except Exception as E:
+            except Exception:
                 # failed to finish the protocol, set the penalty
                 score = penalty
                 build_succeeded = False
@@ -1177,7 +1181,7 @@ class ChemSpace:  # RInterface
                 enamine id: @enamine_id <br>
                 al exp: @run <br>
             </div>
-            """
+            """  # noqa: F841
 
         # make the circles smaller for the noise (==0) in the cluster
         # df["sizes"] = [2 if c == 0 else 10 for c in picked_df.cluster]
@@ -1191,8 +1195,6 @@ class ChemSpace:  # RInterface
         )
 
         # colors = df["cluster"].astype('float').values
-        from bokeh import palettes
-        from bokeh.transform import linear_cmap
 
         # mapper = linear_cmap(field_name='cluster', palette=palettes.Turbo256, low=0, high=20)
 
@@ -1244,7 +1246,7 @@ class ChemSpace:  # RInterface
 
         # filter out previously queried molecules
         new_searches = best_vl_for_searching[
-            best_vl_for_searching.enamine_searched == False
+            best_vl_for_searching.enamine_searched == False  # noqa: E712
         ]
         smiles_to_search = list(new_searches.Smiles)
 
@@ -1477,19 +1479,6 @@ class ChemSpace:  # RInterface
     def __getitem__(self, item):
         return self.df.loc[item].Mol
 
-    def toxicity(self):
-        # return the toxicity of all of them
-        toxicities = []
-        for i, row in self.df.iterrows():
-            toxicity = row.Mol.toxicity()
-
-            # set the index to map the molecules back to the main dataframe
-            toxicity.index = [i]
-
-            toxicities.append(toxicity)
-
-        return pandas.concat(toxicities)
-
     def to_sdf(self, filename, failed=False, unbuilt=True):
         """
         Write every molecule and all its fields as properties, to an SDF file.
@@ -1501,7 +1490,6 @@ class ChemSpace:  # RInterface
             columns.remove("Mol")
 
             for i, row in self.df.iterrows():
-
                 # ignore this molecule because it failed during the build
                 if failed is False and row.Success is False:
                     continue
@@ -1668,7 +1656,6 @@ class Linkers(pandas.DataFrame):
 
 
 def gnina(mol, receptor, gnina_path, gnina_gpu=False):
-
     extras = []
     if gnina_gpu is False:
         extras.append("--no_gpu")
