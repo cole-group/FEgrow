@@ -105,6 +105,24 @@ def test_extend_mol_with_smiles_early_marking(sars_core_scaffold):
     fegrow.build_molecule(sars_core_scaffold, methyl, scaffold_point=7)
 
 
+def test_mol_manual_mapping(sars_scaffold_sdf):
+    mol = Chem.MolFromSmiles("C1CNCCC1OCC")
+
+    # Testing this pair
+    N_idx = 2
+    C_idx = 3
+    mapping = [(0, 5), (1, 0), (19, 1), (C_idx, N_idx), (20, 3), (18, 4), (27, 6)]
+
+    rmol = fegrow.RMol(mol)
+    rmol._save_template(sars_scaffold_sdf)
+    rmol.generate_conformers(num_conf=5, mapping=mapping)
+
+    # check if the nitrogen is close
+    N_pos = rmol.GetConformer().GetAtomPosition(N_idx)
+    C_pos = sars_scaffold_sdf.GetConformer().GetAtomPosition(C_idx)
+    assert N_pos.Distance(C_pos) < 0.01
+
+
 def test_extend_mol_with_smiles_all_marked(sars_core_scaffold):
     methyl_smiles = "[H]OC([H])([H])[H]"
     params = Chem.SmilesParserParams()
