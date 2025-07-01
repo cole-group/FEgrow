@@ -46,6 +46,7 @@ def generate_conformers(
     flexible: Optional[List[int]] = [],
     scaffold_heavy_atoms=True,
     use_ties_mcs: bool = False,
+    mapping: list[tuple[int, int]] = None,
 ) -> List[Chem.rdchem.Mol]:
     """
     flexible:
@@ -63,13 +64,17 @@ def generate_conformers(
     # fixme - check if the conformer has H, it helps with conformer generation
     rmol = deepcopy(rmol)
 
-    # map scaffold atoms to the new molecules
-    match = rmol.GetSubstructMatch(scaffold_mol)
-    if match and not use_ties_mcs:
+    # map scaffold atoms to the new molecules with RDKit
+    if not mapping:
+        match = rmol.GetSubstructMatch(scaffold_mol)
+        # convert the RDKit match from (i1, i2, ..) to ((core_i1, i1), (core_i2, i2), ...) format
+        mapping = list(enumerate(match))
+
+    if mapping and not use_ties_mcs:
         # extract the scaffold coordinates
         coordinates_map = {}
         manmap = []
-        for core_index, matched_index in enumerate(match):
+        for core_index, matched_index in mapping:
             if matched_index in flexible:
                 continue
 
@@ -78,15 +83,6 @@ def generate_conformers(
             # ignore the R atom being matched
             if scaffold_atom.GetAtomicNum() == 0:
                 continue
-
-            # verify that the appropriate atom types were matched
-            rmol_atom = rmol.GetAtomWithIdx(matched_index)
-            if scaffold_atom.GetAtomicNum() != rmol_atom.GetAtomicNum():
-                raise ValueError(
-                    f"Scaffold {core_index}:{scaffold_atom.GetSymbol()} "
-                    f"does not match {matched_index}:{rmol_atom.GetSymbol()}. "
-                    f"RDKit .GetSubstructMatch appears to have failed. Please report.  "
-                )
 
             core_atom_coordinate = scaffold_conformer.GetAtomPosition(core_index)
             coordinates_map[matched_index] = core_atom_coordinate
