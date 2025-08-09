@@ -61,7 +61,7 @@ class RInterface:
 
     @abc.abstractmethod
     def generate_conformers(
-        self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
+        self, num_conf: int, minimum_conf_rms: float = 0.5, **kwargs
     ):
         pass
 
@@ -127,7 +127,7 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
         return df
 
     def generate_conformers(
-        self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
+        self, num_conf: int, minimum_conf_rms: float = 0.5, **kwargs
     ):
         """
         Generate conformers using the RDKIT's ETKDG. The generated conformers
@@ -684,7 +684,7 @@ class ChemSpace:  # RInterface
         return df
 
     def generate_conformers(
-        self, num_conf: int, minimum_conf_rms: Optional[float] = [], **kwargs
+        self, num_conf: int, minimum_conf_rms: float = 0.5, **kwargs
     ):
         # prepare the dask parameters to be send
         num_conf = dask.delayed(num_conf)
