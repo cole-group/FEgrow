@@ -15,7 +15,7 @@ from typing_extensions import Literal
 
 # fix for new openmm versions
 try:
-    from openmm import Platform, app, openmm, unit
+    from openmm import Platform, app, openmm, unit, OpenMMException
 except (ImportError, ModuleNotFoundError):
     from simtk import unit
     from simtk.openmm import app, openmm
@@ -214,8 +214,13 @@ def optimise_in_receptor(
         complex_coords = receptor_coords + lig_vec
         # set the initial positions
         simulation.context.setPositions(complex_coords)
-        # now minimize the energy
-        simulation.minimizeEnergy()
+
+        # minimize the energy
+        try:
+            simulation.minimizeEnergy()
+        except OpenMMException as E:
+            logger.warning(f"Conformer (index: {i}) minimisation failed due to: {E}")
+            continue
 
         # write out the final coords
         min_state = simulation.context.getState(getPositions=True, getEnergy=True)
