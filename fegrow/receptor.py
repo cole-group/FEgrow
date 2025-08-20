@@ -25,6 +25,10 @@ from openff.toolkit.topology import Molecule as OFFMolecule
 logger = logging.getLogger(__name__)
 
 
+class NoPostMinimisationConformers(Exception):
+    """Raise if no conformers survive minimisation (due to e.g. simulation blowing up)"""
+
+
 def fix_receptor(input_file: str, output_file: str, pH: float = 7.0):
     """
     Use PDBFixer to correct the input and add hydrogens with the given pH.
@@ -246,6 +250,9 @@ def optimise_in_receptor(
             min_state.getPotentialEnergy().value_in_unit(unit.kilocalories_per_mole)
         )
         final_mol.AddConformer(final_conformer, assignId=True)
+
+    if final_mol.GetNumConformers() == 0:
+        raise NoPostMinimisationConformers()
 
     return final_mol, energies
 
