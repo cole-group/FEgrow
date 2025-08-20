@@ -25,7 +25,7 @@ from openff.toolkit.topology import Molecule as OFFMolecule
 logger = logging.getLogger(__name__)
 
 
-class NoPostMinimisationConformers(Exception):
+class NoPostMinimisationConformersError(Exception):
     """Raise if no conformers survive minimisation (due to e.g. simulation blowing up)"""
 
 
@@ -252,7 +252,7 @@ def optimise_in_receptor(
         final_mol.AddConformer(final_conformer, assignId=True)
 
     if final_mol.GetNumConformers() == 0:
-        raise NoPostMinimisationConformers()
+        raise NoPostMinimisationConformersError()
 
     return final_mol, energies
 
