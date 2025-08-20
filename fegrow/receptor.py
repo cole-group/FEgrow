@@ -15,7 +15,7 @@ from typing_extensions import Literal
 
 # fix for new openmm versions
 try:
-    from openmm import Platform, app, openmm, unit
+    from openmm import Platform, app, openmm, unit, OpenMMException
 except (ImportError, ModuleNotFoundError):
     from simtk import unit
     from simtk.openmm import app, openmm
@@ -23,6 +23,10 @@ except (ImportError, ModuleNotFoundError):
 from openff.toolkit.topology import Molecule as OFFMolecule
 
 logger = logging.getLogger(__name__)
+
+
+class NoPostMinimisationConformersError(Exception):
+    """Raise if no conformers survive minimisation (due to e.g. simulation blowing up)"""
 
 
 def fix_receptor(input_file: str, output_file: str, pH: float = 7.0):
@@ -214,8 +218,13 @@ def optimise_in_receptor(
         complex_coords = receptor_coords + lig_vec
         # set the initial positions
         simulation.context.setPositions(complex_coords)
-        # now minimize the energy
-        simulation.minimizeEnergy()
+
+        # minimize the energy
+        try:
+            simulation.minimizeEnergy()
+        except OpenMMException as E:
+            logger.warning(f"Conformer (index: {i}) minimisation failed due to: {E}")
+            continue
 
         # write out the final coords
         min_state = simulation.context.getState(getPositions=True, getEnergy=True)
@@ -241,6 +250,9 @@ def optimise_in_receptor(
             min_state.getPotentialEnergy().value_in_unit(unit.kilocalories_per_mole)
         )
         final_mol.AddConformer(final_conformer, assignId=True)
+
+    if final_mol.GetNumConformers() == 0:
+        raise NoPostMinimisationConformersError()
 
     return final_mol, energies
 
