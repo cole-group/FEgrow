@@ -1,7 +1,7 @@
 import logging
 import tempfile
 from copy import deepcopy
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 
 import numpy
 import parmed
@@ -93,7 +93,7 @@ def optimise_in_receptor(
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
     platform_name: str = "CPU",
-    ligand_freeze: list[int] = None,
+    ligand_indices_to_freeze: Optional[list[int]] = None,
 ) -> Tuple[Chem.Mol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -117,7 +117,7 @@ def optimise_in_receptor(
         platform_name:
             The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
             See the OpenMM documentation of Platform.
-        ligand_freeze:
+        ligand_indices_to_freeze:
             The ligand indices to be frozen (relative to the ligand)
 
     Returns:
@@ -171,9 +171,9 @@ def optimise_in_receptor(
         if i not in ligand_idx:
             system.setParticleMass(i, 0)
 
-    if ligand_freeze is not None:
+    if ligand_indices_to_freeze is not None:
         logger.info("Freezing ligand indices")
-        for idx in ligand_freeze:
+        for idx in ligand_indices_to_freeze:
             system.setParticleMass(ligand_idx[idx], 0)
 
     # if we want to use ani2x check we can and adapt the system
