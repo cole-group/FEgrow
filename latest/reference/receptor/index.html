@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.17">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
     
     
       
@@ -1554,6 +1554,8 @@
       
         
       
+        
+      
     
     
     
@@ -1704,6 +1706,29 @@
   
   <span class="md-ellipsis">
     <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> test_general
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/test_receptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> test_receptor
     
   </span>
   
@@ -1868,6 +1893,8 @@
 
 
 
+
+
 <p><span class="doc-section-title">Classes:</span></p>
     <ul>
         <li class="doc-section-item field-body">
@@ -1920,6 +1947,7 @@
 
 
 
+
 <div class="doc doc-object doc-class">
 
 
@@ -1937,6 +1965,8 @@
 
 
         <p>Raise if no conformers survive minimisation (due to e.g. simulation blowing up)</p>
+
+
 
 
 
@@ -2016,7 +2046,7 @@
 
 
 <a href="#fegrow.receptor.optimise_in_receptor" class="headerlink" title="Permanent link">#</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">optimise_in_receptor</span><span class="p">(</span><span class="n">ligand</span><span class="p">:</span> <span class="n"><span title="rdkit.Chem.Mol">Mol</span></span><span class="p">,</span> <span class="n">receptor_file</span><span class="p">:</span> <span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="simtk.openmm.app.PDBFile">PDBFile</span></span><span class="p">],</span> <span class="n">ligand_force_field</span><span class="p">:</span> <span class="n"><span title="fegrow.receptor.ForceField">ForceField</span></span><span class="p">,</span> <span class="n">use_ani</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">sigma_scale_factor</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">relative_permittivity</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">water_model</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;tip3p.xml&#39;</span><span class="p">,</span> <span class="n">platform_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;CPU&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Tuple">Tuple</span></span><span class="p">[</span><span class="n"><span title="rdkit.Chem.Mol">Mol</span></span><span class="p">,</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">optimise_in_receptor</span><span class="p">(</span><span class="n">ligand</span><span class="p">:</span> <span class="n"><span title="rdkit.Chem.Mol">Mol</span></span><span class="p">,</span> <span class="n">receptor_file</span><span class="p">:</span> <span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="simtk.openmm.app.PDBFile">PDBFile</span></span><span class="p">],</span> <span class="n">ligand_force_field</span><span class="p">:</span> <span class="n"><span title="fegrow.receptor.ForceField">ForceField</span></span><span class="p">,</span> <span class="n">use_ani</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">sigma_scale_factor</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">relative_permittivity</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">water_model</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;tip3p.xml&#39;</span><span class="p">,</span> <span class="n">platform_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;CPU&#39;</span><span class="p">,</span> <span class="n">ligand_indices_to_freeze</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Tuple">Tuple</span></span><span class="p">[</span><span class="n"><span title="rdkit.Chem.Mol">Mol</span></span><span class="p">,</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2100,6 +2130,16 @@ openmmforcefields package.</p>
           <div class="doc-md-description">
             <p>The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
 See the OpenMM documentation of Platform.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>ligand_indices_to_freeze</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="list">list</span>[<span title="int">int</span>]]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The ligand indices to be frozen (relative to the ligand)</p>
           </div>
         </li>
     </ul>
@@ -2289,7 +2329,16 @@ See the OpenMM documentation of Platform.</p>
 <span class="normal">254</span>
 <span class="normal">255</span>
 <span class="normal">256</span>
-<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">optimise_in_receptor</span><span class="p">(</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">optimise_in_receptor</span><span class="p">(</span>
     <span class="n">ligand</span><span class="p">:</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
     <span class="n">receptor_file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">],</span>
     <span class="n">ligand_force_field</span><span class="p">:</span> <span class="n">ForceField</span><span class="p">,</span>
@@ -2298,6 +2347,7 @@ See the OpenMM documentation of Platform.</p>
     <span class="n">relative_permittivity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
     <span class="n">water_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tip3p.xml&quot;</span><span class="p">,</span>
     <span class="n">platform_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
+    <span class="n">ligand_indices_to_freeze</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.</span>
@@ -2321,6 +2371,8 @@ See the OpenMM documentation of Platform.</p>
 <span class="sd">        platform_name:</span>
 <span class="sd">            The OpenMM platform name, &#39;cuda&#39; if available, with the &#39;cpu&#39; used by default.</span>
 <span class="sd">            See the OpenMM documentation of Platform.</span>
+<span class="sd">        ligand_indices_to_freeze:</span>
+<span class="sd">            The ligand indices to be frozen (relative to the ligand)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A copy of the input molecule with the optimised positions.</span>
@@ -2372,6 +2424,12 @@ See the OpenMM documentation of Platform.</p>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
         <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ligand_idx</span><span class="p">:</span>
             <span class="n">system</span><span class="o">.</span><span class="n">setParticleMass</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ligand_indices_to_freeze</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Freezing ligand indices&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">ligand_indices_to_freeze</span><span class="p">:</span>
+            <span class="n">system</span><span class="o">.</span><span class="n">setParticleMass</span><span class="p">(</span><span class="n">ligand_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
     <span class="c1"># if we want to use ani2x check we can and adapt the system</span>
     <span class="k">if</span> <span class="n">use_ani</span> <span class="ow">and</span> <span class="n">_can_use_ani2x</span><span class="p">(</span><span class="n">openff_mol</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;using ani2x&quot;</span><span class="p">)</span>
@@ -2521,16 +2579,7 @@ range of the lowest energy conformer.</p>
 
             <details class="quote">
               <summary>Source code in <code>fegrow/receptor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span>
 <span class="normal">272</span>
@@ -2554,7 +2603,16 @@ range of the lowest energy conformer.</p>
 <span class="normal">290</span>
 <span class="normal">291</span>
 <span class="normal">292</span>
-<span class="normal">293</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sort_conformers</span><span class="p">(</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sort_conformers</span><span class="p">(</span>
     <span class="n">ligand</span><span class="p">:</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">energies</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">energy_range</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

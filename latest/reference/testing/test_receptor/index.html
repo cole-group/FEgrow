@@ -10,26 +10,28 @@
       
       
       
-        <link rel="canonical" href="https://github.com/cole-group/FEgrow/latest/">
+        <link rel="canonical" href="https://github.com/cole-group/FEgrow/latest/reference/testing/test_receptor/">
       
       
+        <link rel="prev" href="../test_general/">
       
-        <link rel="next" href="acknowledgments/">
+      
+        <link rel="next" href="../../toxicity/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
     
     
       
-        <title>FEgrow 2.0.0: Active Learning and acceleration - FEgrow</title>
+        <title>test_receptor - FEgrow</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.7e37652d.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e37652d.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -48,9 +50,9 @@
       
     
     
-      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#fegrow-200-active-learning-and-acceleration" class="md-skip">
+        <a href="#fegrow.testing.test_receptor" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +96,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="FEgrow" class="md-header__button md-logo" aria-label="FEgrow" data-md-component="logo">
+    <a href="../../.." title="FEgrow" class="md-header__button md-logo" aria-label="FEgrow" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              FEgrow 2.0.0: Active Learning and acceleration
+              <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> test_receptor
             
           </span>
         </div>
@@ -193,13 +195,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="." class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../.." class="md-tabs__link">
           
   
   
@@ -219,7 +219,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="installation/" class="md-tabs__link">
+      <a href="../../../installation/" class="md-tabs__link">
         
   
   
@@ -240,7 +240,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="tutorials/0_basic/0_basic_tutorial_full/" class="md-tabs__link">
+        <a href="../../../tutorials/0_basic/0_basic_tutorial_full/" class="md-tabs__link">
           
   
   
@@ -262,7 +262,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="notebooks/notebook1-basic-tutorial-full/1_basic_tutorial_full/" class="md-tabs__link">
+        <a href="../../../notebooks/notebook1-basic-tutorial-full/1_basic_tutorial_full/" class="md-tabs__link">
           
   
   
@@ -280,11 +280,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="api/rmol/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../api/rmol/" class="md-tabs__link">
           
   
   
@@ -326,7 +328,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="FEgrow" class="md-nav__button md-logo" aria-label="FEgrow" data-md-component="logo">
+    <a href="../../.." title="FEgrow" class="md-nav__button md-logo" aria-label="FEgrow" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -353,8 +355,6 @@
       
   
   
-    
-  
   
   
     
@@ -372,23 +372,20 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="." class="md-nav__link md-nav__link--active">
+            <a href="../../.." class="md-nav__link ">
               
   
   
@@ -401,13 +398,13 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_1" id="__nav_1_label" tabindex="">
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_1">
             <span class="md-nav__icon md-icon"></span>
             Home
@@ -423,7 +420,7 @@
   
   
     <li class="md-nav__item">
-      <a href="acknowledgments/" class="md-nav__link">
+      <a href="../../../acknowledgments/" class="md-nav__link">
         
   
   
@@ -446,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="license/" class="md-nav__link">
+      <a href="../../../license/" class="md-nav__link">
         
   
   
@@ -476,7 +473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="installation/" class="md-nav__link">
+      <a href="../../../installation/" class="md-nav__link">
         
   
   
@@ -549,7 +546,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/0_basic/0_basic_tutorial_full/" class="md-nav__link">
+      <a href="../../../tutorials/0_basic/0_basic_tutorial_full/" class="md-nav__link">
         
   
   
@@ -572,7 +569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/1_chemspace/1_tutorial_introduce_chemspace/" class="md-nav__link">
+      <a href="../../../tutorials/1_chemspace/1_tutorial_introduce_chemspace/" class="md-nav__link">
         
   
   
@@ -595,7 +592,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/2_active_learning/2_tutorial_active_learning/" class="md-nav__link">
+      <a href="../../../tutorials/2_active_learning/2_tutorial_active_learning/" class="md-nav__link">
         
   
   
@@ -690,7 +687,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook1-basic-tutorial-full/1_basic_tutorial_full/" class="md-nav__link">
+      <a href="../../../notebooks/notebook1-basic-tutorial-full/1_basic_tutorial_full/" class="md-nav__link">
         
   
   
@@ -713,7 +710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook2-mini-tutorial-grow-linker-and-r-group/2_mini_tutorial_grow_linker_rgroup/" class="md-nav__link">
+      <a href="../../../notebooks/notebook2-mini-tutorial-grow-linker-and-r-group/2_mini_tutorial_grow_linker_rgroup/" class="md-nav__link">
         
   
   
@@ -736,7 +733,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook2.1-tutorial-single-molecule/2_tutorial_single_mol/" class="md-nav__link">
+      <a href="../../../notebooks/notebook2.1-tutorial-single-molecule/2_tutorial_single_mol/" class="md-nav__link">
         
   
   
@@ -759,7 +756,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook3-mini-tutorial-replace-substructure/3_mini_tutorial_replace_substructure/" class="md-nav__link">
+      <a href="../../../notebooks/notebook3-mini-tutorial-replace-substructure/3_mini_tutorial_replace_substructure/" class="md-nav__link">
         
   
   
@@ -782,7 +779,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook4-introduce-chemspace/4_tutorial_introduce_chemspace/" class="md-nav__link">
+      <a href="../../../notebooks/notebook4-introduce-chemspace/4_tutorial_introduce_chemspace/" class="md-nav__link">
         
   
   
@@ -805,7 +802,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook5-chemspace-streamlined/5_tutorial_chemspace_streamlined/" class="md-nav__link">
+      <a href="../../../notebooks/notebook5-chemspace-streamlined/5_tutorial_chemspace_streamlined/" class="md-nav__link">
         
   
   
@@ -828,7 +825,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook6-chemspace-smiles/6_chemspace_smiles/" class="md-nav__link">
+      <a href="../../../notebooks/notebook6-chemspace-smiles/6_chemspace_smiles/" class="md-nav__link">
         
   
   
@@ -851,7 +848,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook7-al-enamine/7_active_learning_enamine/" class="md-nav__link">
+      <a href="../../../notebooks/notebook7-al-enamine/7_active_learning_enamine/" class="md-nav__link">
         
   
   
@@ -874,7 +871,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook8-more-al/8_active_learning_details/" class="md-nav__link">
+      <a href="../../../notebooks/notebook8-more-al/8_active_learning_details/" class="md-nav__link">
         
   
   
@@ -897,7 +894,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/notebook9-previous-study50k/9_cs50k_study/" class="md-nav__link">
+      <a href="../../../notebooks/notebook9-previous-study50k/9_cs50k_study/" class="md-nav__link">
         
   
   
@@ -924,8 +921,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -941,19 +940,22 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -966,7 +968,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             API
@@ -980,7 +982,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/rmol/" class="md-nav__link">
+      <a href="../../../api/rmol/" class="md-nav__link">
         
   
   
@@ -1003,7 +1005,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/chemspace/" class="md-nav__link">
+      <a href="../../../api/chemspace/" class="md-nav__link">
         
   
   
@@ -1026,7 +1028,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/al/" class="md-nav__link">
+      <a href="../../../api/al/" class="md-nav__link">
         
   
   
@@ -1046,8 +1048,10 @@
                 
   
   
+    
   
   
+  
     
     
       
@@ -1058,18 +1062,21 @@
     
       
       
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
         
           
-          <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="">
             
   
   
@@ -1082,7 +1089,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5_4">
             <span class="md-nav__icon md-icon"></span>
             reference
@@ -1093,6 +1100,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1129,15 +1138,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4_1" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="reference/" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   
@@ -1156,7 +1165,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_4_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_4_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5_4_1">
             <span class="md-nav__icon md-icon"></span>
             <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> fegrow
@@ -1172,7 +1181,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/al/" class="md-nav__link">
+      <a href="../../al/" class="md-nav__link">
         
   
   
@@ -1195,7 +1204,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/builder/" class="md-nav__link">
+      <a href="../../builder/" class="md-nav__link">
         
   
   
@@ -1247,7 +1256,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="reference/cli/" class="md-nav__link ">
+            <a href="../../cli/" class="md-nav__link ">
               
   
   
@@ -1282,7 +1291,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/cli/cli/" class="md-nav__link">
+      <a href="../../cli/cli/" class="md-nav__link">
         
   
   
@@ -1305,7 +1314,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/cli/scoring/" class="md-nav__link">
+      <a href="../../cli/scoring/" class="md-nav__link">
         
   
   
@@ -1328,7 +1337,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/cli/utils/" class="md-nav__link">
+      <a href="../../cli/utils/" class="md-nav__link">
         
   
   
@@ -1359,7 +1368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/conformers/" class="md-nav__link">
+      <a href="../../conformers/" class="md-nav__link">
         
   
   
@@ -1382,7 +1391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/package/" class="md-nav__link">
+      <a href="../../package/" class="md-nav__link">
         
   
   
@@ -1405,7 +1414,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/receptor/" class="md-nav__link">
+      <a href="../../receptor/" class="md-nav__link">
         
   
   
@@ -1428,7 +1437,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/sascorer/" class="md-nav__link">
+      <a href="../../sascorer/" class="md-nav__link">
         
   
   
@@ -1448,6 +1457,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1478,15 +1489,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4_1_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4_1_9" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="reference/testing/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   
@@ -1505,7 +1516,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_4_1_9_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_4_1_9_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5_4_1_9">
             <span class="md-nav__icon md-icon"></span>
             <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> testing
@@ -1521,7 +1532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/testing/conftest/" class="md-nav__link">
+      <a href="../conftest/" class="md-nav__link">
         
   
   
@@ -1544,7 +1555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/testing/library_gen/" class="md-nav__link">
+      <a href="../library_gen/" class="md-nav__link">
         
   
   
@@ -1567,7 +1578,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/testing/run_al/" class="md-nav__link">
+      <a href="../run_al/" class="md-nav__link">
         
   
   
@@ -1590,7 +1601,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/testing/test_chemspace/" class="md-nav__link">
+      <a href="../test_chemspace/" class="md-nav__link">
         
   
   
@@ -1613,7 +1624,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/testing/test_general/" class="md-nav__link">
+      <a href="../test_general/" class="md-nav__link">
         
   
   
@@ -1633,10 +1644,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="reference/testing/test_receptor/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1647,6 +1667,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -1667,7 +1688,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/toxicity/" class="md-nav__link">
+      <a href="../../toxicity/" class="md-nav__link">
         
   
   
@@ -1743,19 +1764,50 @@
   
 
 
-<h1 id="fegrow-200-active-learning-and-acceleration">FEgrow 2.0.0: Active Learning and acceleration<a class="headerlink" href="#fegrow-200-active-learning-and-acceleration" title="Permanent link">#</a></h1>
-<p>A new release of FEgrow that adds active learning together with acceleration powered by Dask (multi -cpu, -node, -cluster).</p>
-<p>To get started with the new functionality, see the <a href="https://github.com/cole-group/FEgrow/tree/master/tutorials">tutorials</a> folder, which contains examples of i) basic interactive molecular design, ii) an introduction to the chemspace functionality, and iii) an example of active learning for inhibitor design.</p>
-<p>These notebooks are based on the functionality described in:</p>
-<p>Cree B, Bieniek M, Amin S, Kawamura A, Cole D. <a href="https://doi.org/10.26434/chemrxiv-2024-xczfb">Active learning driven prioritisation of compounds from on-demand libraries targeting the SARS-CoV-2 main protease.</a> ChemRxiv (2024).</p>
-<p>Scripts used to create Figures 2-6 in the above paper can be accessed <a href="https://github.com/cole-group/FEgrow_AL_data">here.</a></p>
-<h1 id="fegrow-1">FEgrow (1.*)<a class="headerlink" href="#fegrow-1" title="Permanent link">#</a></h1>
-<p>An interactive workflow for building user-defined congeneric series of ligands in protein binding pockets for input to free energy calculations.</p>
-<p><img alt="CI" src="https://github.com/cole-group/FEgrow/actions/workflows/CI.yml/badge.svg" /><img alt="Anaconda-Server Badge" src="https://anaconda.org/conda-forge/fegrow/badges/downloads.svg" /></p>
-<p>Bieniek, Mateusz K., Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, and Daniel J. Cole. "An open-source molecular builder and free energy preparation workflow." Communications Chemistry 5, no. 1 (2022): 136.</p>
-<p><a href="https://www.nature.com/articles/s42004-022-00754-9">https://doi.org/10.1038/s42004-022-00754-9</a></p>
-<h3 id="further-information">Further Information<a class="headerlink" href="#further-information" title="Permanent link">#</a></h3>
-<p>Please see <a href="https://cole-group.github.io/FEgrow">cole-group.github.io/fegrow</a> for full installation instructions, documentation and acknowledgements.</p>
+<div class="doc doc-object doc-module">
+
+
+
+<h1 id="fegrow.testing.test_receptor" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">test_receptor</span>
+
+
+<a href="#fegrow.testing.test_receptor" class="headerlink" title="Permanent link">#</a></h1>
+
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 
@@ -1790,15 +1842,31 @@
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
+          
+          <a href="../test_general/" class="md-footer__link md-footer__link--prev" aria-label="Previous: &lt;code class=&#34;doc-symbol doc-symbol-nav doc-symbol-module&#34;&gt;&lt;/code&gt; test_general">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> test_general
+              </div>
+            </div>
+          </a>
+        
         
           
-          <a href="acknowledgments/" class="md-footer__link md-footer__link--next" aria-label="Next: Acknowledgments">
+          <a href="../../toxicity/" class="md-footer__link md-footer__link--next" aria-label="Next: &lt;code class=&#34;doc-symbol doc-symbol-nav doc-symbol-module&#34;&gt;&lt;/code&gt; toxicity">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Acknowledgments
+                <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> toxicity
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1838,10 +1906,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": ["announce.dismiss", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "search.highlight", "search.suggest", "toc.follow"], "search": "assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["announce.dismiss", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "search.highlight", "search.suggest", "toc.follow"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="assets/javascripts/bundle.92b07e13.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.92b07e13.min.js"></script>
       
     
   </body>
