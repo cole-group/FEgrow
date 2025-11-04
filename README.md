@@ -1,4 +1,6 @@
-# FEgrow 2.0.0: Active Learning and acceleration 
+# FEgrow 2.0.0: Active Learning and acceleration
+
+![CI](https://github.com/cole-group/FEgrow/actions/workflows/CI.yml/badge.svg)![Anaconda-Server Badge](https://anaconda.org/conda-forge/fegrow/badges/downloads.svg)
 
 A new release of FEgrow that adds active learning together with acceleration powered by Dask (multi -cpu, -node, -cluster).
 
@@ -13,8 +15,6 @@ Scripts used to create Figures 2-6 in the above paper can be accessed [here.](ht
 
 # FEgrow (1.*)
 An interactive workflow for building user-defined congeneric series of ligands in protein binding pockets for input to free energy calculations.
-
-![CI](https://github.com/cole-group/FEgrow/actions/workflows/CI.yml/badge.svg)![Anaconda-Server Badge](https://anaconda.org/conda-forge/fegrow/badges/downloads.svg)
 
 Bieniek, Mateusz K., Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, and Daniel J. Cole. "An open-source molecular builder and free energy preparation workflow." Communications Chemistry 5, no. 1 (2022): 136.
 
