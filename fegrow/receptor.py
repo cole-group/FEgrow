@@ -13,6 +13,11 @@ from rdkit.Geometry.rdGeometry import Point3D
 from tqdm import tqdm
 from typing_extensions import Literal
 
+import subprocess
+#from subprocess import run
+
+import shutil
+
 # fix for new openmm versions
 try:
     from openmm import Platform, app, openmm, unit, OpenMMException
@@ -28,22 +33,63 @@ logger = logging.getLogger(__name__)
 class NoPostMinimisationConformersError(Exception):
     """Raise if no conformers survive minimisation (due to e.g. simulation blowing up)"""
 
+def chimera_path_check():
+    #check if chimera is in the path, if not, raise an error
+    if not shutil.which("chimera"):
+        raise EnvironmentError("Chimera is not in the PATH. Please install Chimera and ensure it is accessible from the command line.")
 
-def fix_receptor(input_file: str, output_file: str, pH: float = 7.0):
+def chimera_protonate(input_file: str, output_file: str):
+    """
+    Use Chimera to protonate the receptor.
+
+    :param input_file: The name of the pdb file which contains the receptor.
+    :param output_file: The name of the pdb file the fixed receptor should be wrote to.
+    :param pH:The ph the pronation state should be fixed for.
+    """
+    chimera_path_check()
+    #from chimera import runCommand as rc
+
+
+    cmds = [
+        "open {}".format(input_file),
+        "addh hbond true",
+        "write format pdb 0 {}".format(output_file),
+        "close all",
+    ]
+
+    subprocess.run(
+        ["chimera", "--nogui", input_file],
+        input="\n".join(cmds).encode(),
+        check=True,
+    )
+
+
+def fix_receptor(input_file: str, output_file: str, pH: float = 7.0, protonate_with_chimera: bool = True):
     """
     Use PDBFixer to correct the input and add hydrogens with the given pH.
 
     :param input_file: The name of the pdb file which contains the receptor.
     :param output_file: The name of the pdb file the fixed receptor should be wrote to.
     :param pH:The ph the pronation state should be fixed for.
+    :param protonate_with_chimera: If True, use Chimera to protonate the receptor instead of PDBFixer.
     """
     fixer = PDBFixer(filename=input_file)
     fixer.findMissingResidues()
     fixer.findMissingAtoms()
     fixer.addMissingAtoms()
-    fixer.addMissingHydrogens(pH)
-    app.PDBFile.writeFile(fixer.topology, fixer.positions, open(output_file, "w"))
 
+    if not protonate_with_chimera:
+        fixer.addMissingHydrogens(pH)
+        app.PDBFile.writeFile(fixer.topology, fixer.positions, open(output_file, "w"))
+
+    if protonate_with_chimera:
+        # write out a temporary file for chimera to read in
+        with tempfile.NamedTemporaryFile(suffix=".pdb") as temp_pdb:
+            app.PDBFile.writeFile(fixer.topology, fixer.positions, open(temp_pdb.name, "w"))
+            # use chimera to protonate the file
+            chimera_protonate(temp_pdb.name, output_file)
+
+            
 
 def _can_use_ani2x(molecule: OFFMolecule) -> bool:
     """
