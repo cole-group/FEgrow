@@ -13,6 +13,8 @@ from rdkit.Geometry.rdGeometry import Point3D
 from tqdm import tqdm
 from typing_extensions import Literal
 
+import warnings
+
 import subprocess
 #from subprocess import run
 
@@ -38,17 +40,24 @@ def chimera_path_check():
     if not shutil.which("chimera"):
         raise EnvironmentError("Chimera is not in the PATH. Please install Chimera and ensure it is accessible from the command line.")
 
-def chimera_protonate(input_file: str, output_file: str):
+def chimera_protonate(input_file: str, output_file: str, verbose: bool = False):
     """
     Use Chimera to protonate the receptor.
 
     :param input_file: The name of the pdb file which contains the receptor.
     :param output_file: The name of the pdb file the fixed receptor should be wrote to.
     :param pH:The ph the pronation state should be fixed for.
+    :param verbose: If True, print the Chimera output.
     """
     chimera_path_check()
     #from chimera import runCommand as rc
 
+    # Silence stdout if not verbose
+    with open(os.devnull, 'w') as devnull:
+        if verbose:
+            stdout_target = None
+        else:
+            stdout_target = devnull
 
     cmds = [
         "open {}".format(input_file),
@@ -79,6 +88,7 @@ def fix_receptor(input_file: str, output_file: str, pH: float = 7.0, protonate_w
     fixer.addMissingAtoms()
 
     if not protonate_with_chimera:
+        warnings.warn("Using PDBFixer for protonation can lead to less accurate results than using Chimera. Please install...", UserWarning)
         fixer.addMissingHydrogens(pH)
         app.PDBFile.writeFile(fixer.topology, fixer.positions, open(output_file, "w"))
 
