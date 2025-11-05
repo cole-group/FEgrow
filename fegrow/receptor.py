@@ -64,7 +64,7 @@ def chimera_protonate(input_file: str, output_file: str, verbose: bool = False):
     )
 
 
-def fix_receptor(input_file: str, output_file: str, pH: float = 7.0, prefer_chimera_protonation: bool = True):
+def fix_receptor(input_file: str, output_file: str, pH: float = 7.0, prefer_chimera_protonation: bool = False):
     """
     Use PDBFixer to correct the input and add hydrogens with the given pH.
 
