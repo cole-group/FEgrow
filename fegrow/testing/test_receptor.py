@@ -47,5 +47,3 @@ def test_mcs_atom_freezing(sars_scaffold_chunk_sdf, rec_7l10_final_path):
         np.testing.assert_almost_equal(
             min_pos_unfrozen[scaffold_atoms], unmin_pos[scaffold_atoms]
         )
-
-

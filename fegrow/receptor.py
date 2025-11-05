@@ -34,10 +34,14 @@ logger = logging.getLogger(__name__)
 class NoPostMinimisationConformersError(Exception):
     """Raise if no conformers survive minimisation (due to e.g. simulation blowing up)"""
 
+
 def chimera_path_check():
-    #check if chimera is in the path, if not, raise an error
+    # check if chimera is in the path, if not, raise an error
     if not shutil.which("chimera"):
-        raise EnvironmentError("Chimera is not in the PATH. Please install Chimera and ensure it is accessible from the command line.")
+        raise EnvironmentError(
+            "Chimera is not in the PATH. Please install Chimera and ensure it is accessible from the command line."
+        )
+
 
 def chimera_protonate(input_file: str, output_file: str, verbose: bool = False):
     """
@@ -64,7 +68,12 @@ def chimera_protonate(input_file: str, output_file: str, verbose: bool = False):
     )
 
 
-def fix_receptor(input_file: str, output_file: str, pH: float = 7.0, prefer_chimera_protonation: bool = False):
+def fix_receptor(
+    input_file: str,
+    output_file: str,
+    pH: float = 7.0,
+    prefer_chimera_protonation: bool = False,
+):
     """
     Use PDBFixer to correct the input and add hydrogens with the given pH.
 
@@ -79,18 +88,22 @@ def fix_receptor(input_file: str, output_file: str, pH: float = 7.0, prefer_chim
     fixer.addMissingAtoms()
 
     if not prefer_chimera_protonation:
-        warnings.warn("Using PDBFixer for protonation can lead to less accurate results than using Chimera. Please install chimera", UserWarning)
+        warnings.warn(
+            "Using PDBFixer for protonation can lead to less accurate results than using Chimera. Please install chimera",
+            UserWarning,
+        )
         fixer.addMissingHydrogens(pH)
         app.PDBFile.writeFile(fixer.topology, fixer.positions, open(output_file, "w"))
 
     if prefer_chimera_protonation:
         # write out a temporary file for chimera to read in
         with tempfile.NamedTemporaryFile(suffix=".pdb") as temp_pdb:
-            app.PDBFile.writeFile(fixer.topology, fixer.positions, open(temp_pdb.name, "w"))
+            app.PDBFile.writeFile(
+                fixer.topology, fixer.positions, open(temp_pdb.name, "w")
+            )
             # use chimera to protonate the file
             chimera_protonate(temp_pdb.name, output_file)
 
-            
 
 def _can_use_ani2x(molecule: OFFMolecule) -> bool:
     """
