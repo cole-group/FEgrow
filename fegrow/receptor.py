@@ -16,7 +16,6 @@ from typing_extensions import Literal
 import warnings
 
 import subprocess
-#from subprocess import run
 
 import shutil
 
@@ -50,14 +49,6 @@ def chimera_protonate(input_file: str, output_file: str, verbose: bool = False):
     :param verbose: If True, print the Chimera output.
     """
     chimera_path_check()
-    #from chimera import runCommand as rc
-
-    # Silence stdout if not verbose
-    with open(os.devnull, 'w') as devnull:
-        if verbose:
-            stdout_target = None
-        else:
-            stdout_target = devnull
 
     cmds = [
         "open {}".format(input_file),
@@ -73,26 +64,26 @@ def chimera_protonate(input_file: str, output_file: str, verbose: bool = False):
     )
 
 
-def fix_receptor(input_file: str, output_file: str, pH: float = 7.0, protonate_with_chimera: bool = True):
+def fix_receptor(input_file: str, output_file: str, pH: float = 7.0, prefer_chimera_protonation: bool = True):
     """
     Use PDBFixer to correct the input and add hydrogens with the given pH.
 
     :param input_file: The name of the pdb file which contains the receptor.
     :param output_file: The name of the pdb file the fixed receptor should be wrote to.
     :param pH:The ph the pronation state should be fixed for.
-    :param protonate_with_chimera: If True, use Chimera to protonate the receptor instead of PDBFixer.
+    :param prefer_chimera_protonation: If True, use Chimera to protonate the receptor instead of PDBFixer.
     """
     fixer = PDBFixer(filename=input_file)
     fixer.findMissingResidues()
     fixer.findMissingAtoms()
     fixer.addMissingAtoms()
 
-    if not protonate_with_chimera:
-        warnings.warn("Using PDBFixer for protonation can lead to less accurate results than using Chimera. Please install...", UserWarning)
+    if not prefer_chimera_protonation:
+        warnings.warn("Using PDBFixer for protonation can lead to less accurate results than using Chimera. Please install chimera", UserWarning)
         fixer.addMissingHydrogens(pH)
         app.PDBFile.writeFile(fixer.topology, fixer.positions, open(output_file, "w"))
 
-    if protonate_with_chimera:
+    if prefer_chimera_protonation:
         # write out a temporary file for chimera to read in
         with tempfile.NamedTemporaryFile(suffix=".pdb") as temp_pdb:
             app.PDBFile.writeFile(fixer.topology, fixer.positions, open(temp_pdb.name, "w"))
