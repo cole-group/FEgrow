@@ -1,7 +1,7 @@
 import logging
 import tempfile
 from copy import deepcopy
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 
 import numpy
 import parmed
@@ -13,9 +13,15 @@ from rdkit.Geometry.rdGeometry import Point3D
 from tqdm import tqdm
 from typing_extensions import Literal
 
+import warnings
+
+import subprocess
+
+import shutil
+
 # fix for new openmm versions
 try:
-    from openmm import Platform, app, openmm, unit
+    from openmm import Platform, app, openmm, unit, OpenMMException
 except (ImportError, ModuleNotFoundError):
     from simtk import unit
     from simtk.openmm import app, openmm
@@ -25,20 +31,78 @@ from openff.toolkit.topology import Molecule as OFFMolecule
 logger = logging.getLogger(__name__)
 
 
-def fix_receptor(input_file: str, output_file: str, pH: float = 7.0):
+class NoPostMinimisationConformersError(Exception):
+    """Raise if no conformers survive minimisation (due to e.g. simulation blowing up)"""
+
+
+def chimera_path_check():
+    # check if chimera is in the path, if not, raise an error
+    if not shutil.which("chimera"):
+        raise EnvironmentError(
+            "Chimera is not in the PATH. Please install Chimera and ensure it is accessible from the command line."
+        )
+
+
+def chimera_protonate(input_file: str, output_file: str, verbose: bool = False):
+    """
+    Use Chimera to protonate the receptor.
+
+    :param input_file: The name of the pdb file which contains the receptor.
+    :param output_file: The name of the pdb file the fixed receptor should be wrote to.
+    :param pH:The ph the pronation state should be fixed for.
+    :param verbose: If True, print the Chimera output.
+    """
+    chimera_path_check()
+
+    cmds = [
+        "open {}".format(input_file),
+        "addh hbond true",
+        "write format pdb 0 {}".format(output_file),
+        "close all",
+    ]
+
+    subprocess.run(
+        ["chimera", "--nogui", input_file],
+        input="\n".join(cmds).encode(),
+        check=True,
+    )
+
+
+def fix_receptor(
+    input_file: str,
+    output_file: str,
+    pH: float = 7.0,
+    prefer_chimera_protonation: bool = False,
+):
     """
     Use PDBFixer to correct the input and add hydrogens with the given pH.
 
     :param input_file: The name of the pdb file which contains the receptor.
     :param output_file: The name of the pdb file the fixed receptor should be wrote to.
     :param pH:The ph the pronation state should be fixed for.
+    :param prefer_chimera_protonation: If True, use Chimera to protonate the receptor instead of PDBFixer.
     """
     fixer = PDBFixer(filename=input_file)
     fixer.findMissingResidues()
     fixer.findMissingAtoms()
     fixer.addMissingAtoms()
-    fixer.addMissingHydrogens(pH)
-    app.PDBFile.writeFile(fixer.topology, fixer.positions, open(output_file, "w"))
+
+    if not prefer_chimera_protonation:
+        warnings.warn(
+            "Using PDBFixer for protonation can lead to less accurate results than using Chimera. Please install chimera",
+            UserWarning,
+        )
+        fixer.addMissingHydrogens(pH)
+        app.PDBFile.writeFile(fixer.topology, fixer.positions, open(output_file, "w"))
+
+    if prefer_chimera_protonation:
+        # write out a temporary file for chimera to read in
+        with tempfile.NamedTemporaryFile(suffix=".pdb") as temp_pdb:
+            app.PDBFile.writeFile(
+                fixer.topology, fixer.positions, open(temp_pdb.name, "w")
+            )
+            # use chimera to protonate the file
+            chimera_protonate(temp_pdb.name, output_file)
 
 
 def _can_use_ani2x(molecule: OFFMolecule) -> bool:
@@ -89,6 +153,7 @@ def optimise_in_receptor(
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
     platform_name: str = "CPU",
+    ligand_indices_to_freeze: Optional[list[int]] = None,
 ) -> Tuple[Chem.Mol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -112,6 +177,8 @@ def optimise_in_receptor(
         platform_name:
             The OpenMM platform name, 'cuda' if available, with the 'cpu' used by default.
             See the OpenMM documentation of Platform.
+        ligand_indices_to_freeze:
+            The ligand indices to be frozen (relative to the ligand)
 
     Returns:
         A copy of the input molecule with the optimised positions.
@@ -163,6 +230,12 @@ def optimise_in_receptor(
     for i in range(system.getNumParticles()):
         if i not in ligand_idx:
             system.setParticleMass(i, 0)
+
+    if ligand_indices_to_freeze is not None:
+        logger.info("Freezing ligand indices")
+        for idx in ligand_indices_to_freeze:
+            system.setParticleMass(ligand_idx[idx], 0)
+
     # if we want to use ani2x check we can and adapt the system
     if use_ani and _can_use_ani2x(openff_mol):
         print("using ani2x")
@@ -214,8 +287,13 @@ def optimise_in_receptor(
         complex_coords = receptor_coords + lig_vec
         # set the initial positions
         simulation.context.setPositions(complex_coords)
-        # now minimize the energy
-        simulation.minimizeEnergy()
+
+        # minimize the energy
+        try:
+            simulation.minimizeEnergy()
+        except OpenMMException as E:
+            logger.warning(f"Conformer (index: {i}) minimisation failed due to: {E}")
+            continue
 
         # write out the final coords
         min_state = simulation.context.getState(getPositions=True, getEnergy=True)
@@ -241,6 +319,9 @@ def optimise_in_receptor(
             min_state.getPotentialEnergy().value_in_unit(unit.kilocalories_per_mole)
         )
         final_mol.AddConformer(final_conformer, assignId=True)
+
+    if final_mol.GetNumConformers() == 0:
+        raise NoPostMinimisationConformersError()
 
     return final_mol, energies
 
