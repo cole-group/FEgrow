@@ -211,3 +211,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# VSCode
+.vscode

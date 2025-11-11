@@ -1,6 +1,9 @@
 
 Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, Daniel J. Cole
 
+**version 3.0.0**
+ - Compatibility with MACE MLPs for optimising the ligand.
+
 **version 2.0.1 **
  - The scaffold's R atom breaks the constrained embedding. The R atom is now omitted. (#74)
 

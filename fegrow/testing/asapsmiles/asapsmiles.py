@@ -36,7 +36,7 @@ if rlist[mol_id].GetNumConformers() > 0:
     energies = rlist[mol_id].optimise_in_receptor(
         receptor_file=protein_filename,
         ligand_force_field="openff",
-        use_ani=True,
+        intramolecular_mlp="ani2x",
         sigma_scale_factor=0.8,
         relative_permittivity=4,
         water_model=None,
