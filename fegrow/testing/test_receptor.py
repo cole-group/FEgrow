@@ -21,7 +21,7 @@ def test_mcs_atom_freezing(sars_scaffold_chunk_sdf, rec_7l10_final_path):
     rmol.optimise_in_receptor(
         receptor_file=rec_7l10_final_path,
         ligand_force_field="openff",
-        use_ani=False,
+        ligand_intramolecular_mlp=None,
         water_model=None,
         platform_name="CPU",
         ligand_indices_to_freeze=scaffold_atoms,
@@ -37,7 +37,7 @@ def test_mcs_atom_freezing(sars_scaffold_chunk_sdf, rec_7l10_final_path):
     rmol.optimise_in_receptor(
         receptor_file=rec_7l10_final_path,
         ligand_force_field="openff",
-        use_ani=False,
+        ligand_intramolecular_mlp=None,
         water_model=None,
         platform_name="CPU",
     )
