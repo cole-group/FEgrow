@@ -150,9 +150,8 @@ class RMol(RInterface, rdkit.Chem.rdchem.Mol):
     def optimise_in_receptor(self, *args, **kwargs):
         """
         Enumerate the conformers inside of the receptor by employing
-        ANI2x, a hybrid machine learning / molecular mechanics (ML/MM) approach.
-        ANI2x is neural nework potential for the ligand energetics
-        but works only for the following atoms: H, C, N, O, F, S, Cl.
+        a hybrid machine learning / molecular mechanics (ML/MM) approach
+        with MLPs such as MACE-OFF-23 and ANI2x.
 
         Open Force Field Parsley force field is used for intermolecular interactions with the receptor.
 
@@ -613,8 +612,8 @@ class ChemSpace:  # RInterface
             )
             warnings.warn(
                 "ANI uses TORCHAni which is not threadsafe, leading to random SEGFAULTS. "
-                "Use a Dask cluster with processes as a work around "
-                "(see the documentation for an example of this workaround) ."
+                "mace-torch has the same issue. Use a Dask cluster with processes as a "
+                "work around (see the documentation for an example of this workaround)."
             )
 
             kwargs = {
@@ -1819,7 +1818,7 @@ def _evaluate_atomic(
         rmol.optimise_in_receptor(
             receptor_file=pdb_filename,
             ligand_force_field="openff",
-            use_ani=ani,
+            ligand_intramolecular_mlp="ani2x",
             sigma_scale_factor=0.8,
             relative_permittivity=4,
             water_model=None,

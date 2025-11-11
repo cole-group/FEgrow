@@ -9,6 +9,8 @@ from rdkit import Chem
 from fegrow import RMol
 from fegrow.receptor import ForceField
 
+from .mlp import AVAILABLE_ML_FORCE_FIELDS
+
 
 class Settings(BaseModel):
     """A class to configure the runtime settings of a high throughput scoring."""
@@ -25,9 +27,10 @@ class Settings(BaseModel):
         "openff",
         description="The force field model to use for the small molecule during the restrained optimisation.",
     )
-    use_ani: bool = Field(
-        True,
-        description="If we should attempt to use ANI2x to model the internal energies of the ligand in an ML/MM optimisation.",
+    ligand_intramolecuar_mlp: Optional[AVAILABLE_ML_FORCE_FIELDS] = Field(
+        None,
+        description="The machine learning force field that should be used for the ligand intramolecular interactions. "
+        "If set to None, the molecular mechanics ligand_force_field is used for all ligand interactions. ",
     )
     sigma_scale_factor: float = Field(
         0.8,
@@ -86,7 +89,7 @@ def score_ligand(
     rmol.optimise_in_receptor(
         receptor_file=receptor,
         ligand_force_field=settings.ligand_force_field,
-        use_ani=settings.use_ani,
+        ligand_intramolecular_mlp=settings.ligand_intramolecular_mlp,
         sigma_scale_factor=settings.sigma_scale_factor,
         relative_permittivity=settings.relative_permittivity,
         water_model=settings.water_model,

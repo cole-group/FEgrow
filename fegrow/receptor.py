@@ -6,12 +6,13 @@ from typing import List, Tuple, Union, Optional
 import numpy
 import parmed
 from openmmforcefields.generators import SystemGenerator
-from openmmml import MLPotential
 from pdbfixer import PDBFixer
 from rdkit import Chem
 from rdkit.Geometry.rdGeometry import Point3D
 from tqdm import tqdm
-from typing_extensions import Literal
+from typing_extensions import Literal, get_args
+
+from .mlp import _MLFF_NAME_TO_CLASS, AVAILABLE_ML_FORCE_FIELDS
 
 import warnings
 
@@ -79,7 +80,7 @@ def fix_receptor(
 
     :param input_file: The name of the pdb file which contains the receptor.
     :param output_file: The name of the pdb file the fixed receptor should be wrote to.
-    :param pH:The ph the pronation state should be fixed for.
+    :param pH: The pH the protonation state should be fixed for.
     :param prefer_chimera_protonation: If True, use Chimera to protonate the receptor instead of PDBFixer.
     """
     fixer = PDBFixer(filename=input_file)
@@ -103,18 +104,6 @@ def fix_receptor(
             )
             # use chimera to protonate the file
             chimera_protonate(temp_pdb.name, output_file)
-
-
-def _can_use_ani2x(molecule: OFFMolecule) -> bool:
-    """
-    Check if ani2x can be used for this molecule by inspecting the elements.
-    """
-    mol_elements = set([atom.symbol for atom in molecule.atoms])
-    ani2x_elements = {"H", "C", "N", "O", "S", "F", "Cl"}
-    if mol_elements - ani2x_elements:
-        # if there is any difference in the sets or a net charge ani2x can not be used.
-        return False
-    return True
 
 
 def _scale_system(
@@ -148,7 +137,7 @@ def optimise_in_receptor(
     ligand: Chem.Mol,
     receptor_file: Union[str, app.PDBFile],
     ligand_force_field: ForceField,
-    use_ani: bool = True,
+    ligand_intramolecular_mlp: Optional[AVAILABLE_ML_FORCE_FIELDS] = None,
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
@@ -165,8 +154,10 @@ def optimise_in_receptor(
             The pdb file of the fixed and pronated receptor.
         ligand_force_field:
             The base ligand force field that should be used.
-        use_ani:
-            If we should try and use ani2x for the internal energy of the ligand.
+        ligand_intramolecular_mlp:
+            The machine learning force field that should be used for the ligand intramolecular interactions.
+            If set to None, the molecular mechanics ligand_force_field is used for all ligand interactions.
+            Representations of available MLPs can be imported from the `fegrow.mlp` module.
         sigma_scale_factor:
             The factor by which all sigma values should be scaled
         relative_permittivity:
@@ -236,21 +227,41 @@ def optimise_in_receptor(
         for idx in ligand_indices_to_freeze:
             system.setParticleMass(ligand_idx[idx], 0)
 
-    # if we want to use ani2x check we can and adapt the system
-    if use_ani and _can_use_ani2x(openff_mol):
-        print("using ani2x")
-        potential = MLPotential("ani2x", platform_name=platform_name)
-
-        # save the torch model animodel.pt to a temporary file to ensure this is thread safe
-        # note this file will be closed when garbage collected
-        tmpfile = tempfile.NamedTemporaryFile()
-
-        complex_system = potential.createMixedSystem(
-            complex_structure.topology, system, ligand_idx, filename=tmpfile.name
+    # Check if we want to add an intramolecular MLP
+    if ligand_intramolecular_mlp is not None:
+        logger.info(
+            f"Using ligand intramolecular MLP: {ligand_intramolecular_mlp} "
+            "for ligand intramolecular interactions and "
+            f"{ligand_force_field} for intermolecular interactions."
         )
-    else:
-        print("Using force field")
+
+        if ligand_intramolecular_mlp not in get_args(AVAILABLE_ML_FORCE_FIELDS):
+            raise ValueError(
+                f"ligand_intramolecular_mlp must be one of {AVAILABLE_ML_FORCE_FIELDS}"
+            )
+
+        # get the MLP class
+        ligand_intramolecular_mlp_class = _MLFF_NAME_TO_CLASS[ligand_intramolecular_mlp]
+
+        if not ligand_intramolecular_mlp_class.is_compatible_with_molecule(openff_mol):
+            raise ValueError(
+                f"The ligand {ligand} is not compatible with the MLP {ligand_intramolecular_mlp}"
+            )
+
+        # create the potential
+        potential = ligand_intramolecular_mlp_class.get_potential()
+        # add the potential to the system
+        complex_system = potential.createMixedSystem(
+            complex_structure.topology, system, ligand_idx
+        )
+
+    else:  # Use the MM FF for all ligand interactions
+        logger.info(
+            f"Using {ligand_force_field} force field for ligand intra and "
+            "inter-molecular interactions."
+        )
         complex_system = system
+
     # scale the charges and sigma values
     _scale_system(
         system=complex_system,
