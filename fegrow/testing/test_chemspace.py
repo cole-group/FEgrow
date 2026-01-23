@@ -19,7 +19,9 @@ root = pathlib.Path(__file__).parent
 
 def test_chem_space(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.item()
     R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.item()
@@ -66,7 +68,9 @@ def test_pipeline_experimental(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_
 
 def test_pipeline_rgroups(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.item()
     R_group_cyclopropane = RGroups[RGroups.Name == "*C1CC1"].Mol.item()
@@ -207,7 +211,9 @@ def test_io_write_load(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
 def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     # this could be a list of smiles, (but molecules would be automatically converted to smiles anyway)
@@ -227,7 +233,9 @@ def test_pipeline_smiles(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
 def test_pipeline_smiles_noh(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     bare_scaffold_noh = Chem.RemoveHs(sars_scaffold_chunk_sdf)
     chemspace.add_scaffold(bare_scaffold_noh)
@@ -259,7 +267,9 @@ def test_evaluate_scoring_function_works(
     """
 
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     chemspace.add_smiles(["[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]"])
@@ -288,7 +298,9 @@ def test_evaluate_scoring_function_saves_data(
     """
 
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     chemspace.add_smiles(["[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]"])
@@ -316,7 +328,9 @@ def test_evaluate_full_hijack(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_p
     """
 
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     chemspace.add_smiles(["[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]"])
@@ -374,7 +388,9 @@ def test_al_local(sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
 
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     scaffold = Chem.SDMolSupplier(str(root / "data/5R83_core.sdf"), removeHs=False)[0]
     chemspace.add_scaffold(scaffold, 6)
@@ -433,7 +449,9 @@ def test_al_full(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
 
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     scaffold = Chem.SDMolSupplier(str(root / "data/5R83_core.sdf"), removeHs=False)[0]
     chemspace.add_scaffold(scaffold, 6)
@@ -467,7 +485,9 @@ def test_al_full(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 def test_al_manual_gp(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """ """
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     scaffold = Chem.SDMolSupplier(str(root / "data/5R83_core.sdf"), removeHs=False)[0]
     chemspace.add_scaffold(scaffold, 6)
@@ -533,7 +553,9 @@ def test_adding_enamines(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
     """
 
     # check if two molecules were built with chemspace
-    chemspace = ChemSpace()
+    chemspace = ChemSpace(
+        dask_local_cluster_kwargs={"processes": True}
+    )  # Required for use with MLPs
 
     chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
     chemspace.add_smiles(["[H]OC([H])([H])C([H])([H])c1c([H])nc([H])c([H])c1[H]"], h=8)
@@ -549,3 +571,55 @@ def test_adding_enamines(RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path):
 
     # at least one extra one must have made it
     assert len(chemspace) > 1
+
+
+def test_ani_parameter_deprecation_error(
+    RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path
+):
+    """Test that using the deprecated 'ani' parameter in evaluate raises an error."""
+    chemspace = ChemSpace(dask_local_cluster_kwargs={"processes": True})
+
+    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.item()
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    chemspace.add_rgroups([R_group_ethanol])
+    chemspace.add_protein(rec_7l10_final_path)
+
+    # Test that ani=True raises an error
+    with pytest.raises(ValueError) as exc_info:
+        chemspace.evaluate([0], ani=True, skip_optimisation=True)
+
+    error_msg = str(exc_info.value)
+    assert "deprecated" in error_msg.lower()
+    assert "ligand_intramolecular_mlp" in error_msg
+    assert "ani2x" in error_msg
+
+    # Test that ani=False also raises an error
+    with pytest.raises(ValueError) as exc_info:
+        chemspace.evaluate([0], ani=False, skip_optimisation=True)
+
+    error_msg = str(exc_info.value)
+    assert "deprecated" in error_msg.lower()
+    assert "ligand_intramolecular_mlp" in error_msg
+
+
+def test_ligand_intramolecular_mlp_requires_processes(
+    RGroups, sars_scaffold_chunk_sdf, rec_7l10_final_path
+):
+    """Test that using MLPs without processes=True raises an error."""
+    # Create ChemSpace with processes=False (default)
+    chemspace = ChemSpace(dask_local_cluster_kwargs={"processes": False})
+
+    R_group_ethanol = RGroups[RGroups.Name == "*CCO"].Mol.item()
+    chemspace.add_scaffold(sars_scaffold_chunk_sdf, 8)
+    chemspace.add_rgroups([R_group_ethanol])
+    chemspace.add_protein(rec_7l10_final_path)
+
+    # Test that using MLP with processes=False raises an error
+    with pytest.raises(ValueError) as exc_info:
+        chemspace.evaluate(
+            [0], ligand_intramolecular_mlp="ani2x", skip_optimisation=True
+        )
+
+    error_msg = str(exc_info.value)
+    assert "processes=True" in error_msg
+    assert "ML-based" in error_msg or "ligand intramolecular" in error_msg

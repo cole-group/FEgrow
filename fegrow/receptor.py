@@ -188,8 +188,6 @@ def optimise_in_receptor(
             "  - New: optimise_in_receptor(..., ligand_intramolecular_mlp='ani2x')\n\n"
             "  - Old: optimise_in_receptor(..., use_ani=False)\n"
             "  - New: optimise_in_receptor(..., ligand_intramolecular_mlp=None)\n\n"
-            "Available MLPs: 'ani2x', 'mace-off23-small', 'mace-off23-medium', "
-            "'mace-off23-large', 'egret-1'"
         )
 
     ligand_force_fields = {

@@ -734,6 +734,15 @@ class ChemSpace:  # RInterface
         """
         Return lists of energies.
         """
+        # Check we're not using an MLP with processes= False
+        if (
+            kwargs.get("ligand_intramolecular_mlp", None) is not None
+            and self._dask_cluster.processes is False
+        ):
+            raise ValueError(
+                "When using ML-based ligand intramolecular potentials, "
+                "Dask has to be configured with `processes=True`."
+            )
 
         # daskify parameters
         args = [dask.delayed(arg) for arg in args]
@@ -1020,6 +1029,7 @@ class ChemSpace:  # RInterface
         minimum_conf_rms=0.5,
         penalty=pd.NA,
         al_ignore_penalty=True,
+        ligand_intramolecular_mlp="ani2x",
         **kwargs,
     ):
         """
@@ -1079,6 +1089,26 @@ class ChemSpace:  # RInterface
         h_attachement_index = None
         if len(h_attachements) > 0:
             h_attachement_index = h_attachements[0]
+
+        if kwargs.get("ani", None) is not None:
+            raise ValueError(
+                "The 'ani' parameter has been deprecated and removed. "
+                "Please use 'ligand_intramolecular_mlp' instead.\n\n"
+                "Migration guide:\n"
+                "  - Old: ani=True\n"
+                "  - New: ligand_intramolecular_mlp='ani2x'\n\n"
+                "  - Old: ani=False\n"
+                "  - New: ligand_intramolecular_mlp=None\n\n"
+            )
+
+        if (
+            ligand_intramolecular_mlp is not None
+            and self._dask_cluster.processes is False
+        ):
+            raise ValueError(
+                "When using ML-based ligand intramolecular potentials, "
+                "Dask has to be configured with `processes=True`."
+            )
 
         # create dask jobs
         delayed_evaluate = dask.delayed(_evaluate_atomic)
@@ -1767,7 +1797,8 @@ def _evaluate_atomic(
     scoring_function=None,
     num_conf=50,
     minimum_conf_rms=0.5,
-    ani=True,
+    ligand_intramolecular_mlp=None,
+    ani=None,
     platform="CPU",
     gnina_gpu=False,
     skip_optimisation=False,
@@ -1783,7 +1814,6 @@ def _evaluate_atomic(
     :param gnina_path:
     :return:
     """
-
     if full_evaluation is not None:
         return full_evaluation(
             scaffold,
@@ -1793,6 +1823,7 @@ def _evaluate_atomic(
             scoring_function=None,
             num_conf=50,
             minimum_conf_rms=0.5,
+            ligand_intramolecular_mlp=ligand_intramolecular_mlp,
             ani=ani,
             platform="CPU",
             skip_optimisation=False,
@@ -1818,7 +1849,7 @@ def _evaluate_atomic(
         rmol.optimise_in_receptor(
             receptor_file=pdb_filename,
             ligand_force_field="openff",
-            ligand_intramolecular_mlp="ani2x",
+            ligand_intramolecular_mlp=ligand_intramolecular_mlp,
             sigma_scale_factor=0.8,
             relative_permittivity=4,
             water_model=None,
