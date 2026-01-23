@@ -1,8 +1,9 @@
 import numpy as np
 import prody
+import pytest
 from rdkit import Chem
 
-from fegrow import build_molecule
+from fegrow import build_molecule, optimise_in_receptor
 
 
 def test_mcs_atom_freezing(sars_scaffold_chunk_sdf, rec_7l10_final_path):
@@ -21,7 +22,7 @@ def test_mcs_atom_freezing(sars_scaffold_chunk_sdf, rec_7l10_final_path):
     rmol.optimise_in_receptor(
         receptor_file=rec_7l10_final_path,
         ligand_force_field="openff",
-        use_ani=False,
+        ligand_intramolecular_mlp=None,
         water_model=None,
         platform_name="CPU",
         ligand_indices_to_freeze=scaffold_atoms,
@@ -37,7 +38,7 @@ def test_mcs_atom_freezing(sars_scaffold_chunk_sdf, rec_7l10_final_path):
     rmol.optimise_in_receptor(
         receptor_file=rec_7l10_final_path,
         ligand_force_field="openff",
-        use_ani=False,
+        ligand_intramolecular_mlp=None,
         water_model=None,
         platform_name="CPU",
     )
@@ -47,3 +48,38 @@ def test_mcs_atom_freezing(sars_scaffold_chunk_sdf, rec_7l10_final_path):
         np.testing.assert_almost_equal(
             min_pos_unfrozen[scaffold_atoms], unmin_pos[scaffold_atoms]
         )
+
+
+def test_use_ani_parameter_raises_deprecation_error():
+    """Test that using the deprecated use_ani parameter raises a helpful error."""
+    # Create a simple molecule
+    mol = Chem.MolFromSmiles("CCO")
+    mol = Chem.AddHs(mol)
+
+    # Test use_ani=True raises deprecation error
+    with pytest.raises(TypeError) as exc_info:
+        optimise_in_receptor(
+            ligand=mol,
+            receptor_file="dummy.pdb",
+            ligand_force_field="openff",
+            use_ani=True,
+        )
+
+    error_msg = str(exc_info.value)
+    assert "deprecated" in error_msg.lower()
+    assert "ligand_intramolecular_mlp" in error_msg
+    assert "ani2x" in error_msg
+    assert "Migration guide" in error_msg
+
+    # Test use_ani=False also raises deprecation error
+    with pytest.raises(TypeError) as exc_info:
+        optimise_in_receptor(
+            ligand=mol,
+            receptor_file="dummy.pdb",
+            ligand_force_field="openff",
+            use_ani=False,
+        )
+
+    error_msg = str(exc_info.value)
+    assert "deprecated" in error_msg.lower()
+    assert "ligand_intramolecular_mlp" in error_msg
