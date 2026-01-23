@@ -1,9 +1,5 @@
 """Functionality for working with ML force fields."""
 
-import atexit
-import os
-import tempfile
-import urllib.request
 from abc import ABC, abstractmethod
 import pooch
 import logging
