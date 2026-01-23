@@ -5,13 +5,17 @@ import os
 import tempfile
 import urllib.request
 from abc import ABC, abstractmethod
+import pooch
+import logging
 from typing import Literal
 
 from openff.toolkit import Molecule
 from openmmml import MLPotential as OMMMLPotential
 
+logger = logging.getLogger(__name__)
+
 __all__ = [
-    "AVAILABLE_ML_FORCE_FIELDS",
+    "MLForceFieldName",
     "ANI2X",
     "MACEOFF23Small",
     "MACEOFF23Medium",
@@ -19,13 +23,12 @@ __all__ = [
     "EGRET1",
 ]
 
-# Model accessed 24/05/25
 _EGRET1_MODEL_URL = (
     "https://github.com/rowansci/egret-public/raw/227d6641e6851"
     "eb1037d48712462e4ce61c1518f/compiled_models/EGRET_1.model"
 )
 
-AVAILABLE_ML_FORCE_FIELDS = Literal[
+MLForceFieldName = Literal[
     "ani2x",
     "mace-off23-small",
     "mace-off23-medium",
@@ -34,7 +37,7 @@ AVAILABLE_ML_FORCE_FIELDS = Literal[
 ]
 
 
-def _check_mace_installed() -> None:
+def check_mace_installed() -> None:
     """Check that mace-torch is installed."""
     try:
         import mace  # noqa: F401
@@ -47,7 +50,7 @@ def _check_mace_installed() -> None:
         raise ImportError(msg)
 
 
-class _MLForceField(ABC):
+class MLForceField(ABC):
     """Abstract base class for machine learning force fields."""
 
     name: str
@@ -58,6 +61,10 @@ class _MLForceField(ABC):
     @abstractmethod
     def get_potential(cls) -> OMMMLPotential:
         """Get the OpenMM MLPotential for this force field."""
+
+    @classmethod
+    def _check_available(cls) -> None:
+        """Check if the force field is available and raise an error if not."""
 
     @classmethod
     def is_compatible_with_molecule(cls, molecule: Molecule) -> bool:
@@ -81,7 +88,7 @@ class _MLForceField(ABC):
         return True
 
 
-class ANI2X(_MLForceField):
+class ANI2X(MLForceField):
     name = "ani2x"
     allowed_elements = frozenset(["H", "C", "N", "O", "S", "F", "Cl"])
     allow_charged = False
@@ -92,7 +99,7 @@ class ANI2X(_MLForceField):
         return OMMMLPotential(cls.name)
 
 
-class _MACE_BASE(_MLForceField):
+class _MACE_BASE(MLForceField):
     """Base class for MACE force fields."""
 
     allowed_elements = frozenset(["C", "H", "N", "O", "S", "F", "Cl", "Br"])
@@ -104,7 +111,7 @@ class _MACE_BASE(_MLForceField):
 
         cls._check_available()
 
-        print(
+        logger.warning(
             "MACE models are distributed under the ASL which"
             "does not permit commercial use."
         )
@@ -114,7 +121,7 @@ class _MACE_BASE(_MLForceField):
     @staticmethod
     def _check_available() -> None:
         """Check if the MACE force field is available."""
-        _check_mace_installed()
+        check_mace_installed()
 
 
 class MACEOFF23Small(_MACE_BASE):
@@ -135,7 +142,7 @@ class MACEOFF23Large(_MACE_BASE):
     name = "mace-off23-large"
 
 
-class EGRET1(_MLForceField):
+class EGRET1(MLForceField):
     """EGRET-1 force field."""
 
     name = "egret-1"
@@ -148,25 +155,21 @@ class EGRET1(_MLForceField):
 
         cls._check_available()
 
-        tmp_file = tempfile.NamedTemporaryFile(suffix=".model", delete=False)
-        tmp_file.close()  # Close so urllib can write to it
-        print(f"Downloading Egret-1 model from {_EGRET1_MODEL_URL}")
-        urllib.request.urlretrieve(_EGRET1_MODEL_URL, filename=tmp_file.name)
-
-        # Register file for deletion at program exit
-        atexit.register(
-            lambda: os.remove(tmp_file.name) if os.path.exists(tmp_file.name) else None
+        model_path = pooch.retrieve(
+            url=_EGRET1_MODEL_URL,
+            known_hash="e674f134fd463c11f78fab182419bed8e0b5e1485ca4cad006fd327f9b8bf1ca",
+            path=pooch.os_cache("fegrow"),
         )
 
-        return OMMMLPotential("mace", modelPath=tmp_file.name)
+        return OMMMLPotential("mace", modelPath=model_path)
 
     @staticmethod
     def _check_available() -> None:
         """Check if the EGRET-1 MLP is available."""
-        _check_mace_installed()
+        check_mace_installed()
 
 
-_MLFF_NAME_TO_CLASS: dict[AVAILABLE_ML_FORCE_FIELDS, type[_MLForceField]] = {
+AVAILABLE_ML_FORCE_FIELD_CLASSES: dict[MLForceFieldName, type[MLForceField]] = {
     "ani2x": ANI2X,
     "mace-off23-small": MACEOFF23Small,
     "mace-off23-medium": MACEOFF23Medium,

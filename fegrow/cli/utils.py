@@ -8,8 +8,7 @@ from rdkit import Chem
 
 from fegrow import RMol
 from fegrow.receptor import ForceField
-
-from .mlp import AVAILABLE_ML_FORCE_FIELDS
+from fegrow.mlp import MLForceFieldName
 
 
 class Settings(BaseModel):
@@ -27,7 +26,7 @@ class Settings(BaseModel):
         "openff",
         description="The force field model to use for the small molecule during the restrained optimisation.",
     )
-    ligand_intramolecuar_mlp: Optional[AVAILABLE_ML_FORCE_FIELDS] = Field(
+    ligand_intramolecuar_mlp: Optional[MLForceFieldName] = Field(
         None,
         description="The machine learning force field that should be used for the ligand intramolecular interactions. "
         "If set to None, the molecular mechanics ligand_force_field is used for all ligand interactions. ",

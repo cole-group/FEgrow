@@ -12,7 +12,7 @@ from rdkit.Geometry.rdGeometry import Point3D
 from tqdm import tqdm
 from typing_extensions import Literal, get_args
 
-from .mlp import _MLFF_NAME_TO_CLASS, AVAILABLE_ML_FORCE_FIELDS
+from fegrow.mlp import AVAILABLE_ML_FORCE_FIELD_CLASSES, MLForceFieldName
 
 import warnings
 
@@ -137,7 +137,7 @@ def optimise_in_receptor(
     ligand: Chem.Mol,
     receptor_file: Union[str, app.PDBFile],
     ligand_force_field: ForceField,
-    ligand_intramolecular_mlp: Optional[AVAILABLE_ML_FORCE_FIELDS] = None,
+    ligand_intramolecular_mlp: Optional[MLForceFieldName] = None,
     sigma_scale_factor: float = 0.8,
     relative_permittivity: float = 4,
     water_model: str = "tip3p.xml",
@@ -235,13 +235,15 @@ def optimise_in_receptor(
             f"{ligand_force_field} for intermolecular interactions."
         )
 
-        if ligand_intramolecular_mlp not in get_args(AVAILABLE_ML_FORCE_FIELDS):
+        if ligand_intramolecular_mlp not in get_args(MLForceFieldName):
             raise ValueError(
-                f"ligand_intramolecular_mlp must be one of {AVAILABLE_ML_FORCE_FIELDS}"
+                f"ligand_intramolecular_mlp must be one of {MLForceFieldName}"
             )
 
         # get the MLP class
-        ligand_intramolecular_mlp_class = _MLFF_NAME_TO_CLASS[ligand_intramolecular_mlp]
+        ligand_intramolecular_mlp_class = AVAILABLE_ML_FORCE_FIELD_CLASSES[
+            ligand_intramolecular_mlp
+        ]
 
         if not ligand_intramolecular_mlp_class.is_compatible_with_molecule(openff_mol):
             raise ValueError(

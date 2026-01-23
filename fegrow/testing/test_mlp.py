@@ -12,19 +12,19 @@ from fegrow.mlp import (
     MACEOFF23Large,
     MACEOFF23Medium,
     MACEOFF23Small,
-    _MLFF_NAME_TO_CLASS,
-    _check_mace_installed,
+    AVAILABLE_ML_FORCE_FIELD_CLASSES,
+    check_mace_installed,
 )
 
 
 class TestCheckMaceInstalled:
-    """Tests for _check_mace_installed function."""
+    """Tests for check_mace_installed function."""
 
     @patch.dict("sys.modules", {"mace": MagicMock()})
     def test_check_mace_installed_success(self):
         """Test that no error is raised when mace is installed."""
         # Should not raise any exception
-        _check_mace_installed()
+        check_mace_installed()
 
     def test_check_mace_not_installed(self):
         """Test that ImportError is raised when mace is not installed."""
@@ -35,7 +35,7 @@ class TestCheckMaceInstalled:
                 import fegrow.mlp as mlp_module
 
                 importlib.reload(mlp_module)
-                mlp_module._check_mace_installed()
+                mlp_module.check_mace_installed()
 
 
 class TestANI2X:
@@ -143,16 +143,16 @@ class TestMACEForceFields:
         "mace_class",
         [MACEOFF23Small, MACEOFF23Medium, MACEOFF23Large],
     )
-    @patch("fegrow.mlp._check_mace_installed")
-    @patch("builtins.print")
-    def test_get_potential(self, mock_print, mock_check, mace_class):
+    @patch("fegrow.mlp.check_mace_installed")
+    @patch("fegrow.mlp.logger")
+    def test_get_potential(self, mock_logger, mock_check, mace_class):
         """Test that get_potential returns an MLPotential for MACE models."""
         potential = mace_class.get_potential()
         assert isinstance(potential, MLPotential)
         mock_check.assert_called_once()
-        # Check that the ASL license warning is printed
-        mock_print.assert_called_once()
-        assert "ASL" in mock_print.call_args[0][0]
+        # Check that the ASL license warning is logged
+        mock_logger.warning.assert_called_once()
+        assert "ASL" in mock_logger.warning.call_args[0][0]
 
     @pytest.mark.parametrize(
         "mace_class",
@@ -198,36 +198,30 @@ class TestEGRET1:
         """Test that charged molecules are not allowed."""
         assert EGRET1.allow_charged is False
 
-    @patch("fegrow.mlp._check_mace_installed")
-    @patch("fegrow.mlp.urllib.request.urlretrieve")
-    @patch("fegrow.mlp.tempfile.NamedTemporaryFile")
-    @patch("fegrow.mlp.atexit.register")
-    @patch("builtins.print")
+    @patch("fegrow.mlp.check_mace_installed")
+    @patch("fegrow.mlp.pooch.retrieve")
     def test_get_potential(
         self,
-        mock_print,
-        mock_atexit,
-        mock_tempfile,
-        mock_urlretrieve,
+        mock_pooch_retrieve,
         mock_check,
     ):
-        """Test that get_potential downloads model and returns
+        """Test that get_potential retrieves model using pooch and returns
         an MLPotential.
         """
-        # Mock the temporary file
-        mock_file = MagicMock()
-        mock_file.name = "/tmp/test_egret.model"
-        mock_tempfile.return_value = mock_file
+        # Mock pooch.retrieve to return a fake model path
+        mock_model_path = "/tmp/cached_egret.model"
+        mock_pooch_retrieve.return_value = mock_model_path
 
         potential = EGRET1.get_potential()
 
         assert isinstance(potential, MLPotential)
         mock_check.assert_called_once()
-        mock_urlretrieve.assert_called_once()
-        mock_atexit.assert_called_once()
-        # Check that download message is printed
-        mock_print.assert_called_once()
-        assert "Downloading" in mock_print.call_args[0][0]
+        # Check that pooch.retrieve was called with correct arguments
+        mock_pooch_retrieve.assert_called_once()
+        call_kwargs = mock_pooch_retrieve.call_args[1]
+        assert "url" in call_kwargs
+        assert "known_hash" in call_kwargs
+        assert "path" in call_kwargs
 
     def test_compatible_with_bromine(self):
         """Test EGRET-1 compatibility with bromine."""
@@ -246,7 +240,7 @@ class TestEGRET1:
 
 
 class TestMLFFNameToClass:
-    """Tests for the _MLFF_NAME_TO_CLASS mapping."""
+    """Tests for the AVAILABLE_ML_FORCE_FIELD_CLASSES mapping."""
 
     def test_mapping_contains_all_models(self):
         """Test that the mapping contains all available models."""
@@ -257,15 +251,15 @@ class TestMLFFNameToClass:
             "mace-off23-large",
             "egret-1",
         }
-        assert set(_MLFF_NAME_TO_CLASS.keys()) == expected_keys
+        assert set(AVAILABLE_ML_FORCE_FIELD_CLASSES.keys()) == expected_keys
 
     def test_mapping_values(self):
         """Test that the mapping values are correct classes."""
-        assert _MLFF_NAME_TO_CLASS["ani2x"] == ANI2X
-        assert _MLFF_NAME_TO_CLASS["mace-off23-small"] == MACEOFF23Small
-        assert _MLFF_NAME_TO_CLASS["mace-off23-medium"] == MACEOFF23Medium
-        assert _MLFF_NAME_TO_CLASS["mace-off23-large"] == MACEOFF23Large
-        assert _MLFF_NAME_TO_CLASS["egret-1"] == EGRET1
+        assert AVAILABLE_ML_FORCE_FIELD_CLASSES["ani2x"] == ANI2X
+        assert AVAILABLE_ML_FORCE_FIELD_CLASSES["mace-off23-small"] == MACEOFF23Small
+        assert AVAILABLE_ML_FORCE_FIELD_CLASSES["mace-off23-medium"] == MACEOFF23Medium
+        assert AVAILABLE_ML_FORCE_FIELD_CLASSES["mace-off23-large"] == MACEOFF23Large
+        assert AVAILABLE_ML_FORCE_FIELD_CLASSES["egret-1"] == EGRET1
 
 
 class TestCompatibilityEdgeCases:
