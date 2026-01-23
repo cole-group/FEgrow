@@ -143,6 +143,7 @@ def optimise_in_receptor(
     water_model: str = "tip3p.xml",
     platform_name: str = "CPU",
     ligand_indices_to_freeze: Optional[list[int]] = None,
+    use_ani: Optional[bool] = None,
 ) -> Tuple[Chem.Mol, List[float]]:
     """
     For each of the input molecule conformers optimise the system using the chosen force field with the receptor held fixed.
@@ -170,10 +171,26 @@ def optimise_in_receptor(
             See the OpenMM documentation of Platform.
         ligand_indices_to_freeze:
             The ligand indices to be frozen (relative to the ligand)
+        use_ani:
+            **DEPRECATED**: This parameter has been removed. Use `ligand_intramolecular_mlp="ani2x"` instead.
 
     Returns:
         A copy of the input molecule with the optimised positions.
     """
+
+    # Check for deprecated use_ani parameter
+    if use_ani is not None:
+        raise TypeError(
+            "The 'use_ani' parameter has been deprecated and removed. "
+            "Please use 'ligand_intramolecular_mlp' instead.\n\n"
+            "Migration guide:\n"
+            "  - Old: optimise_in_receptor(..., use_ani=True)\n"
+            "  - New: optimise_in_receptor(..., ligand_intramolecular_mlp='ani2x')\n\n"
+            "  - Old: optimise_in_receptor(..., use_ani=False)\n"
+            "  - New: optimise_in_receptor(..., ligand_intramolecular_mlp=None)\n\n"
+            "Available MLPs: 'ani2x', 'mace-off23-small', 'mace-off23-medium', "
+            "'mace-off23-large', 'egret-1'"
+        )
 
     ligand_force_fields = {
         "openff": "openff_unconstrained-2.0.0.offxml",
