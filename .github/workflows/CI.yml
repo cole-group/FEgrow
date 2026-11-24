@@ -28,7 +28,7 @@ jobs:
           python=${{ matrix.python-version }}
 
     - name: env summary
-      run: conda list
+      run: micromamba list
 
     - name: dry install fegrow
       run: pip install --dry-run .
