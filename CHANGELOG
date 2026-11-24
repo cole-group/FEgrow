@@ -2,15 +2,34 @@
 Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie J. Tatum, Daniel J. Cole
 
 **version 3.0.0**
- - Compatibility with MACE MLPs for optimising the ligand.
+ - Selectable machine-learned potentials (MLPs) for the ligand intramolecular energy during optimisation in the
+    receptor: ANI-2x, MACE-OFF23 (small, medium, large) and Egret-1. MACE models need `pip install mace-torch`. (#115)
+ - BREAKING: the `use_ani` / `ani` arguments are removed and now raise an error. Use
+    `ligand_intramolecular_mlp="ani2x"` (or `None` to disable) instead. (#115)
+ - Using an MLP with a Dask cluster now requires `processes=True`, otherwise an error is raised. (#115)
+ - `fix_receptor` can protonate the receptor with UCSF Chimera via `prefer_chimera_protonation=True`
+    (Chimera must be on the PATH). A warning is shown when PDBFixer is used instead. (#109)
+ - New dependencies: nnpops, pooch.
 
-**version 2.0.1 **
+**version 2.0.2**
+ - Ligand atoms can be frozen during the energy minimisation. (#108)
+ - Energy minimisation of a single conformer may now fail with a warning; an error is raised only if every
+    conformer fails. (#107)
+ - Default `minimum_conf_rms` is now 0.5 instead of []. (#105)
+ - Conformers can be generated using an externally specified atom mapping. (#96)
+ - Documentation is published with mkdocs; code is formatted and linted with ruff.
+
+**version 2.0.1**
  - The scaffold's R atom breaks the constrained embedding. The R atom is now omitted. (#74)
 
-**version 2.0.0 **
- - The new FEgrow with ChemSpace (AL) and Dask support
-
-**version 1.4.0 **
+**version 2.0.0**
+ - The new FEgrow with ChemSpace: active learning (multiple models and querying strategies) and parallelisation
+    with Dask across CPUs, machines and clusters (PBS, SLURM, etc). (#69)
+ - Some previous functions were modified to work with Dask, so not all of them keep the same interface.
+ - CLI for high-throughput scoring. (#64)
+ - A previously minimised structure is used as the starting scaffold by default. (#43)
+ - Hydrogens are excluded from the RMS calculation to avoid comparing the wrong hydrogens. (#55)
+ - Improved gnina error handling. (#39)
  - rmol.to_file now writes all conformers into the PDB using the "MODEL / ENDMDL" flavour which can be ready by
     MDAnalysis.
  - ANI in some cases explodes. Remove the bad conformers with bonds that have lengths larger than 3A.
@@ -21,8 +40,6 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
     (thanks to @RPirie96)
  - When growing a molecule C multiple time in the same session (e.g. +linker +R), the .template attribute will
     always be the original C
- - Lipinski now uses the initial definitions of HBD: "sum of Ns and Os" and HBA: "sum of OHs and NHs",
-    (thanks to @RPirie96)
  - R-group without coordinates are now using by default Chem.rdDistGeom.EmbedMolecule
  - Do not cache openff parameters into db.json which right now crashes when multiple threads are used (same filename)
  - using a tempfile with the anipotential .pt model file for for thread safety
