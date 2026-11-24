@@ -3,7 +3,7 @@ import logging
 import time
 from typing import Callable
 
-import dask
+import dask.array
 import numpy as np
 from modAL.acquisition import max_EI, max_PI, max_UCB
 from sklearn import ensemble, gaussian_process, linear_model, neural_network
