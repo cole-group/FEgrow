@@ -30,3 +30,5 @@ dependencies:
   - modal # modAL on pip
   - cachey
   - pyparsing<3.1.0 # temporary fix for prody
+  - nnpops
+  - pooch

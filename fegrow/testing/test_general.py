@@ -1,6 +1,9 @@
 from rdkit import Chem
+import pytest
+from pydantic import ValidationError
 
 import fegrow
+from fegrow.cli.utils import Settings
 
 
 def test_adding_ethanol_1mol(RGroups, sars_core_scaffold):
@@ -254,3 +257,39 @@ def test_add_a_linker_check_star(RLinkers, sars_scaffold_sdf):
     for atom in template_with_linker.GetAtoms():
         if atom.GetAtomicNum() == 0:
             assert len(atom.GetBonds()) == 1
+
+
+def test_cli_settings_use_ani_deprecation_error():
+    """Test that CLI Settings with use_ani parameter raises a helpful error."""
+
+    # Test with use_ani=True
+    with pytest.raises(ValidationError) as exc_info:
+        Settings(
+            gnina_path="/usr/bin/gnina",
+            use_ani=True,
+        )
+
+    error_msg = str(exc_info.value)
+    assert "deprecated" in error_msg.lower()
+    assert "ligand_intramolecular_mlp" in error_msg
+    assert "Migration guide" in error_msg
+
+    # Test with use_ani=False
+    with pytest.raises(ValidationError) as exc_info:
+        Settings(
+            gnina_path="/usr/bin/gnina",
+            use_ani=False,
+        )
+
+    error_msg = str(exc_info.value)
+    assert "deprecated" in error_msg.lower()
+    assert "ligand_intramolecular_mlp" in error_msg
+
+
+def test_cli_settings_without_use_ani_works():
+    """Test that CLI Settings without use_ani parameter works correctly."""
+    settings = Settings(
+        gnina_path="/usr/bin/gnina",
+        ligand_intramolecular_mlp="ani2x",
+    )
+    assert settings.ligand_intramolecular_mlp == "ani2x"

@@ -221,7 +221,7 @@ rmol.remove_clashing_confs(rec_final)
 energies = rmol.optimise_in_receptor(
     receptor_file="rec_final.pdb",
     ligand_force_field="openff",
-    use_ani=True,
+    ligand_intramolecular_mlp="ani2x",
     sigma_scale_factor=0.8,
     relative_permittivity=4,
     water_model=None,

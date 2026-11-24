@@ -8,6 +8,7 @@ from rdkit import Chem
 
 from fegrow import RMol
 from fegrow.receptor import ForceField
+from fegrow.mlp import MLForceFieldName
 
 
 class Settings(BaseModel):
@@ -25,9 +26,14 @@ class Settings(BaseModel):
         "openff",
         description="The force field model to use for the small molecule during the restrained optimisation.",
     )
-    use_ani: bool = Field(
-        True,
-        description="If we should attempt to use ANI2x to model the internal energies of the ligand in an ML/MM optimisation.",
+    use_ani: Optional[bool] = Field(
+        None,
+        description="**DEPRECATED**: Use 'ligand_intramolecular_mlp' instead. This field is kept for backwards compatibility only.",
+    )
+    ligand_intramolecular_mlp: Optional[MLForceFieldName] = Field(
+        None,
+        description="The machine learning force field that should be used for the ligand intramolecular interactions. "
+        "If set to None, the molecular mechanics ligand_force_field is used for all ligand interactions. ",
     )
     sigma_scale_factor: float = Field(
         0.8,
@@ -53,6 +59,21 @@ class Settings(BaseModel):
         2,
         description="The relative energy cutoff in kcal/mol used to select the top conformers for scoring.",
     )
+
+    def model_post_init(self, __context) -> None:
+        """Validate and handle deprecated use_ani parameter."""
+        if self.use_ani is not None:
+            raise ValueError(
+                "The 'use_ani' parameter has been deprecated and removed. "
+                "Please use 'ligand_intramolecular_mlp' instead.\n\n"
+                "Migration guide:\n"
+                "  - Old: use_ani=true\n"
+                "  - New: ligand_intramolecular_mlp='ani2x'\n\n"
+                "  - Old: use_ani=false\n"
+                "  - New: ligand_intramolecular_mlp=None\n\n"
+                "Available MLPs: 'ani2x', 'mace-off23-small', 'mace-off23-medium', "
+                "'mace-off23-large', 'egret-1'"
+            )
 
 
 @dask.delayed
@@ -86,7 +107,7 @@ def score_ligand(
     rmol.optimise_in_receptor(
         receptor_file=receptor,
         ligand_force_field=settings.ligand_force_field,
-        use_ani=settings.use_ani,
+        ligand_intramolecular_mlp=settings.ligand_intramolecular_mlp,
         sigma_scale_factor=settings.sigma_scale_factor,
         relative_permittivity=settings.relative_permittivity,
         water_model=settings.water_model,
