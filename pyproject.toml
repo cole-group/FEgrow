@@ -1,3 +1,16 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+# CI installs the latest ruff, so pin the behaviour here rather than relying on ruff's defaults,
+# which change between releases.
+
+[tool.ruff.lint]
+# Ruff's original default rule set, which the code is written against. Newer ruff releases
+# enable many more rules by default.
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.format]
+# Newer ruff releases also format Python code blocks inside Markdown. The docs' .md files are
+# generated from the notebooks, so don't format them.
+exclude = ["*.md"]
