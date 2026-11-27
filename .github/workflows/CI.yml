@@ -10,7 +10,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ubuntu-latest" ]
-        python-version: ["3.10", "3.11"]
+        # 3.13/3.14 are blocked until ProDy has conda-forge builds for them
+        python-version: ["3.11", "3.12"]
       max-parallel: 5
 
     defaults:
@@ -18,7 +19,7 @@ jobs:
         shell: bash -l {0}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Create Environment
       uses: mamba-org/setup-micromamba@v2

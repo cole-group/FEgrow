@@ -3,12 +3,13 @@ channels:
   - conda-forge
 
 dependencies:
-  - python>=3.8
+  - python>=3.11 # ProDy currently limits this to <=3.12
   - notebook<7.0.0
   - pip
   - rdkit
   - prody
   - openff-toolkit>=0.13
+  - openff-amber-ff-ports>=2025.09.0 # older builds import pkg_resources, removed in setuptools 81
   - parmed
   - openmm>=7.5.0
   - openmm-ml

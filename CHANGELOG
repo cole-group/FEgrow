@@ -10,6 +10,7 @@ Authors: Mateusz K. Bieniek, Ben Cree, Rachael Pirie, Joshua T. Horton, Natalie 
  - `fix_receptor` can protonate the receptor with UCSF Chimera via `prefer_chimera_protonation=True`
     (Chimera must be on the PATH). A warning is shown when PDBFixer is used instead. (#109)
  - New dependencies: nnpops, pooch.
+ - Dropped support for Python < 3.11. Supported versions are 3.11 and 3.12.
 
 **version 2.0.2**
  - Ligand atoms can be frozen during the energy minimisation. (#108)
